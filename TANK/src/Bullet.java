@@ -14,6 +14,8 @@ public class Bullet{
 	private int dx;
 	private int dy;
 	
+	private final long test = 1000000000;
+	
 	private final int SPEED = 2;
 	
 	private BufferedImage image;
