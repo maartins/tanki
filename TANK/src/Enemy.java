@@ -2,8 +2,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.Random;
-
+import java.util.ArrayList;
 
 public class Enemy extends GameObject{
 	
@@ -17,7 +16,7 @@ public class Enemy extends GameObject{
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 	
-	Random rand;
+	private ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
 	
 	public Enemy(int posX, int posY){
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
@@ -27,11 +26,47 @@ public class Enemy extends GameObject{
 		
 		curDirection = UP;
 		preDirection = RIGHT;
-		
-		rand = new Random();
+		this.setImage(rotate(this.getImage(), curDirection, preDirection));
 	}
 	
 	public void control(){
+		collisionCheck();
+		
+		generateWayPoints();
+		
+		//preDirection = curDirection;
+		
+/*		if(MainPanel.tank.getX() < this.getX()){
+			curDirection = LEFT;
+			veloX = -1;
+			this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		}else if(MainPanel.tank.getX() > this.getX()){
+			curDirection = RIGHT;
+			veloX = 1;
+			this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		}else if(MainPanel.tank.getY() < this.getY()){
+			curDirection = UP;
+			veloY = -1;
+			this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		}else if(MainPanel.tank.getY() > this.getY()){
+			curDirection = DOWN;
+			veloY = 1;
+			this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		}else{
+			veloX = 0;
+		}
+		*/
+		this.setX(this.getX() + veloX);
+		this.setY(this.getY() + veloY);
+	}
+	
+	private void generateWayPoints(){
+		wayPoints.clear();
+		
+		
+	}
+	
+	private void collisionCheck(){
 		for(Block b : MainPanel.map1.getBlocks()){
 			if(this.getBounds().intersects(b.getBounds())){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
@@ -167,33 +202,7 @@ public class Enemy extends GameObject{
 		        }
 		    }
 		}
-		
-		preDirection = curDirection;
-		
-		if(MainPanel.tank.getX() < this.getX()){
-			curDirection = LEFT;
-			veloX = -1;
-			this.setImage(rotate(this.getImage(), curDirection, preDirection));
-		}else if(MainPanel.tank.getX() > this.getX()){
-			curDirection = RIGHT;
-			veloX = 1;
-			this.setImage(rotate(this.getImage(), curDirection, preDirection));
-		}else if(MainPanel.tank.getY() < this.getY()){
-			curDirection = UP;
-			veloY = -1;
-			this.setImage(rotate(this.getImage(), curDirection, preDirection));
-		}else if(MainPanel.tank.getY() > this.getY()){
-			curDirection = DOWN;
-			veloY = 1;
-			this.setImage(rotate(this.getImage(), curDirection, preDirection));
-		}else{
-			veloX = 0;
-		}
-		
-		this.setX(this.getX() + veloX);
-		this.setY(this.getY() + veloY);
 	}
-	
 	
 	private BufferedImage rotate(BufferedImage img, int cdir, int pdir){
 		AffineTransform transform = new AffineTransform();

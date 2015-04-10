@@ -8,12 +8,14 @@ import java.util.ArrayList;
 
 public class Map extends GameObject{
 	
-	private ArrayList<Block> blocks; 
+	private ArrayList<Block> blocks;
+	private ArrayList<NavigationTile> navTiles;
 	
 	public Map(){
 		super(0, 0, "Map");
 		
 		blocks = new ArrayList<Block>();
+		navTiles = new ArrayList<NavigationTile>();
 		
 		makeMap();
 	}
@@ -31,6 +33,8 @@ public class Map extends GameObject{
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
 						blocks.add(new Block(j * 32, i * 32));
+					}else if(c == ' '){
+						navTiles.add(new NavigationTile(j * 32, i * 32));
 					}
 					j++;
 				}
@@ -52,9 +56,19 @@ public class Map extends GameObject{
 				b.draw(g);
 			}
 		}
+		
+		if(!navTiles.isEmpty()){
+			for(NavigationTile n : navTiles){
+				n.draw(g);
+			}
+		}
 	}
 	
 	public ArrayList<Block> getBlocks(){
 		return blocks;
+	}
+	
+	public ArrayList<NavigationTile> getNavTiles(){
+		return navTiles;
 	}
 }
