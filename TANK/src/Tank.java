@@ -1,49 +1,46 @@
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
 
-
-public class Tank implements KeyListener{
-	private BufferedImage image;
-	
-	private int x;
-	private int y;
+public class Tank extends GameObject implements KeyListener, Runnable{
 	
 	private int veloX;
 	private int veloY;
-	
-	private boolean keyA;
-	private boolean keyD;
-	private boolean keyW;
-	private boolean keyS;
-	
-	private boolean keySPACE;
+	private int curDirection;
+	private int preDirection;
 	
 	private final int UP = 1;
 	private final int DOWN = 3;
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
+	private final int FPS = 60;
+
+	private long startTime;
+	private long curTime;
+	private long waitTime;
+	private long shootTime;
 	
-	private int curDirection;
-	private int preDirection;
+	private boolean keyA;
+	private boolean keyD;
+	private boolean keyW;
+	private boolean keyS;
+	private boolean keySPACE;
 	
-	private ArrayList<Bullet> ba;
+	private ArrayList<Bullet> bulletList;
+	private Thread thread;
 	
 	public Tank(int posX, int posY){
-		super();
+		super(posX, posY, "Tank", "Images//Test02.png");
 		
-		ba = new ArrayList<Bullet>();
-		
-		x = posX;
-		y = posY;
+		curTime = System.currentTimeMillis();
+		bulletList = new ArrayList<Bullet>();
 		
 		veloX = 0;
 		veloY = 0;
@@ -56,29 +53,159 @@ public class Tank implements KeyListener{
 		keySPACE = false;
 		
 		curDirection = UP;
-		preDirection = 0;
+		preDirection = RIGHT;
 		
-		try{
-			image = ImageIO.read(new File("Images//Test02.png"));
-		}catch(Exception e){
-			System.out.println("Failed to load image.");
+		if(thread == null){
+			thread = new Thread(this);
+			thread.start();
 		}
 	}
 	
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.drawImage(image, x, y, null);
+		g2d.drawImage(this.getImage(), this.getX(), this.getY(), null);
 		
-		if(!ba.isEmpty()){
-			for(Bullet b : ba){
-				b.draw(g);
-				b.move();
+		if(!bulletList.isEmpty()){
+			for(Bullet b : bulletList){
+				if(!b.isMaxDistReached()){
+					if(!b.isCollision()){
+						b.draw(g);
+					}
+				}
+			}
+		}
+		
+		//System.out.println(bulletList.size());
+	}
+	
+	@Override
+	public void run() {
+		while(true){
+			startTime = System.currentTimeMillis();
+			
+			if(!bulletList.isEmpty()){
+				for(Bullet b : bulletList){
+					if(!b.isMaxDistReached()){
+						if(!b.isCollision()){
+							b.move();
+						}
+					}
+				}
+				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
+					System.out.println("delete");
+					bulletList.remove(bulletList.size() - 1);
+				}
+			}
+			
+			
+			curTime = System.currentTimeMillis() - startTime;
+			waitTime = (1000 / FPS) - curTime;
+			try{
+				if(waitTime < 0){
+					Thread.sleep(5);
+				}else{
+					Thread.sleep(waitTime);
+				}
+			}catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 	}
 	
 	public void control(){
+		for(Block b : MainPanel.map1.getBlocks()){
+			if(this.getBounds().intersects(b.getBounds())){
+			    Rectangle insect = this.getBounds().intersection(b.getBounds());
+
+			    boolean vertical = false;
+			    boolean horizontal = false;
+			    boolean isLeft = false;
+			    boolean isTop = false;
+	
+			    if(insect.getX() == this.getX()){
+			        horizontal = true;
+			        isLeft = true;
+			    }else if(insect.getX() + insect.getWidth() == this.getX() + this.getWidth()){
+			        horizontal = true;
+			    }
+			    if(insect.getY() == this.getY()){
+			        vertical = true;
+			        isTop = true;
+			    }else if(insect.getY() + insect.getHeight() == this.getY() + this.getHeight()){
+			        vertical = true;
+			    }
+
+			    if(horizontal && vertical){
+			        if(insect.getWidth() > insect.getHeight()){
+			            horizontal = false;
+			        }else{
+			            vertical = false;
+			        }
+			    }
+				
+			    if(horizontal){
+			        if(isLeft){
+			        	this.setX(b.getX() + b.getWidth());
+			        }else{
+			        	this.setX(b.getX() - this.getWidth());
+			        }
+			    }else if(vertical){
+			        if(isTop){
+			        	this.setY(b.getY() + b.getHeight());
+			        }else{
+			        	this.setY(b.getY() - this.getHeight());
+			        }
+			    }
+			}
+		}
+		
+		for(Enemy e : MainPanel.enemies){
+			if(this.getBounds().intersects(e.getBounds())){
+			    Rectangle insect = this.getBounds().intersection(e.getBounds());
+
+			    boolean vertical = false;
+			    boolean horizontal = false;
+			    boolean isLeft = false;
+			    boolean isTop = false;
+	
+			    if(insect.getX() == this.getX()){
+			        horizontal = true;
+			        isLeft = true;
+			    }else if(insect.getX() + insect.getWidth() == this.getX() + this.getWidth()){
+			        horizontal = true;
+			    }
+			    if(insect.getY() == this.getY()){
+			        vertical = true;
+			        isTop = true;
+			    }else if(insect.getY() + insect.getHeight() == this.getY() + this.getHeight()){
+			        vertical = true;
+			    }
+
+			    if(horizontal && vertical){
+			        if(insect.getWidth() > insect.getHeight()){
+			            horizontal = false;
+			        }else{
+			            vertical = false;
+			        }
+			    }
+				
+			    if(horizontal){
+			        if(isLeft){
+			        	this.setX(e.getX() + e.getWidth());
+			        }else{
+			        	this.setX(e.getX() - this.getWidth());
+			        }
+			    }else if(vertical){
+			        if(isTop){
+			        	this.setY(e.getY() + e.getHeight());
+			        }else{
+			        	this.setY(e.getY() - this.getHeight());
+			        }
+			    }
+			}
+		}
+		
 		if(keyA == keyD){
 			veloX = 0;
 		}else if(keyA){
@@ -104,40 +231,37 @@ public class Tank implements KeyListener{
 		}
 		
 		if(keySPACE){
-			shoot();
-			System.out.println("SHOOT");
-		}else{
-			if(!ba.isEmpty() && ba.get(ba.size() - 1).hit()){
-				ba.remove(ba.size() - 1);
-				//System.out.println("REMOVE BULLET = " + ba.size());
+			if(System.currentTimeMillis() - shootTime > 250){
+				shootTime = System.currentTimeMillis();
+				shoot();
+				System.out.println("SHOOT");
 			}
 		}
 		
 		//System.out.println("cur dir: " + curDirection + " prev dir: " + preDirection);
 		
-		x += veloX;
-		y += veloY;
+		this.setX(this.getX() + veloX);
+		this.setY(this.getY() + veloY);
 	}
 	
-	public void shoot(){
+	private void shoot(){
 		int posX = 0, posY = 0;
 		if(curDirection == RIGHT){
-			posX = x + image.getWidth();
-			posY = y + (image.getHeight() / 2);
-			ba.add(new Bullet(posX, posY, curDirection));
-			//System.out.println("ADD BULLET" + ba.size());
+			posX = this.getX() + this.getWidth();
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new Bullet(posX + 1, posY, curDirection));
 		}else if(curDirection == UP){
-			posX = x + (image.getWidth() / 2);
-			posY = y - 2;
-			ba.add(new Bullet(posX, posY, curDirection));
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() - 2;
+			bulletList.add(new Bullet(posX, posY - 1, curDirection));
 		}else if(curDirection == LEFT){
-			posX = x - 2;
-			posY = y + (image.getHeight() / 2);
-			ba.add(new Bullet(posX, posY, curDirection));
+			posX = this.getX() - 2;
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new Bullet(posX - 1, posY, curDirection));
 		}else if(curDirection == DOWN){
-			posX = x + (image.getWidth() / 2);
-			posY = y + image.getHeight();
-			ba.add(new Bullet(posX, posY, curDirection));
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() + this.getHeight();
+			bulletList.add(new Bullet(posX, posY + 1, curDirection));
 		}
 	}
 	
@@ -158,7 +282,7 @@ public class Tank implements KeyListener{
 			if(curDirection != LEFT){
 				preDirection = curDirection;
 				curDirection = LEFT;
-				image = rotate(image, curDirection, preDirection);
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_D:
@@ -166,7 +290,7 @@ public class Tank implements KeyListener{
 			if(curDirection != RIGHT){
 				preDirection = curDirection;
 				curDirection = RIGHT;
-				image = rotate(image, curDirection, preDirection);
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_W:
@@ -174,7 +298,7 @@ public class Tank implements KeyListener{
 			if(curDirection != UP){
 				preDirection = curDirection;
 				curDirection = UP;
-				image = rotate(image, curDirection, preDirection);
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_S:
@@ -182,7 +306,7 @@ public class Tank implements KeyListener{
 			if(curDirection != DOWN){
 				preDirection = curDirection;
 				curDirection = DOWN;
-				image = rotate(image, curDirection, preDirection);
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_SPACE:
@@ -214,7 +338,5 @@ public class Tank implements KeyListener{
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		
-	}
+	public void keyTyped(KeyEvent e) {}
 }

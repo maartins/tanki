@@ -1,83 +1,74 @@
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
 
-
-
-public class Bullet{
+public class Bullet extends GameObject{
 	
-	private int x;
-	private int y;
 	private int dx;
 	private int dy;
-	
-	private final long test = 1000000000;
-	
-	private final int SPEED = 2;
-	
-	private BufferedImage image;
-	
 	private int curDirection;
 	
-	private final int MAXDIST = 150;
-	private boolean hit;
+	private final int SPEED = 5;
+	private final int MAXDIST = 500;
+	
+	private boolean maxDistReached;
+	private boolean collide;
 	
 	public Bullet(int posX, int posY, int curDir){
-		x = posX;
-		y = posY;
+		super(posX, posY, "Bullet", "Images//Test03.png");
 		dx = posX;
 		dy = posY;
 		
 		curDirection = curDir;
 		
-		hit = false;
+		maxDistReached = false;
 		
-		try{
-			image = ImageIO.read(new File("Images//Test03.png"));
-		}catch(Exception e){
-			System.out.println("Failed to load image.");
-		}
-	}
-	
-	public void draw(Graphics g){
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.drawImage(image, x, y, null);
+		collide = false;
 	}
 	
 	public void move(){
 		switch(curDirection){
 		case 0:
-			x += SPEED;
-			if(x - dx >= MAXDIST){
-				hit = true;
+			this.setX(this.getX() + SPEED);
+			if(this.getX() - dx >= MAXDIST){
+				maxDistReached = true;
 			}
 			break;
 		case 1:
-			y -= SPEED;
-			if(y - dy <= -MAXDIST){
-				hit = true;
+			this.setY(this.getY() - SPEED);
+			if(this.getY() - dy <= -MAXDIST){
+				maxDistReached = true;
 			}
 			break;
 		case 2:
-			x -= SPEED;
-			if(x - dx <= -MAXDIST){
-				hit = true;
+			this.setX(this.getX() - SPEED);
+			if(this.getX() - dx <= -MAXDIST){
+				maxDistReached = true;
 			}
 			break;
 		case 3:
-			y += SPEED;
-			if(y - dy >= MAXDIST){
-				hit = true;
+			this.setY(this.getY() + SPEED);
+			if(this.getY() - dy >= MAXDIST){
+				maxDistReached = true;
 			}
 			break;
 		}
+		
+		for(Block b : MainPanel.map1.getBlocks()){
+			if(this.getBounds().intersects(b.getBounds())){
+		    	collide = true;
+		    }
+		}
+		
+		for(Enemy e : MainPanel.enemies){
+			if(this.getBounds().intersects(e.getBounds())){
+		    	collide = true;
+		    }
+		}
 	}
 	
-	public boolean hit(){
-		return hit;
+	public boolean isMaxDistReached(){
+		return maxDistReached;
+	}
+	
+	public boolean isCollision(){
+		return collide;
 	}
 }
