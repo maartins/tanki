@@ -1,8 +1,31 @@
 
 public class Block extends GameObject{
 	
-	public Block(int posX, int posY){	
-		super(posX, posY, "Block", "Images//Block_Test01.png");
+	private boolean isWalkable;
+	private boolean isShootable;
+
+	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imgPath){	
+		super(posX, posY, name, imgPath);
+		
+		this.isWalkable = isWalkable;
+		this.isShootable = isShootable;
 	}
 	
+	
+	public boolean isWalkable() {
+		return isWalkable;
+	}
+
+	public void setWalkable(boolean isWalkable) {
+		this.isWalkable = isWalkable;
+	}
+	
+	public boolean isShootable() {
+		return isShootable;
+	}
+
+	public void setShootable(boolean isShootable) {
+		this.isShootable = isShootable;
+	}
+
 }

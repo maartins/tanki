@@ -16,8 +16,6 @@ public class Enemy extends GameObject{
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 	
-	private ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
-	
 	public Enemy(int posX, int posY){
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
 		
@@ -61,14 +59,12 @@ public class Enemy extends GameObject{
 	}
 	
 	private void generateWayPoints(){
-		wayPoints.clear();
-		
 		
 	}
 	
 	private void collisionCheck(){
 		for(Block b : MainPanel.map1.getBlocks()){
-			if(this.getBounds().intersects(b.getBounds())){
+			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
 
 			    boolean vertical = false;

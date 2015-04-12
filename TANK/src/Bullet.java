@@ -52,7 +52,7 @@ public class Bullet extends GameObject{
 		}
 		
 		for(Block b : MainPanel.map1.getBlocks()){
-			if(this.getBounds().intersects(b.getBounds())){
+			if(this.getBounds().intersects(b.getBounds()) && b.isShootable()){
 		    	collide = true;
 		    }
 		}

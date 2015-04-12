@@ -9,13 +9,14 @@ import java.util.ArrayList;
 public class Map extends GameObject{
 	
 	private ArrayList<Block> blocks;
-	private ArrayList<NavigationTile> navTiles;
+	private char[][] charmap;
 	
 	public Map(){
 		super(0, 0, "Map");
 		
 		blocks = new ArrayList<Block>();
-		navTiles = new ArrayList<NavigationTile>();
+		
+		charmap = new char[16][16];
 		
 		makeMap();
 	}
@@ -32,9 +33,11 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
-						blocks.add(new Block(j * 32, i * 32));
+						charmap[i][j] = '#';
+						blocks.add(new Wall(j * 32, i * 32));
 					}else if(c == ' '){
-						navTiles.add(new NavigationTile(j * 32, i * 32));
+						charmap[i][j] = ' ';
+						blocks.add(new Floor(j * 32, i * 32));
 					}
 					j++;
 				}
@@ -43,6 +46,14 @@ public class Map extends GameObject{
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		}
+		
+		
+		for(int i = 0; i < 16; i++){
+			for(int j = 0; j < 16; j++){
+				System.out.print(charmap[i][j]);
+			}
+			System.out.println();
 		}
 	}
 	
@@ -56,19 +67,9 @@ public class Map extends GameObject{
 				b.draw(g);
 			}
 		}
-		
-		if(!navTiles.isEmpty()){
-			for(NavigationTile n : navTiles){
-				n.draw(g);
-			}
-		}
 	}
 	
 	public ArrayList<Block> getBlocks(){
 		return blocks;
-	}
-	
-	public ArrayList<NavigationTile> getNavTiles(){
-		return navTiles;
 	}
 }
