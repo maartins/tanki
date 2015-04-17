@@ -74,9 +74,17 @@ public class GameObject {
 	public BufferedImage getImage() {
 		return image;
 	}
-
+	
 	public void setImage(BufferedImage image) {
 		this.image = image;
+	}
+	
+	public void setImage(String imagePath) {
+		try{
+			image = ImageIO.read(new File(imagePath));
+		}catch(IOException e){
+			System.out.println("Failed to load image.");
+		}
 	}
 
 	public String getName() {

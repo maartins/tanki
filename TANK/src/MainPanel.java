@@ -25,9 +25,10 @@ public class MainPanel extends JPanel implements Runnable{
 	public static Map map1;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
-	private Thread thread;
+	private ArrayList<Block> closedList = new ArrayList<Block>();
+	private ArrayList<Block> openList = new ArrayList<Block>();
 	
-	private JLabel positionLabel = new JLabel();
+	private Thread thread;
 	
 	public MainPanel(){
 		this.setPreferredSize(new Dimension(WWIDTH, WHEIGHT));
@@ -37,9 +38,6 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		
-		
-		positionLabel.setBounds(0, 0, 100, 15);
-		this.add(positionLabel);
 		map1 = new Map();
 		if(thread == null){
 			thread = new Thread(this);
@@ -51,10 +49,84 @@ public class MainPanel extends JPanel implements Runnable{
 		tank = new Tank(100, 100);
 		this.addKeyListener(tank);
 		
+		for(Block b : map1.getBlocks()){
+			if(b.getTileX() == tank.getPositionOnMap().getTileX() && b.getTileY() == tank.getPositionOnMap().getTileY()){
+				b.setImage("Images//Nav01.png");
+				closedList.add(b);
+			}
+		}
+		
 		enemies.add(new Enemy(300, 150));
 		//enemies.add(new Enemy(200, 150));
 		//enemies.add(new Enemy(200, 200));
 		//enemies.add(new Enemy(150, 200));
+		
+		for(Enemy e : enemies){
+			for(Block b : map1.getBlocks()){
+				if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY()){
+					b.setImage("Images//Nav01.png");
+					closedList.add(b);
+				}
+			}
+			for(Block b : map1.getBlocks()){
+				if(b.getTileX() == e.getPositionOnMap().getTileX() + 1 && b.getTileY() == e.getPositionOnMap().getTileY()){
+					int temp1 = closedList.get(0).getTileX() - b.getTileX();
+					if(temp1 < 0){
+						temp1 = -temp1;
+					}
+					int temp2 = closedList.get(0).getTileY() - b.getTileY();
+					if(temp2 < 0){
+						temp2 = -temp2;
+					}
+					b.setH(temp1 + temp2);
+					b.setImage("Images//Nav01.png");
+					openList.add(b);
+					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
+				}else if(b.getTileX() == e.getPositionOnMap().getTileX() - 1 && b.getTileY() == e.getPositionOnMap().getTileY()){
+					int temp1 = closedList.get(0).getTileX() - b.getTileX();
+					if(temp1 < 0){
+						temp1 = -temp1;
+					}
+					int temp2 = closedList.get(0).getTileY() - b.getTileY();
+					if(temp2 < 0){
+						temp2 = -temp2;
+					}
+					b.setH(temp1 + temp2);
+					b.setImage("Images//Nav01.png");
+					openList.add(b);
+					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
+				}else if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY() + 1){
+					int temp1 = closedList.get(0).getTileX() - b.getTileX();
+					if(temp1 < 0){
+						temp1 = -temp1;
+					}
+					int temp2 = closedList.get(0).getTileY() - b.getTileY();
+					if(temp2 < 0){
+						temp2 = -temp2;
+					}
+					b.setH(temp1 + temp2);
+					b.setImage("Images//Nav01.png");
+					openList.add(b);
+					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
+				}else if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY() - 1){
+					int temp1 = closedList.get(0).getTileX() - b.getTileX();
+					if(temp1 < 0){
+						temp1 = -temp1;
+					}
+					int temp2 = closedList.get(0).getTileY() - b.getTileY();
+					if(temp2 < 0){
+						temp2 = -temp2;
+					}
+					b.setH(temp1 + temp2);
+					b.setImage("Images//Nav01.png");
+					openList.add(b);
+					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
+				}
+			}
+		}
+		
+		// open list  // if H1  <= H2  add to closedlist
+		
 		
 		isRunning = true;
 	}
@@ -79,7 +151,9 @@ public class MainPanel extends JPanel implements Runnable{
 			
 			tank.control();
 			
-			positionLabel.setText(tank.getX() + " " + tank.getY());
+			for(Block b : map1.getBlocks()){
+				// check closed list +  add new path
+			}
 			
 			for(Enemy e : enemies){
 				e.control();

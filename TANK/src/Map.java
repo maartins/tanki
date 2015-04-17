@@ -15,7 +15,6 @@ public class Map extends GameObject{
 		super(0, 0, "Map");
 		
 		blocks = new ArrayList<Block>();
-		
 		charmap = new char[16][16];
 		
 		makeMap();
@@ -34,10 +33,10 @@ public class Map extends GameObject{
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
 						charmap[i][j] = '#';
-						blocks.add(new Wall(j * 32, i * 32));
+						blocks.add(new Wall(j * 32, i * 32, i, j));
 					}else if(c == ' '){
 						charmap[i][j] = ' ';
-						blocks.add(new Floor(j * 32, i * 32));
+						blocks.add(new Floor(j * 32, i * 32, i, j,"Floor" + i + " " + j));
 					}
 					j++;
 				}

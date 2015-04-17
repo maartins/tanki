@@ -30,7 +30,6 @@ public class Enemy extends GameObject{
 	public void control(){
 		collisionCheck();
 		
-		generateWayPoints();
 		
 		//preDirection = curDirection;
 		
@@ -58,8 +57,19 @@ public class Enemy extends GameObject{
 		this.setY(this.getY() + veloY);
 	}
 	
-	private void generateWayPoints(){
-		
+	public Block getPositionOnMap(){
+		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Test01.png");
+		int temp = 0;
+		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks().get(0).getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks().get(0).getY(), 2));
+		for(Block b : MainPanel.map1.getBlocks()){
+			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
+			if(temp < distance){
+				distance = temp;
+				closestTile = b;
+			}
+		}
+		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
+		return closestTile;
 	}
 	
 	private void collisionCheck(){
