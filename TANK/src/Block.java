@@ -1,22 +1,27 @@
 
 public class Block extends GameObject{
 	
-	private int h;
-	private int g;
-	private int X;
-	private int Y;
+	private int value;
+	private int tileX;
+	private int tileY;
 	
 	private boolean isWalkable;
 	private boolean isShootable;
 
+	private Block parent;
+
 	public Block(int posX, int posY, int tileX, int tileY, boolean isWalkable, boolean isShootable, String name, String imgPath){	
 		super(posX, posY, name, imgPath);
 		
-		X = tileX;
-		Y = tileY;
+		this.tileX = tileX;
+		this.tileY = tileY;
+		
+		value = 0;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
+		
+		parent = this;
 	}
 	
 	public boolean isWalkable() {
@@ -35,35 +40,39 @@ public class Block extends GameObject{
 		this.isShootable = isShootable;
 	}
 	
-	public int getH() {
-		return h;
+	public int getValue() {
+		return value;
 	}
 
-	public void setH(int h) {
-		this.h = h;
-	}
-
-	public int getG() {
-		return g;
-	}
-
-	public void setG(int g) {
-		this.g = g;
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	public int getTileX() {
-		return X;
+		return tileX;
 	}
 
 	public void setTileX(int x) {
-		X = x;
+		tileX = x;
 	}
 
 	public int getTileY() {
-		return Y;
+		return tileY;
 	}
 
 	public void setTileY(int y) {
-		Y = y;
+		tileY = y;
+	}
+	
+	public Block getParent() {
+		return parent;
+	}
+
+	public void setParent(Block parent) {
+		this.parent = parent;
+	}
+	
+	public String toString(){
+		return getName() + " x" + tileX + " y" + tileY + " h" + value; 
 	}
 }

@@ -116,20 +116,22 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	public Block getPositionOnMap(){
 		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Test01.png");
 		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks().get(0).getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks().get(0).getY(), 2));
-		for(Block b : MainPanel.map1.getBlocks()){
-			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-			if(temp < distance){
-				distance = temp;
-				closestTile = b;
+		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
+		for(Block[] bb : MainPanel.map1.getBlocks()){
+			for(Block b : bb){
+				temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
+				if(temp < distance){
+					distance = temp;
+					closestTile = b;
+				}
 			}
 		}
-		System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
+		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
 		return closestTile;
 	}
 	
 	public void control(){
-		for(Block b : MainPanel.map1.getBlocks()){
+		for(Block b : MainPanel.map1.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
 

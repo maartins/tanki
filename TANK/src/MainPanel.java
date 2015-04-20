@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
@@ -25,9 +26,6 @@ public class MainPanel extends JPanel implements Runnable{
 	public static Map map1;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
-	private ArrayList<Block> closedList = new ArrayList<Block>();
-	private ArrayList<Block> openList = new ArrayList<Block>();
-	
 	private Thread thread;
 	
 	public MainPanel(){
@@ -46,89 +44,16 @@ public class MainPanel extends JPanel implements Runnable{
 	}
 	
 	private void init(){
-		tank = new Tank(100, 100);
+		tank = new Tank(250, 400);
 		this.addKeyListener(tank);
-		
-		for(Block b : map1.getBlocks()){
-			if(b.getTileX() == tank.getPositionOnMap().getTileX() && b.getTileY() == tank.getPositionOnMap().getTileY()){
-				b.setImage("Images//Nav01.png");
-				closedList.add(b);
-			}
-		}
 		
 		enemies.add(new Enemy(300, 150));
 		//enemies.add(new Enemy(200, 150));
 		//enemies.add(new Enemy(200, 200));
 		//enemies.add(new Enemy(150, 200));
 		
-		for(Enemy e : enemies){
-			for(Block b : map1.getBlocks()){
-				if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY()){
-					b.setImage("Images//Nav01.png");
-					closedList.add(b);
-				}
-			}
-			for(Block b : map1.getBlocks()){
-				if(b.getTileX() == e.getPositionOnMap().getTileX() + 1 && b.getTileY() == e.getPositionOnMap().getTileY()){
-					int temp1 = closedList.get(0).getTileX() - b.getTileX();
-					if(temp1 < 0){
-						temp1 = -temp1;
-					}
-					int temp2 = closedList.get(0).getTileY() - b.getTileY();
-					if(temp2 < 0){
-						temp2 = -temp2;
-					}
-					b.setH(temp1 + temp2);
-					b.setImage("Images//Nav01.png");
-					openList.add(b);
-					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
-				}else if(b.getTileX() == e.getPositionOnMap().getTileX() - 1 && b.getTileY() == e.getPositionOnMap().getTileY()){
-					int temp1 = closedList.get(0).getTileX() - b.getTileX();
-					if(temp1 < 0){
-						temp1 = -temp1;
-					}
-					int temp2 = closedList.get(0).getTileY() - b.getTileY();
-					if(temp2 < 0){
-						temp2 = -temp2;
-					}
-					b.setH(temp1 + temp2);
-					b.setImage("Images//Nav01.png");
-					openList.add(b);
-					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
-				}else if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY() + 1){
-					int temp1 = closedList.get(0).getTileX() - b.getTileX();
-					if(temp1 < 0){
-						temp1 = -temp1;
-					}
-					int temp2 = closedList.get(0).getTileY() - b.getTileY();
-					if(temp2 < 0){
-						temp2 = -temp2;
-					}
-					b.setH(temp1 + temp2);
-					b.setImage("Images//Nav01.png");
-					openList.add(b);
-					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
-				}else if(b.getTileX() == e.getPositionOnMap().getTileX() && b.getTileY() == e.getPositionOnMap().getTileY() - 1){
-					int temp1 = closedList.get(0).getTileX() - b.getTileX();
-					if(temp1 < 0){
-						temp1 = -temp1;
-					}
-					int temp2 = closedList.get(0).getTileY() - b.getTileY();
-					if(temp2 < 0){
-						temp2 = -temp2;
-					}
-					b.setH(temp1 + temp2);
-					b.setImage("Images//Nav01.png");
-					openList.add(b);
-					System.out.println(b.getH() + " x" + b.getTileX() + " y" + b.getTileY());
-				}
-			}
-		}
-		
-		// open list  // if H1  <= H2  add to closedlist
-		
-		
 		isRunning = true;
+		
 	}
 	
 	@Override
@@ -151,12 +76,9 @@ public class MainPanel extends JPanel implements Runnable{
 			
 			tank.control();
 			
-			for(Block b : map1.getBlocks()){
-				// check closed list +  add new path
-			}
-			
 			for(Enemy e : enemies){
 				e.control();
+				e.pathing();
 			}
 			
 			this.repaint();
@@ -177,7 +99,7 @@ public class MainPanel extends JPanel implements Runnable{
             totalTime += (System.currentTimeMillis() - startTime);
             if (totalTime > 1000) {
                 long realFPS = (long) ((double) frameCount/ (double) totalTime * 1000.0);
-                System.out.println("fps: " + realFPS);
+                //System.out.println("fps: " + realFPS);
                 frameCount = 0;
                 totalTime = 0;
             }

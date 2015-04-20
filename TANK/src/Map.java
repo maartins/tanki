@@ -8,14 +8,14 @@ import java.util.ArrayList;
 
 public class Map extends GameObject{
 	
-	private ArrayList<Block> blocks;
-	private char[][] charmap;
+	private ArrayList<Block> blockList;
+	private Block[][] blocks;
 	
 	public Map(){
 		super(0, 0, "Map");
 		
-		blocks = new ArrayList<Block>();
-		charmap = new char[16][16];
+		blockList = new ArrayList<Block>();
+		blocks = new Block[16][16];
 		
 		makeMap();
 	}
@@ -32,11 +32,11 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
-						charmap[i][j] = '#';
-						blocks.add(new Wall(j * 32, i * 32, i, j));
+						blockList.add(new Wall(j * 32, i * 32, i, j));
+						blocks[i][j] = new Wall(j * 32, i * 32, i, j);
 					}else if(c == ' '){
-						charmap[i][j] = ' ';
-						blocks.add(new Floor(j * 32, i * 32, i, j,"Floor" + i + " " + j));
+						blockList.add(new Floor(j * 32, i * 32, i, j,"Floor"));
+						blocks[i][j] = new  Floor(j * 32, i * 32, i, j,"Floor");
 					}
 					j++;
 				}
@@ -46,14 +46,6 @@ public class Map extends GameObject{
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		
-		for(int i = 0; i < 16; i++){
-			for(int j = 0; j < 16; j++){
-				System.out.print(charmap[i][j]);
-			}
-			System.out.println();
-		}
 	}
 	
 	public void draw(Graphics g){
@@ -61,14 +53,23 @@ public class Map extends GameObject{
 		//g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		//g2d.drawImage(super.image, super.x, super.y, null);
 		
-		if(!blocks.isEmpty()){
-			for(Block b : blocks){
+		
+		//for(Block b : blockList){
+			//b.draw(g);
+		//}
+		
+		for(Block[] bb : blocks){
+			for(Block b : bb){
 				b.draw(g);
 			}
 		}
 	}
 	
-	public ArrayList<Block> getBlocks(){
+	public ArrayList<Block> getBlockList(){
+		return blockList;
+	}
+	
+	public Block[][] getBlocks(){
 		return blocks;
 	}
 }

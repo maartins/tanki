@@ -6,6 +6,7 @@ import javax.swing.*;
 public class Main{
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Tank");
+		frame.setLocation(20, 20);
 		frame.setResizable(false);
 		frame.setContentPane(new MainPanel());
 		frame.pack();

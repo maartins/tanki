@@ -16,6 +16,13 @@ public class Enemy extends GameObject{
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 	
+	private boolean isPathing;
+	private boolean isPathingStart;
+	private boolean isPathDone;
+	
+	private ArrayList<Block> closedList = new ArrayList<Block>();
+	private ArrayList<Block> openList = new ArrayList<Block>();
+	
 	public Enemy(int posX, int posY){
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
 		
@@ -25,6 +32,8 @@ public class Enemy extends GameObject{
 		curDirection = UP;
 		preDirection = RIGHT;
 		this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		
+		isPathingStart = true;
 	}
 	
 	public void control(){
@@ -57,15 +66,202 @@ public class Enemy extends GameObject{
 		this.setY(this.getY() + veloY);
 	}
 	
+	public void pathing(){
+		if(isPathingStart){
+			if(MainPanel.map1.getBlocks()[MainPanel.tank.getPositionOnMap().getTileX()][MainPanel.tank.getPositionOnMap().getTileY()].isWalkable()){
+				MainPanel.map1.getBlocks()[MainPanel.tank.getPositionOnMap().getTileX()][MainPanel.tank.getPositionOnMap().getTileY()].setImage("Images//Nav01.png");
+				closedList.add(MainPanel.map1.getBlocks()[MainPanel.tank.getPositionOnMap().getTileX()][MainPanel.tank.getPositionOnMap().getTileY()]);
+			}
+			
+			if(MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY()].isWalkable()){
+				MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY()].setImage("Images//Nav01.png");
+				closedList.add(MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY()]);
+			}
+			
+			if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()])){
+				if(MainPanel.map1.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()].isWalkable()){
+					Block tempb = MainPanel.map1.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()];
+					//System.out.println(tempb + " 1");
+					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX() + 1)) 
+								   + Math.abs(closedList.get(0).getTileY() - closedList.get(1).getTileY()))) + 10;
+					
+					tempb.setValue(temp);
+					tempb.setImage("Images//Nav01.png");
+					tempb.setParent(closedList.get(1));
+					openList.add(tempb);
+				}	
+			}
+			if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()])){
+				if(MainPanel.map1.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()].isWalkable()){
+					Block tempb = MainPanel.map1.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()];
+					//System.out.println(tempb + " 2");
+					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX() - 1)) 
+							   + Math.abs(closedList.get(0).getTileY() - closedList.get(1).getTileY()))) + 10;
+					
+					tempb.setValue(temp);
+					tempb.setImage("Images//Nav01.png");
+					tempb.setParent(closedList.get(1));
+					openList.add(tempb);
+				}
+			}
+			if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1])){
+				if(MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1].isWalkable()){
+					Block tempb = MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1];
+					//System.out.println(tempb + " 3");
+					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX())) 
+							   + Math.abs(closedList.get(0).getTileY() - (closedList.get(1).getTileY() + 1)))) + 10;
+					
+					tempb.setValue(temp);
+					tempb.setImage("Images//Nav01.png");
+					tempb.setParent(closedList.get(1));
+					openList.add(tempb);
+				}
+			}
+			if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1])){
+				if(MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1].isWalkable()){
+					Block tempb = MainPanel.map1.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1];
+					//System.out.println(tempb + " 4");
+					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX())) 
+							   + Math.abs(closedList.get(0).getTileY() - (closedList.get(1).getTileY() - 1)))) + 10;
+					
+					tempb.setValue(temp);
+					tempb.setImage("Images//Nav01.png");
+					tempb.setParent(closedList.get(1));
+					openList.add(tempb);
+				}
+			}
+			
+			
+			
+			Block tempBlock = openList.get(0);
+			for(Block b : openList){
+				if(b.getValue() <= tempBlock.getValue()){
+					tempBlock = b;
+				}
+			}
+			
+			tempBlock.setImage("Images//Test03.png");
+			closedList.add(tempBlock);
+			
+			openList.clear();
+			
+			isPathing = true;
+			isPathingStart = false;
+		}
+		
+		if(isPathing){
+			for(int i = 2; i < closedList.size(); i++){
+				if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()])){
+					if(MainPanel.map1.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()].isWalkable()){
+						Block tempb = MainPanel.map1.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()];
+						//System.out.println(tempb + " 1");
+						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX() + 1)) 
+								   + Math.abs(closedList.get(0).getTileY() - closedList.get(i).getTileY()))) + 10;
+						
+						tempb.setValue(temp);
+						tempb.setImage("Images//Nav01.png");
+						tempb.setParent(closedList.get(i));
+						openList.add(tempb);
+					}	
+				}
+				if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()])){
+					if(MainPanel.map1.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()].isWalkable()){
+						Block tempb = MainPanel.map1.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()];
+						//System.out.println(tempb + " 2");
+						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX() - 1)) 
+								   + Math.abs(closedList.get(0).getTileY() - closedList.get(i).getTileY()))) + 10;
+						
+						tempb.setValue(temp);
+						tempb.setImage("Images//Nav01.png");
+						tempb.setParent(closedList.get(i));
+						openList.add(tempb);
+					}
+				}
+				if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1])){
+					if(MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1].isWalkable()){
+						Block tempb = MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1];
+						//System.out.println(tempb + " 3");
+						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX())) 
+								   + Math.abs(closedList.get(0).getTileY() - (closedList.get(i).getTileY() + 1)))) + 10;
+						
+						tempb.setValue(temp);
+						tempb.setImage("Images//Nav01.png");
+						tempb.setParent(closedList.get(i));
+						openList.add(tempb);
+					}
+				}
+				if(!closedList.contains(MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1])){
+					if(MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1].isWalkable()){
+						Block tempb = MainPanel.map1.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1];
+						//System.out.println(tempb + " 4");
+						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX())) 
+								   + Math.abs(closedList.get(0).getTileY() - (closedList.get(i).getTileY() - 1)))) + 10;
+						
+						tempb.setValue(temp);
+						tempb.setImage("Images//Nav01.png");
+						tempb.setParent(closedList.get(i));
+						openList.add(tempb);
+					}
+				}				
+			}
+			
+		
+			
+			
+		    Block tempBlock = openList.get(0);
+			for(Block b : openList){
+				if(b.getValue() <= tempBlock.getValue()){
+					tempBlock = b;
+				}
+			}
+			tempBlock.setImage("Images//Test03.png");
+			closedList.add(tempBlock);
+			
+			openList.clear();
+			
+			if(MainPanel.map1.getBlocks()[closedList.get(0).getTileX() + 1][closedList.get(0).getTileY()].equals(tempBlock)){
+				isPathing = false;
+				isPathDone = false;
+			}else if(MainPanel.map1.getBlocks()[closedList.get(0).getTileX() - 1][closedList.get(0).getTileY()].equals(tempBlock)){
+				isPathing = false;
+				isPathDone = false;
+			}else if(MainPanel.map1.getBlocks()[closedList.get(0).getTileX()][closedList.get(0).getTileY() + 1].equals(tempBlock)){
+				isPathing = false;
+				isPathDone = false;
+			}else if(MainPanel.map1.getBlocks()[closedList.get(0).getTileX()][closedList.get(0).getTileY() - 1].equals(tempBlock)){
+				isPathing = false;
+				isPathDone = false;
+			}
+		}else{
+			if(!isPathDone){
+				for(int i = closedList.size() - 1; i > 0; i--){
+					closedList.get(i).getParent().setImage("Images//Test02.png");
+					
+					//System.out.println(closedList.get(i).getParent());
+				}
+				isPathDone = true;
+			}
+			
+			if(MainPanel.tank.getPositionOnMap().getTileX() != closedList.get(0).getTileX() || MainPanel.tank.getPositionOnMap().getTileY() != closedList.get(0).getTileY()){
+				closedList.clear();
+				openList.clear();
+				
+				isPathingStart = true;
+			}
+		}
+	}
+	
 	public Block getPositionOnMap(){
 		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Test01.png");
 		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks().get(0).getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks().get(0).getY(), 2));
-		for(Block b : MainPanel.map1.getBlocks()){
-			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-			if(temp < distance){
-				distance = temp;
-				closestTile = b;
+		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
+		for(Block[] bb : MainPanel.map1.getBlocks()){
+			for(Block b : bb){
+				temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
+				if(temp < distance){
+					distance = temp;
+					closestTile = b;
+				}
 			}
 		}
 		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
@@ -73,7 +269,7 @@ public class Enemy extends GameObject{
 	}
 	
 	private void collisionCheck(){
-		for(Block b : MainPanel.map1.getBlocks()){
+		for(Block b : MainPanel.map1.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
 
