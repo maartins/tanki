@@ -21,7 +21,7 @@ public class Block extends GameObject{
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		
-		parent = this;
+		parent = null;
 	}
 	
 	public boolean isWalkable() {
@@ -70,6 +70,11 @@ public class Block extends GameObject{
 
 	public void setParent(Block parent) {
 		this.parent = parent;
+	}
+	
+	public void reset(){
+		value = 0;
+		parent = null;
 	}
 	
 	public String toString(){

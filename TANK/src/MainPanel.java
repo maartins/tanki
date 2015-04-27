@@ -44,7 +44,7 @@ public class MainPanel extends JPanel implements Runnable{
 	}
 	
 	private void init(){
-		tank = new Tank(250, 400);
+		tank = new Tank(100, 400);
 		this.addKeyListener(tank);
 		
 		enemies.add(new Enemy(300, 150));
