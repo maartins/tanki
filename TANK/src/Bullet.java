@@ -59,9 +59,15 @@ public class Bullet extends GameObject{
 		
 		for(Enemy e : MainPanel.enemies){
 			if(this.getBounds().intersects(e.getBounds())){
+				e.damage();
 		    	collide = true;
 		    }
 		}
+		
+		if(this.getBounds().intersects(MainPanel.tank.getBounds())){
+			MainPanel.tank.damage();
+	    	collide = true;
+	    }
 	}
 	
 	public boolean isMaxDistReached(){

@@ -1,9 +1,11 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Enemy extends GameObject{
 	
@@ -11,7 +13,9 @@ public class Enemy extends GameObject{
 	private int veloY;
 	private int curDirection;
 	private int preDirection;
+	private int curHp;
 	
+	private final int maxHp = 3;
 	private final int UP = 1;
 	private final int DOWN = 3;
 	private final int LEFT = 2;
@@ -28,6 +32,8 @@ public class Enemy extends GameObject{
 	public Enemy(int posX, int posY){
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
 		
+		curHp = maxHp;
+		
 		veloX = 0;
 		veloY = 0;
 		
@@ -43,41 +49,72 @@ public class Enemy extends GameObject{
 	}
 	
 	public void control(){
+		//collisionCheck();
+		
 		if(!navList.isEmpty()){
-			System.out.println("Moving");
+			//System.out.println("Moving");
 			
 			preDirection = curDirection;
 			
-			if(navList.get(navList.size() - 1).getX() < this.getX()){
-				curDirection = LEFT;
-				veloX = -1;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() > this.getX()){
-				curDirection = RIGHT;
-				veloX = 1;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() < this.getY()){
-				curDirection = UP;
-				veloY = -1;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() > this.getY()){
-				curDirection = DOWN;
-				veloY = 1;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() == this.getX() && navList.get(navList.size() - 1).getY() == this.getY()){
-				veloX = 0;
-				veloY = 0;
-				navList.remove(navList.size() - 1);
-			}else{
-				veloX = 0;
-				veloY = 0;
-			}
+			//if(targeting()){
+				//for(Block b : navList){
+				//	b.reset();
+			//	}
+			//	navList.clear();
+			//	
+			//	veloX = 0;
+			//	veloY = 0;
+			//	
+			//	System.out.println("TARGETED");
+			//}else{
+				//System.out.println("Going for: " + navList.get(navList.size() - 1));
+				if(navList.get(navList.size() - 1).getX() < this.getX()){
+					curDirection = LEFT;
+					veloX = -1;
+					this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				}else if(navList.get(navList.size() - 1).getX() > this.getX()){
+					curDirection = RIGHT;
+					veloX = 1;
+					this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				}else if(navList.get(navList.size() - 1).getY() < this.getY()){
+					curDirection = UP;
+					veloY = -1;
+					this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				}else if(navList.get(navList.size() - 1).getY() > this.getY()){
+					curDirection = DOWN;
+					veloY = 1;
+					this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				}else if(navList.get(navList.size() - 1).getX() == this.getX() && navList.get(navList.size() - 1).getY() == this.getY()){
+					veloX = 0;
+					veloY = 0;
+					navList.get(navList.size() - 1).reset();
+					navList.remove(navList.size() - 1);
+					//System.out.println("TILE REACHED");
+				}
+			//}
 		}
-		
-		collisionCheck();
 		
 		this.setX(this.getX() + veloX);
 		this.setY(this.getY() + veloY);
+	}
+	
+	private boolean targeting(){
+		Block top = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX() + 1][this.getPositionOnMap().getTileY()];
+		Block bot = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX() - 1][this.getPositionOnMap().getTileY()];
+		Block left = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY() + 1];
+		Block right = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY() - 1];
+		
+		if(top.equals(MainPanel.tank)){
+			return true;
+		}else if(bot.equals(MainPanel.tank)){
+			return true;
+		}else if(left.equals(MainPanel.tank)){
+			return true;
+		}else if(right.equals(MainPanel.tank)){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	public void pathing(){
@@ -86,6 +123,9 @@ public class Enemy extends GameObject{
 		Block enemyPos = this.getPositionOnMap();
 		
 		if(isPathingStart){
+			//System.out.println("PATHING START   size of closed " + closedList.size());
+			//System.out.println("PATHING START   size of open   " + openList.size());
+			//System.out.println("PATHING START   size of nav    " + navList.size());
 			for(Block b : navList){
 				b.reset();
 			}
@@ -176,6 +216,9 @@ public class Enemy extends GameObject{
 		}
 		
 		if(isPathing){
+			//System.out.println("PATHING   size of closed " + closedList.size());
+			//System.out.println("PATHING   size of open   " + openList.size());
+			//System.out.println("PATHING   size of nav    " + navList.size());
 			for(int i = 2; i < closedList.size(); i++){
 				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()])){
 					if(mainMap.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()].isWalkable()){
@@ -189,6 +232,8 @@ public class Enemy extends GameObject{
 						if(tempb.getParent() == null)
 							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
 						openList.add(tempb);
+						
+						//System.out.println("U adding - " + tempb);
 					}	
 				}
 				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()])){
@@ -203,6 +248,8 @@ public class Enemy extends GameObject{
 						if(tempb.getParent() == null)
 							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
 						openList.add(tempb);
+						
+						//System.out.println("D adding - " + tempb);
 					}
 				}
 				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1])){
@@ -217,6 +264,8 @@ public class Enemy extends GameObject{
 						if(tempb.getParent() == null)
 							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
 						openList.add(tempb);
+						
+						//System.out.println("L adding - " + tempb);
 					}
 				}
 				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1])){
@@ -231,6 +280,8 @@ public class Enemy extends GameObject{
 						if(tempb.getParent() == null)
 							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
 						openList.add(tempb);
+						
+						//System.out.println("R adding - " + tempb);
 					}
 				}				
 			}
@@ -238,6 +289,7 @@ public class Enemy extends GameObject{
 		
 			
 			if(!openList.isEmpty()){
+				//System.out.println("CALCULATE BLOCK WIEGHT");
 			    Block tempBlock = openList.get(0);
 				for(Block b : openList){
 					if(b.getValue() <= tempBlock.getValue()){
@@ -250,76 +302,70 @@ public class Enemy extends GameObject{
 				
 				openList.clear();
 				
-				
-				if(mainMap.getBlocks()[closedList.get(0).getTileX() + 1][closedList.get(0).getTileY()].equals(tempBlock)){
+				if(tempBlock.getTileX() + 1 == tankPos.getTileX() && tempBlock.getTileY() == tankPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
-				}else if(mainMap.getBlocks()[closedList.get(0).getTileX() - 1][closedList.get(0).getTileY()].equals(tempBlock)){
+					//System.out.println("PATHING DONE");
+				}else if(tempBlock.getTileX() - 1 == tankPos.getTileX() && tempBlock.getTileY() == tankPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
-				}else if(mainMap.getBlocks()[closedList.get(0).getTileX()][closedList.get(0).getTileY() + 1].equals(tempBlock)){
+					//System.out.println("PATHING DONE");
+				}else if(tempBlock.getTileY() + 1 == tankPos.getTileY() && tempBlock.getTileX() == tankPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
-				}else if(mainMap.getBlocks()[closedList.get(0).getTileX()][closedList.get(0).getTileY() - 1].equals(tempBlock)){
+					//System.out.println("PATHING DONE");
+				}else if(tempBlock.getTileY() - 1 == tankPos.getTileY() && tempBlock.getTileX() == tankPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
+					//System.out.println("PATHING DONE");
 				}
 			}
 		}else{
 			if(!isPathDone){
+				navList.add(closedList.get(closedList.size() - 1));
+				
 				for(int i = closedList.size() - 1; i > 0; i--){
 					if(closedList.get(i).getParent() == null){
-						navList.add(closedList.get(i));
 						break;
 					}else{	
 						if(closedList.get(i).getParent().equals(enemyPos)){
 							break;
 						}else{
+							//System.out.println("CREATING NAV   size of closed " + closedList.size());
+							//System.out.println("CREATING NAV   size of open   " + openList.size());
+							//System.out.println("CREATING NAV   size of nav    " + navList.size());
 							//closedList.get(i).getParent().setImage("Images//Test02.png");
 							
 							//System.out.println(closedList.get(i) + " -> " +closedList.get(i).getParent());
 							navList.add(closedList.get(i).getParent());
-							//Collections.reverse(navList);
 						}
 					}
 				}
+				//System.out.println("NAV LIST DONE");
 				isPathDone = true;
 			}
+		}
+		
+		if(tankPos.getTileX() != closedList.get(0).getTileX() || tankPos.getTileY() != closedList.get(0).getTileY()){
+			for(Block b : closedList){
+				b.reset();
+			}
+			for(Block b : openList){
+				b.reset();
+			}
 			
-			if(tankPos.getTileX() != closedList.get(0).getTileX() || tankPos.getTileY() != closedList.get(0).getTileY()){
-				for(Block b : closedList){
-					b.reset();
-				}
-				for(Block b : openList){
-					b.reset();
-				}
-				
-				closedList.clear();
-				openList.clear();
-				
-				isPathingStart = true;
-			}
+			closedList.clear();
+			openList.clear();
+			
+			isPathingStart = true;
+			
+			//System.out.println("RESET   size of closed " + closedList.size());
+			//System.out.println("RESET   size of open   " + openList.size());
+			//System.out.println("RESET   size of nav    " + navList.size());
 		}
 	}
 	
-	public Block getPositionOnMap(){
-		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Test01.png");
-		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
-		for(Block[] bb : MainPanel.map1.getBlocks()){
-			for(Block b : bb){
-				temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-				if(temp < distance){
-					distance = temp;
-					closestTile = b;
-				}
-			}
-		}
-		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
-		return closestTile;
-	}
-	
-	private void collisionCheck(){
+	public void collisionCheck(){
 		for(Block b : MainPanel.map1.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
@@ -356,16 +402,12 @@ public class Enemy extends GameObject{
 			        }else{
 			        	this.setX(b.getX() - this.getWidth());
 			        }
-			        
-			        veloX = 0;
 			    }else if(vertical){
 			        if(isTop){
 			        	this.setY(b.getY() + b.getHeight());
 			        }else{
 			        	this.setY(b.getY() - this.getHeight());
 			        }
-			        
-			        veloY = 0;
 			    }
 			}
 		}
@@ -406,16 +448,12 @@ public class Enemy extends GameObject{
 			        }else{
 			        	this.setX(e.getX() - this.getWidth());
 			        }
-			        
-			        veloX = 0;
 			    }else if(vertical){
 			        if(isTop){
 			        	this.setY(e.getY() + e.getHeight());
 			        }else{
 			        	this.setY(e.getY() - this.getHeight());
 			        }
-			        
-			        veloY = 0;
 			    }
 			}
 		}
@@ -455,25 +493,27 @@ public class Enemy extends GameObject{
 		        }else{
 		        	this.setX(MainPanel.tank.getX() - this.getWidth());
 		        }
-		        
-		        veloX = 0;
 		    }else if(vertical){
 		        if(isTop){
 		        	this.setY(MainPanel.tank.getY() + MainPanel.tank.getHeight());
 		        }else{
 		        	this.setY(MainPanel.tank.getY() - this.getHeight());
 		        }
-		        
-		        veloY = 0;
 		    }
 		}
 	}
 	
-	private BufferedImage rotate(BufferedImage img, int cdir, int pdir){
-		AffineTransform transform = new AffineTransform();
-	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth()/2, img.getHeight()/2);
-	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-	    img = op.filter(img, null);
-	    return img;
+	public void damage(){
+		curHp--;
+	}
+	
+	public boolean isDead(){
+		if(curHp <= 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }
+
+

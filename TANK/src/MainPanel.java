@@ -10,8 +10,6 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
 	
-	private final int WWIDTH = 512;
-	private final int WHEIGHT = 512;
 	private final int FPS = 60;
 
 	private long startTime;
@@ -26,10 +24,11 @@ public class MainPanel extends JPanel implements Runnable{
 	public static Map map1;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
+	private ArrayList<Enemy> deadList = new ArrayList<Enemy>();
+	
 	private Thread thread;
 	
 	public MainPanel(){
-		this.setPreferredSize(new Dimension(WWIDTH, WHEIGHT));
 		this.setLayout(null);
 		
 		this.setFocusable(true);
@@ -37,6 +36,7 @@ public class MainPanel extends JPanel implements Runnable{
 		this.setDoubleBuffered(true);
 		
 		map1 = new Map();
+		
 		if(thread == null){
 			thread = new Thread(this);
 			thread.start();
@@ -48,6 +48,7 @@ public class MainPanel extends JPanel implements Runnable{
 		this.addKeyListener(tank);
 		
 		enemies.add(new Enemy(300, 150));
+		enemies.add(new Enemy(200, 150));
 		//enemies.add(new Enemy(200, 150));
 		//enemies.add(new Enemy(200, 200));
 		//enemies.add(new Enemy(150, 200));
@@ -75,10 +76,26 @@ public class MainPanel extends JPanel implements Runnable{
 			Toolkit.getDefaultToolkit().sync();
 			
 			tank.control();
+			tank.collisionCheck();
 			
-			for(Enemy e : enemies){
-				e.control();
-				e.pathing();
+			if(!enemies.isEmpty()){
+				for(Enemy e : enemies){
+					e.pathing();
+					e.control();
+					e.collisionCheck();
+					
+					if(e.isDead()){
+						tank.setScore(tank.getScore() + 20);
+						deadList.add(e);
+					}
+				}
+				
+				for(Enemy e : deadList){
+					enemies.remove(e);
+				}
+				if(!deadList.isEmpty()){
+					deadList.clear();
+				}
 			}
 			
 			this.repaint();

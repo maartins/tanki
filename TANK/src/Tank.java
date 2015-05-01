@@ -15,7 +15,10 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private int veloY;
 	private int curDirection;
 	private int preDirection;
-	
+	private int curHp;
+	private int score;
+
+	private final int maxHp = 3;
 	private final int UP = 1;
 	private final int DOWN = 3;
 	private final int LEFT = 2;
@@ -40,6 +43,11 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		super(posX, posY, "Tank", "Images//Test02.png");
 		
 		curTime = System.currentTimeMillis();
+		
+		curHp = maxHp;
+		
+		score = 0;
+				
 		bulletList = new ArrayList<Bullet>();
 		
 		veloX = 0;
@@ -59,6 +67,22 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			thread = new Thread(this);
 			thread.start();
 		}
+	}
+	
+	public int getCurHp() {
+		return curHp;
+	}
+
+	public void setCurHp(int curHp) {
+		this.curHp = curHp;
+	}
+	
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
 	}
 	
 	public void draw(Graphics g){
@@ -93,7 +117,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 					}
 				}
 				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
-					System.out.println("delete");
+					//System.out.println("delete");
 					bulletList.remove(bulletList.size() - 1);
 				}
 			}
@@ -113,24 +137,48 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		}
 	}
 	
-	public Block getPositionOnMap(){
-		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Test01.png");
-		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
-		for(Block[] bb : MainPanel.map1.getBlocks()){
-			for(Block b : bb){
-				temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-				if(temp < distance){
-					distance = temp;
-					closestTile = b;
-				}
+	public void control(){
+		collisionCheck();
+		
+		if(keyA == keyD){
+			veloX = 0;
+		}else if(keyA){
+			veloX = -1;
+		}else if(keyD){
+			veloX = 1;
+		}
+		
+		if(keyW == keyS){
+			veloY = 0;
+		}else if(keyW){
+			veloY = -1;
+		}else if(keyS){
+			veloY = 1;
+		}
+		
+		if(keyA && keyS || keyA && keyW){
+			veloX = 0;
+			veloY = 0;
+		}else if(keyD && keyS || keyD && keyW){
+			veloX = 0;
+			veloY = 0;			
+		}
+		
+		if(keySPACE){
+			if(System.currentTimeMillis() - shootTime > 250){
+				shootTime = System.currentTimeMillis();
+				shoot();
+				//System.out.println("SHOOT");
 			}
 		}
-		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
-		return closestTile;
+		
+		//System.out.println("cur dir: " + curDirection + " prev dir: " + preDirection);
+		
+		this.setX(this.getX() + veloX);
+		this.setY(this.getY() + veloY);
 	}
 	
-	public void control(){
+	public void collisionCheck(){
 		for(Block b : MainPanel.map1.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
@@ -222,43 +270,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			    }
 			}
 		}
-		
-		if(keyA == keyD){
-			veloX = 0;
-		}else if(keyA){
-			veloX = -1;
-		}else if(keyD){
-			veloX = 1;
-		}
-		
-		if(keyW == keyS){
-			veloY = 0;
-		}else if(keyW){
-			veloY = -1;
-		}else if(keyS){
-			veloY = 1;
-		}
-		
-		if(keyA && keyS || keyA && keyW){
-			veloX = 0;
-			veloY = 0;
-		}else if(keyD && keyS || keyD && keyW){
-			veloX = 0;
-			veloY = 0;			
-		}
-		
-		if(keySPACE){
-			if(System.currentTimeMillis() - shootTime > 250){
-				shootTime = System.currentTimeMillis();
-				shoot();
-				System.out.println("SHOOT");
-			}
-		}
-		
-		//System.out.println("cur dir: " + curDirection + " prev dir: " + preDirection);
-		
-		this.setX(this.getX() + veloX);
-		this.setY(this.getY() + veloY);
 	}
 	
 	private void shoot(){
@@ -281,15 +292,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			bulletList.add(new Bullet(posX, posY + 1, curDirection));
 		}
 	}
-	
-	private BufferedImage rotate(BufferedImage img, int cdir, int pdir){
-		AffineTransform transform = new AffineTransform();
-	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth()/2, img.getHeight()/2);
-	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-	    img = op.filter(img, null);
-	    return img;
-	}
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
@@ -356,4 +359,16 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 
 	@Override
 	public void keyTyped(KeyEvent e) {}
+	
+	public void damage(){
+		curHp--;
+	}
+	
+	public boolean isDead(){
+		if(curHp <= 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
