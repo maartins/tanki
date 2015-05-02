@@ -2,12 +2,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Enemy extends GameObject{
+public class Enemy extends GameObject implements Runnable{
 	
 	private int veloX;
 	private int veloY;
@@ -21,6 +18,11 @@ public class Enemy extends GameObject{
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 	
+	private long startTime;
+	private long curTime;
+	private long waitTime;
+	private long shootTime;
+	
 	private boolean isPathing;
 	private boolean isPathingStart;
 	private boolean isPathDone;
@@ -28,9 +30,14 @@ public class Enemy extends GameObject{
 	private ArrayList<Block> closedList;
 	private ArrayList<Block> openList;
 	private ArrayList<Block> navList;
+	private ArrayList<Bullet> bulletList;
+	
+	private Thread thread;
 	
 	public Enemy(int posX, int posY){
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
+		
+		curTime = System.currentTimeMillis();
 		
 		curHp = maxHp;
 		
@@ -44,8 +51,90 @@ public class Enemy extends GameObject{
 		closedList = new ArrayList<Block>();
 		openList = new ArrayList<Block>();
 		navList = new ArrayList<Block>();
+		bulletList = new ArrayList<Bullet>();
 		
 		isPathingStart = true;
+		
+		if(thread == null){
+			thread = new Thread(this);
+			thread.start();
+		}
+	}
+	
+	public void draw(Graphics g){
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.drawImage(this.getImage(), this.getX(), this.getY(), null);
+		
+		if(!bulletList.isEmpty()){
+			for(Bullet b : bulletList){
+				if(!b.isMaxDistReached()){
+					if(!b.isCollision()){
+						b.draw(g);
+					}
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void run() {
+		while(true){
+			startTime = System.currentTimeMillis();
+			
+			if(System.currentTimeMillis() - shootTime > 1250){
+				shootTime = System.currentTimeMillis();
+				shoot();
+			}
+			
+			if(!bulletList.isEmpty()){
+				for(Bullet b : bulletList){
+					if(!b.isMaxDistReached()){
+						if(!b.isCollision()){
+							b.move();
+						}
+					}
+				}
+				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
+					//System.out.println("delete");
+					bulletList.remove(bulletList.size() - 1);
+				}
+			}
+			
+			
+			curTime = System.currentTimeMillis() - startTime;
+			waitTime = (1000 / 60) - curTime;
+			try{
+				if(waitTime < 0){
+					Thread.sleep(5);
+				}else{
+					Thread.sleep(waitTime);
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void shoot(){
+		int posX = 0, posY = 0;
+		if(curDirection == RIGHT){
+			posX = this.getX() + this.getWidth();
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new Bullet(posX + 1, posY, curDirection));
+		}else if(curDirection == UP){
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() - 2;
+			bulletList.add(new Bullet(posX, posY - 1, curDirection));
+		}else if(curDirection == LEFT){
+			posX = this.getX() - 2;
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new Bullet(posX - 1, posY, curDirection));
+		}else if(curDirection == DOWN){
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() + this.getHeight();
+			bulletList.add(new Bullet(posX, posY + 1, curDirection));
+		}
 	}
 	
 	public void control(){
@@ -96,25 +185,6 @@ public class Enemy extends GameObject{
 		
 		this.setX(this.getX() + veloX);
 		this.setY(this.getY() + veloY);
-	}
-	
-	private boolean targeting(){
-		Block top = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX() + 1][this.getPositionOnMap().getTileY()];
-		Block bot = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX() - 1][this.getPositionOnMap().getTileY()];
-		Block left = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY() + 1];
-		Block right = MainPanel.map1.getBlocks()[this.getPositionOnMap().getTileX()][this.getPositionOnMap().getTileY() - 1];
-		
-		if(top.equals(MainPanel.tank)){
-			return true;
-		}else if(bot.equals(MainPanel.tank)){
-			return true;
-		}else if(left.equals(MainPanel.tank)){
-			return true;
-		}else if(right.equals(MainPanel.tank)){
-			return true;
-		}else{
-			return false;
-		}
 	}
 	
 	public void pathing(){

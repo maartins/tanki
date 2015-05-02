@@ -59,6 +59,7 @@ public class Bullet extends GameObject{
 		
 		for(Enemy e : MainPanel.enemies){
 			if(this.getBounds().intersects(e.getBounds())){
+				System.out.println("Enemy took damage");
 				e.damage();
 		    	collide = true;
 		    }

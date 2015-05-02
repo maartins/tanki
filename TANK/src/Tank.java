@@ -4,9 +4,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Tank extends GameObject implements KeyListener, Runnable{
@@ -23,7 +20,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private final int DOWN = 3;
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
-	private final int FPS = 60;
 
 	private long startTime;
 	private long curTime;
@@ -37,6 +33,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private boolean keySPACE;
 	
 	private ArrayList<Bullet> bulletList;
+	
 	private Thread thread;
 	
 	public Tank(int posX, int posY){
@@ -124,7 +121,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			
 			
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / FPS) - curTime;
+			waitTime = (1000 / 60) - curTime;
 			try{
 				if(waitTime < 0){
 					Thread.sleep(5);

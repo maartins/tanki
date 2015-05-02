@@ -1,6 +1,4 @@
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,11 +30,14 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
-						blockList.add(new Wall(j * 32, i * 32, i, j));
-						blocks[i][j] = new Wall(j * 32, i * 32, i, j);
+						blockList.add(new Wall(j * 32, i * 32));
+						blocks[j][i] = new Wall(j * 32, i * 32);
 					}else if(c == ' '){
-						blockList.add(new Floor(j * 32, i * 32, i, j,"Floor"));
-						blocks[i][j] = new  Floor(j * 32, i * 32, i, j,"Floor");
+						blockList.add(new Floor(j * 32, i * 32));
+						blocks[j][i] = new  Floor(j * 32, i * 32);
+					}else if(c == 's'){
+						blockList.add(new Spawner(j * 32, i * 32));
+						blocks[j][i] = new  Spawner(j * 32, i * 32);
 					}
 					j++;
 				}

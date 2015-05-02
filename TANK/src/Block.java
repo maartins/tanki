@@ -9,12 +9,41 @@ public class Block extends GameObject{
 	private boolean isShootable;
 
 	private Block parent;
-
-	public Block(int posX, int posY, int tileX, int tileY, boolean isWalkable, boolean isShootable, String name, String imgPath){	
-		super(posX, posY, name, imgPath);
+	
+	/**
+	* @param  pos x
+	* @param  pos y
+	* @param  is walkable
+	* @param  is shootable
+	* @param  name
+	*/
+	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name){	
+		super(posX, posY, name);
 		
-		this.tileX = tileX;
-		this.tileY = tileY;
+		tileX = posX / 32;
+		tileY = posY / 32;
+		
+		value = 0;
+		
+		this.isWalkable = isWalkable;
+		this.isShootable = isShootable;
+		
+		parent = null;
+	}
+	
+	/**
+	* @param  pos x
+	* @param  pos y
+	* @param  is walkable
+	* @param  is shootable
+	* @param  name
+	* @param image path
+	*/
+	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imagePath){	
+		super(posX, posY, name, imagePath);
+		
+		tileX = posX / 32;
+		tileY = posY / 32;
 		
 		value = 0;
 		

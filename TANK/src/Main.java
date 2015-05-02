@@ -18,7 +18,7 @@ public class Main{
 		          System.exit(0);
 		       }        
 		    });
-		frame.setVisible(true);
 		frame.add(new StatPanel(), BorderLayout.SOUTH);
+		frame.setVisible(true);
 	}
 }

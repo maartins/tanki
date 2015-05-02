@@ -24,6 +24,8 @@ public class GameObject {
 		this.y = y;
 		
 		this.name = name;
+		
+		image = null;
 	}
 	
 	public GameObject(int x, int y, String name ,String imagePath){
@@ -42,11 +44,15 @@ public class GameObject {
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.drawImage(image, x, y, null);
+		if(image != null)
+			g2d.drawImage(image, x, y, null);
 	}
 	
 	public Rectangle getBounds(){
-		return new Rectangle(x, y, image.getWidth(), image.getHeight());
+		if(image != null)
+			return new Rectangle(x, y, image.getWidth(), image.getHeight());
+		else
+			return new Rectangle(x, y, 32, 32);
 	}
 	
 	public BufferedImage rotate(BufferedImage img, int cdir, int pdir){
@@ -58,16 +64,14 @@ public class GameObject {
 	}
 	
 	public Block getPositionOnMap(){
-		Block closestTile = new Block(-32, -32, -1, -1, true, false, "test", "Images//Floor01.png");
+		Block closestTile = new Block(-32, -32, true, false, "test");
 		int temp = 0;
 		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
-		for(Block[] bb : MainPanel.map1.getBlocks()){
-			for(Block b : bb){
-				temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-				if(temp < distance){
-					distance = temp;
-					closestTile = b;
-				}
+		for(Block b : MainPanel.map1.getBlockList()){
+			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
+			if(temp < distance){
+				distance = temp;
+				closestTile = b;
 			}
 		}
 		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
@@ -91,11 +95,17 @@ public class GameObject {
 	}
 	
 	public int getWidth(){
-		return image.getWidth();
+		if(image != null)
+			return image.getWidth();
+		else
+			return 32;
 	}
 	
 	public int getHeight(){
-		return image.getHeight();
+		if(image != null)
+			return image.getHeight();
+		else
+			return 32;
 	}
 
 	public BufferedImage getImage() {

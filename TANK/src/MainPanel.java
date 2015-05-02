@@ -1,11 +1,8 @@
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
@@ -115,7 +112,8 @@ public class MainPanel extends JPanel implements Runnable{
 			++frameCount;
             totalTime += (System.currentTimeMillis() - startTime);
             if (totalTime > 1000) {
-                long realFPS = (long) ((double) frameCount/ (double) totalTime * 1000.0);
+                @SuppressWarnings("unused")
+				long realFPS = (long) ((double) frameCount/ (double) totalTime * 1000.0);
                 //System.out.println("fps: " + realFPS);
                 frameCount = 0;
                 totalTime = 0;
