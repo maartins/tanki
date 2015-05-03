@@ -32,6 +32,8 @@ public class Enemy extends GameObject implements Runnable{
 	private ArrayList<Block> navList;
 	private ArrayList<Bullet> bulletList;
 	
+	private Spawner spawner;
+	
 	private Thread thread;
 	
 	public Enemy(int posX, int posY){
@@ -583,6 +585,14 @@ public class Enemy extends GameObject implements Runnable{
 		}else{
 			return false;
 		}
+	}
+	
+	public void setSpawner(Spawner spawner){
+		this.spawner = spawner;
+	}
+	
+	public Spawner getSpawner(){
+		return spawner;
 	}
 }
 

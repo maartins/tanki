@@ -6,12 +6,18 @@ import java.util.ArrayList;
 
 public class Map extends GameObject{
 	
+	private String mapPath;
+	
+	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
 	private Block[][] blocks;
 	
-	public Map(){
+	public Map(String mapPath){
 		super(0, 0, "Map");
 		
+		this.mapPath = mapPath;
+		
+		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
 		blocks = new Block[16][16];
 		
@@ -23,7 +29,7 @@ public class Map extends GameObject{
 		
 		try {
 			String ss;
-			br = new BufferedReader(new FileReader("Maps//map1.txt"));
+			br = new BufferedReader(new FileReader(mapPath));
 
 			int i = 0;
 			while((ss = br.readLine()) != null){
@@ -31,13 +37,14 @@ public class Map extends GameObject{
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
 						blockList.add(new Wall(j * 32, i * 32));
-						blocks[j][i] = new Wall(j * 32, i * 32);
+						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == ' '){
 						blockList.add(new Floor(j * 32, i * 32));
-						blocks[j][i] = new  Floor(j * 32, i * 32);
+						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 's'){
-						blockList.add(new Spawner(j * 32, i * 32));
-						blocks[j][i] = new  Spawner(j * 32, i * 32);
+						spawnerList.add(new Spawner(j * 32, i * 32));
+						blockList.add(new Floor(j * 32, i * 32));
+						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}
 					j++;
 				}
@@ -50,20 +57,13 @@ public class Map extends GameObject{
 	}
 	
 	public void draw(Graphics g){
-		//Graphics2D g2d = (Graphics2D) g;
-		//g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		//g2d.drawImage(super.image, super.x, super.y, null);
-		
-		
-		//for(Block b : blockList){
-			//b.draw(g);
-		//}
-		
-		for(Block[] bb : blocks){
-			for(Block b : bb){
-				b.draw(g);
-			}
+		for(Block b : blockList){
+			b.draw(g);
 		}
+	}
+	
+	public ArrayList<Spawner> getSpawnerList(){
+		return spawnerList;
 	}
 	
 	public ArrayList<Block> getBlockList(){

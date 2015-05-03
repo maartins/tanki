@@ -32,7 +32,7 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		
-		map1 = new Map();
+		map1 = new Map("Maps//map1.txt");
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -44,11 +44,9 @@ public class MainPanel extends JPanel implements Runnable{
 		tank = new Tank(100, 400);
 		this.addKeyListener(tank);
 		
-		enemies.add(new Enemy(300, 150));
-		enemies.add(new Enemy(200, 150));
-		//enemies.add(new Enemy(200, 150));
-		//enemies.add(new Enemy(200, 200));
-		//enemies.add(new Enemy(150, 200));
+		for(Spawner s : map1.getSpawnerList()){
+			s.spawn();
+		}
 		
 		isRunning = true;
 		
@@ -72,6 +70,10 @@ public class MainPanel extends JPanel implements Runnable{
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
 			
+			for(Spawner s : map1.getSpawnerList()){
+				s.spawn();
+			}
+			
 			tank.control();
 			tank.collisionCheck();
 			
@@ -82,6 +84,7 @@ public class MainPanel extends JPanel implements Runnable{
 					e.collisionCheck();
 					
 					if(e.isDead()){
+						e.getSpawner().setCanSpawn(true);
 						tank.setScore(tank.getScore() + 20);
 						deadList.add(e);
 					}
