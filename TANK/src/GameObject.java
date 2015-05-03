@@ -35,6 +35,14 @@ public class GameObject {
 		image = null;
 	}
 	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param name
+	 * @param imagePath
+	 */
+	
 	public GameObject(int x, int y, String name ,String imagePath){
 		this.x = x;
 		this.y = y;
