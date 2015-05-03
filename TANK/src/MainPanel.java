@@ -91,11 +91,15 @@ public class MainPanel extends JPanel implements Runnable{
 				}
 				
 				for(Enemy e : deadList){
+					e.die();
 					enemies.remove(e);
 				}
+				
 				if(!deadList.isEmpty()){
 					deadList.clear();
 				}
+				
+				
 			}
 			
 			this.repaint();

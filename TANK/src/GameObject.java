@@ -59,15 +59,17 @@ public class GameObject {
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		if(image != null)
+		if(image != null){
 			g2d.drawImage(image, x, y, null);
+		}
 	}
 	
 	public Rectangle getBounds(){
-		if(image != null)
+		if(image != null){
 			return new Rectangle(x, y, image.getWidth(), image.getHeight());
-		else
+		}else{
 			return new Rectangle(x, y, 32, 32);
+		}
 	}
 	
 	public BufferedImage rotate(BufferedImage img, int cdir, int pdir){
@@ -75,6 +77,7 @@ public class GameObject {
 	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth()/2, img.getHeight()/2);
 	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
 	    img = op.filter(img, null);
+	    
 	    return img;
 	}
 	
@@ -110,17 +113,19 @@ public class GameObject {
 	}
 	
 	public int getWidth(){
-		if(image != null)
+		if(image != null){
 			return image.getWidth();
-		else
+		}else{
 			return 32;
+		}
 	}
 	
 	public int getHeight(){
-		if(image != null)
+		if(image != null){
 			return image.getHeight();
-		else
+		}else{
 			return 32;
+		}
 	}
 
 	public BufferedImage getImage() {

@@ -2,6 +2,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -41,14 +42,16 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		
 		curTime = System.currentTimeMillis();
 		
-		curHp = maxHp;
-		
-		score = 0;
-				
 		bulletList = new ArrayList<Bullet>();
+		
+		curHp = maxHp;
+		score = 0;		
 		
 		veloX = 0;
 		veloY = 0;
+		
+		curDirection = UP;
+		preDirection = RIGHT;
 		
 		keyA = false;
 		keyD = false;
@@ -56,9 +59,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		keyS = false;
 		
 		keySPACE = false;
-		
-		curDirection = UP;
-		preDirection = RIGHT;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -104,6 +104,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	public void run() {
 		while(true){
 			startTime = System.currentTimeMillis();
+			Toolkit.getDefaultToolkit().sync();
 			
 			if(!bulletList.isEmpty()){
 				for(Bullet b : bulletList){
@@ -135,8 +136,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	}
 	
 	public void control(){
-		collisionCheck();
-		
 		if(keyA == keyD){
 			veloX = 0;
 		}else if(keyA){

@@ -48,7 +48,6 @@ public class Map extends GameObject{
 					}
 					j++;
 				}
-				
 				i++;
 			}
 		} catch (IOException e1) {

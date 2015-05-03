@@ -2,6 +2,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 public class Enemy extends GameObject implements Runnable{
@@ -26,6 +27,7 @@ public class Enemy extends GameObject implements Runnable{
 	private boolean isPathing;
 	private boolean isPathingStart;
 	private boolean isPathDone;
+	private boolean isRunning;
 	
 	private ArrayList<Block> closedList;
 	private ArrayList<Block> openList;
@@ -41,6 +43,11 @@ public class Enemy extends GameObject implements Runnable{
 		
 		curTime = System.currentTimeMillis();
 		
+		closedList = new ArrayList<Block>();
+		openList = new ArrayList<Block>();
+		navList = new ArrayList<Block>();
+		bulletList = new ArrayList<Bullet>();
+		
 		curHp = maxHp;
 		
 		veloX = 0;
@@ -50,12 +57,8 @@ public class Enemy extends GameObject implements Runnable{
 		preDirection = RIGHT;
 		this.setImage(rotate(this.getImage(), curDirection, preDirection));
 		
-		closedList = new ArrayList<Block>();
-		openList = new ArrayList<Block>();
-		navList = new ArrayList<Block>();
-		bulletList = new ArrayList<Bullet>();
-		
 		isPathingStart = true;
+		isRunning = true;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -81,8 +84,9 @@ public class Enemy extends GameObject implements Runnable{
 	
 	@Override
 	public void run() {
-		while(true){
+		while(isRunning){
 			startTime = System.currentTimeMillis();
+			Toolkit.getDefaultToolkit().sync();
 			
 			if(System.currentTimeMillis() - shootTime > 1250){
 				shootTime = System.currentTimeMillis();
@@ -139,50 +143,35 @@ public class Enemy extends GameObject implements Runnable{
 		}
 	}
 	
-	public void control(){
-		//collisionCheck();
-		
+	public void control(){	
 		if(!navList.isEmpty()){
 			//System.out.println("Moving");
 			
 			preDirection = curDirection;
-			
-			//if(targeting()){
-				//for(Block b : navList){
-				//	b.reset();
-			//	}
-			//	navList.clear();
-			//	
-			//	veloX = 0;
-			//	veloY = 0;
-			//	
-			//	System.out.println("TARGETED");
-			//}else{
-				//System.out.println("Going for: " + navList.get(navList.size() - 1));
-				if(navList.get(navList.size() - 1).getX() < this.getX()){
-					curDirection = LEFT;
-					veloX = -1;
-					this.setImage(rotate(this.getImage(), curDirection, preDirection));
-				}else if(navList.get(navList.size() - 1).getX() > this.getX()){
-					curDirection = RIGHT;
-					veloX = 1;
-					this.setImage(rotate(this.getImage(), curDirection, preDirection));
-				}else if(navList.get(navList.size() - 1).getY() < this.getY()){
-					curDirection = UP;
-					veloY = -1;
-					this.setImage(rotate(this.getImage(), curDirection, preDirection));
-				}else if(navList.get(navList.size() - 1).getY() > this.getY()){
-					curDirection = DOWN;
-					veloY = 1;
-					this.setImage(rotate(this.getImage(), curDirection, preDirection));
-				}else if(navList.get(navList.size() - 1).getX() == this.getX() && navList.get(navList.size() - 1).getY() == this.getY()){
-					veloX = 0;
-					veloY = 0;
-					navList.get(navList.size() - 1).reset();
-					navList.remove(navList.size() - 1);
-					//System.out.println("TILE REACHED");
-				}
-			//}
+
+			if(navList.get(navList.size() - 1).getX() < this.getX()){
+				curDirection = LEFT;
+				veloX = -1;
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+			}else if(navList.get(navList.size() - 1).getX() > this.getX()){
+				curDirection = RIGHT;
+				veloX = 1;
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+			}else if(navList.get(navList.size() - 1).getY() < this.getY()){
+				curDirection = UP;
+				veloY = -1;
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+			}else if(navList.get(navList.size() - 1).getY() > this.getY()){
+				curDirection = DOWN;
+				veloY = 1;
+				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+			}else if(navList.get(navList.size() - 1).getX() == this.getX() && navList.get(navList.size() - 1).getY() == this.getY()){
+				veloX = 0;
+				veloY = 0;
+				navList.get(navList.size() - 1).reset();
+				navList.remove(navList.size() - 1);
+				//System.out.println("TILE REACHED");
+			}
 		}
 		
 		this.setX(this.getX() + veloX);
@@ -593,6 +582,17 @@ public class Enemy extends GameObject implements Runnable{
 	
 	public Spawner getSpawner(){
 		return spawner;
+	}
+	
+	public void die(){
+		isRunning = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		bulletList.clear();
 	}
 }
 
