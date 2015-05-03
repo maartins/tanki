@@ -19,6 +19,13 @@ public class GameObject {
 	
 	private BufferedImage image;
 	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param name
+	 */
+	
 	public GameObject(int x, int y, String name){
 		this.x = x;
 		this.y = y;
