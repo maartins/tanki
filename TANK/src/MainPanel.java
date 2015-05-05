@@ -1,3 +1,4 @@
+
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -6,6 +7,8 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
+	
+	private int curMap;
 	
 	private final int FPS = 60;
 
@@ -18,12 +21,15 @@ public class MainPanel extends JPanel implements Runnable{
 	private boolean isRunning;
 	
 	public static Tank tank;
-	public static Map map1;
+	public static Map map;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
+	private ArrayList<String> mapList = new ArrayList<String>();
 	private ArrayList<Enemy> deadList = new ArrayList<Enemy>();
 	
 	private Thread thread;
+	
+	// NEED TO ADD GAME STATES FOR       -         Main Menu; Main Game; Game End Screen; 
 	
 	public MainPanel(){
 		this.setLayout(null);
@@ -32,7 +38,12 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		
-		map1 = new Map("Maps//map1.txt");
+		mapList.add("Maps//map1.txt");
+		mapList.add("Maps//map2.txt");
+		
+		curMap = 0;
+		
+		changeMap();
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -44,18 +55,17 @@ public class MainPanel extends JPanel implements Runnable{
 		tank = new Tank(100, 400);
 		this.addKeyListener(tank);
 		
-		for(Spawner s : map1.getSpawnerList()){
+		for(Spawner s : map.getSpawnerList()){
 			s.spawn();
 		}
 		
 		isRunning = true;
-		
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		map1.draw(g);
+		map.draw(g);
 		tank.draw(g);
 		
 		for(Enemy e : enemies){
@@ -70,8 +80,17 @@ public class MainPanel extends JPanel implements Runnable{
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
 			
-			for(Spawner s : map1.getSpawnerList()){
+			int emptySpawnerCounter = 0;
+			
+			for(Spawner s : map.getSpawnerList()){
 				s.spawn();
+				if(s.getEnemyCount() <= 0){
+					emptySpawnerCounter++;
+				}
+			}
+			
+			if(emptySpawnerCounter == map.getSpawnerList().size()){
+				changeMap();
 			}
 			
 			tank.control();
@@ -125,6 +144,13 @@ public class MainPanel extends JPanel implements Runnable{
                 frameCount = 0;
                 totalTime = 0;
             }
+		}
+	}
+	
+	private void changeMap(){
+		if(curMap != mapList.size()){
+			map = new Map(mapList.get(curMap));
+			curMap++;
 		}
 	}
 }

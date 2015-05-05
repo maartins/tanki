@@ -15,12 +15,13 @@ public class StatPanel extends JPanel implements Runnable{
 	private Thread thread;
 	
 	public StatPanel(){
+		this.setBounds(0, 512, 518, 70);
 		this.setLayout(new GridLayout(0, 2));
 		
-		healthLable.setText("Dzivibas " + MainPanel.tank.getCurHp());
+		healthLable.setText("Dzivibas");
 		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
 		this.add(healthLable);
-		scoreLable.setText("Punkti " + String.format("%08d", MainPanel.tank.getScore()));
+		scoreLable.setText("Punkti");
 		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		this.add(scoreLable);
 		

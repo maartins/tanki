@@ -51,7 +51,7 @@ public class Bullet extends GameObject{
 			break;
 		}
 		
-		for(Block b : MainPanel.map1.getBlockList()){
+		for(Block b : MainPanel.map.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && b.isShootable()){
 		    	collide = true;
 		    }
@@ -59,7 +59,6 @@ public class Bullet extends GameObject{
 		
 		for(Enemy e : MainPanel.enemies){
 			if(this.getBounds().intersects(e.getBounds())){
-				System.out.println("Enemy took damage");
 				e.damage();
 		    	collide = true;
 		    }

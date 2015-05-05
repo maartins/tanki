@@ -175,7 +175,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	}
 	
 	public void collisionCheck(){
-		for(Block b : MainPanel.map1.getBlockList()){
+		for(Block b : MainPanel.map.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && !b.isWalkable()){
 			    Rectangle insect = this.getBounds().intersection(b.getBounds());
 

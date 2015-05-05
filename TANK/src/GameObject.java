@@ -84,8 +84,8 @@ public class GameObject {
 	public Block getPositionOnMap(){
 		Block closestTile = new Block(-32, -32, true, false, "test");
 		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map1.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map1.getBlocks()[0][0].getY(), 2));
-		for(Block b : MainPanel.map1.getBlockList()){
+		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map.getBlocks()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map.getBlocks()[0][0].getY(), 2));
+		for(Block b : MainPanel.map.getBlockList()){
 			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
 			if(temp < distance){
 				distance = temp;
