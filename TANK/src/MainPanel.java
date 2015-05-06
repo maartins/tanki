@@ -90,6 +90,11 @@ public class MainPanel extends JPanel implements Runnable{
 			}
 			
 			if(emptySpawnerCounter == map.getSpawnerList().size()){
+				for(Enemy e : enemies){
+					e.die();
+				}
+				enemies.clear();
+				deadList.clear();
 				changeMap();
 			}
 			

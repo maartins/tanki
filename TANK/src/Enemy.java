@@ -592,6 +592,13 @@ public class Enemy extends GameObject implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		closedList.clear();
+		openList.clear();
+		for (Block b : navList) {
+			b.reset();
+		}
+		navList.clear();
 		bulletList.clear();
 	}
 }
