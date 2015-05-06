@@ -36,8 +36,6 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private Thread thread;
 	
-	// NEED TO ADD GAME STATES FOR       -         Main Menu; Main Game; Game End Screen; 
-	
 	public MainPanel(){
 		this.setLayout(null);
 		
