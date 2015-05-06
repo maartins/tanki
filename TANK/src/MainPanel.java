@@ -1,12 +1,17 @@
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
+	
+	private JLabel healthLable = new JLabel("Dzivibas ");
+	private JLabel scoreLable = new JLabel("Punkti ");
 	
 	private int curMap;
 	
@@ -27,6 +32,8 @@ public class MainPanel extends JPanel implements Runnable{
 	private ArrayList<String> mapList = new ArrayList<String>();
 	private ArrayList<Enemy> deadList = new ArrayList<Enemy>();
 	
+	private GameStates curState;
+	
 	private Thread thread;
 	
 	// NEED TO ADD GAME STATES FOR       -         Main Menu; Main Game; Game End Screen; 
@@ -38,12 +45,21 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		
+		healthLable.setBounds(5, 515, 200, 30);
+		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
+		this.add(healthLable);
+		scoreLable.setBounds(210, 515, 200, 30);
+		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		this.add(scoreLable);
+		
 		mapList.add("Maps//map1.txt");
 		mapList.add("Maps//map2.txt");
 		
 		curMap = 0;
 		
 		changeMap();
+		
+		curState = GameStates.MainGame;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -65,11 +81,14 @@ public class MainPanel extends JPanel implements Runnable{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		map.draw(g);
-		tank.draw(g);
 		
-		for(Enemy e : enemies){
-			e.draw(g);
+		if(curState == GameStates.MainGame){
+			map.draw(g);
+			tank.draw(g);
+			
+			for(Enemy e : enemies){
+				e.draw(g);
+			}
 		}
 	}
 
@@ -80,51 +99,58 @@ public class MainPanel extends JPanel implements Runnable{
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
 			
-			int emptySpawnerCounter = 0;
-			
-			for(Spawner s : map.getSpawnerList()){
-				s.spawn();
-				if(s.getEnemyCount() <= 0){
-					emptySpawnerCounter++;
-				}
-			}
-			
-			if(emptySpawnerCounter == map.getSpawnerList().size()){
-				for(Enemy e : enemies){
-					e.die();
-				}
-				enemies.clear();
-				deadList.clear();
-				changeMap();
-			}
-			
-			tank.control();
-			tank.collisionCheck();
-			
-			if(!enemies.isEmpty()){
-				for(Enemy e : enemies){
-					e.pathing();
-					e.control();
-					e.collisionCheck();
-					
-					if(e.isDead()){
-						e.getSpawner().setCanSpawn(true);
-						tank.setScore(tank.getScore() + 20);
-						deadList.add(e);
+			// ----------------------------------- Speles darbibas kods
+			if(curState == GameStates.MainGame){
+				int emptySpawnerCounter = 0;
+				
+				for(Spawner s : map.getSpawnerList()){
+					s.spawn();
+					if(s.getEnemyCount() <= 0){
+						emptySpawnerCounter++;
 					}
 				}
 				
-				for(Enemy e : deadList){
-					e.die();
-					enemies.remove(e);
-				}
-				
-				if(!deadList.isEmpty()){
+				if(emptySpawnerCounter == map.getSpawnerList().size()){
+					for(Enemy e : enemies){
+						e.die();
+					}
+					enemies.clear();
 					deadList.clear();
+					changeMap();
 				}
 				
+				tank.control();
+				tank.collisionCheck();
 				
+				if(!enemies.isEmpty()){
+					for(Enemy e : enemies){
+						e.pathing();
+						e.control();
+						e.collisionCheck();
+						
+						if(e.isDead()){
+							e.getSpawner().setCanSpawn(true);
+							tank.setScore(tank.getScore() + 20);
+							deadList.add(e);
+						}
+					}
+					
+					for(Enemy e : deadList){
+						e.die();
+						enemies.remove(e);
+					}
+					
+					if(!deadList.isEmpty()){
+						deadList.clear();
+					}
+					
+					
+				}
+				
+				healthLable.setText("Dzivibas " + MainPanel.tank.getCurHp());
+				scoreLable.setText("Punkti " + String.format("%08d", MainPanel.tank.getScore()));
 			}
+			// ----------------------------------- Speles darbibas koda beigas
 			
 			this.repaint();
 			
