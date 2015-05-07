@@ -2,7 +2,6 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import javax.swing.*;
 
-
 public class Main{
 	
 	private JFrame frame = new JFrame("Tank");
@@ -13,7 +12,6 @@ public class Main{
 		frame.setResizable(false);
 		frame.setLayout(null);
 		frame.setContentPane(new MainPanel());
-		//frame.add(new StatPanel(), BorderLayout.SOUTH);
 		RepaintManager.currentManager(frame).setDoubleBufferingEnabled(true);
 		frame.addWindowListener(new WindowAdapter() {
 		       public void windowClosing(WindowEvent windowEvent){

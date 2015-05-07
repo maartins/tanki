@@ -2,8 +2,11 @@
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -12,16 +15,17 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private JLabel healthLable = new JLabel("Dzivibas ");
 	private JLabel scoreLable = new JLabel("Punkti ");
+	private JButton startButton = new JButton("Sakt speli");
 	
-	private int curMap;
+	private int currentMap;
 	
 	private final int FPS = 60;
 
 	private long startTime;
-	private long curTime;
+	private long currentTime;
 	private long totalTime;
-	private long frameCount;
 	private long waitTime;
+	private long frameCount;
 	
 	private boolean isRunning;
 	
@@ -32,7 +36,7 @@ public class MainPanel extends JPanel implements Runnable{
 	private ArrayList<String> mapList = new ArrayList<String>();
 	private ArrayList<Enemy> deadList = new ArrayList<Enemy>();
 	
-	private GameStates curState;
+	private GameStates currentGameState;
 	
 	private Thread thread;
 	
@@ -46,18 +50,33 @@ public class MainPanel extends JPanel implements Runnable{
 		healthLable.setBounds(5, 515, 200, 30);
 		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
 		this.add(healthLable);
+		healthLable.setVisible(false);
 		scoreLable.setBounds(210, 515, 200, 30);
 		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		this.add(scoreLable);
+		scoreLable.setVisible(false);
+		startButton.setBounds(150, 50, 200, 30);
+		startButton.setFont(new Font("Arial", Font.BOLD, 16));
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				currentGameState = GameStates.MainGame;
+				startButton.setVisible(false);
+				scoreLable.setVisible(true);
+				healthLable.setVisible(true);
+			}
+		});
+		this.add(startButton);
 		
 		mapList.add("Maps//map1.txt");
 		mapList.add("Maps//map2.txt");
 		
-		curMap = 0;
+		currentMap = 0;
 		
 		changeMap();
 		
-		curState = GameStates.MainGame;
+		currentGameState = GameStates.MainMenu;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -80,7 +99,7 @@ public class MainPanel extends JPanel implements Runnable{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if(curState == GameStates.MainGame){
+		if(currentGameState == GameStates.MainGame){
 			map.draw(g);
 			tank.draw(g);
 			
@@ -98,7 +117,7 @@ public class MainPanel extends JPanel implements Runnable{
 			Toolkit.getDefaultToolkit().sync();
 			
 			// ----------------------------------- Speles darbibas kods
-			if(curState == GameStates.MainGame){
+			if(currentGameState == GameStates.MainGame){
 				int emptySpawnerCounter = 0;
 				
 				for(Spawner s : map.getSpawnerList()){
@@ -147,16 +166,18 @@ public class MainPanel extends JPanel implements Runnable{
 				
 				healthLable.setText("Dzivibas " + MainPanel.tank.getCurHp());
 				scoreLable.setText("Punkti " + String.format("%08d", MainPanel.tank.getScore()));
+			}else if(currentGameState == GameStates.MainMenu){
+				
 			}
 			// ----------------------------------- Speles darbibas koda beigas
 			
 			this.repaint();
 			
-			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / FPS) - curTime;
+			currentTime = System.currentTimeMillis() - startTime;
+			waitTime = (1000 / FPS) - currentTime;
 			try{
 				if(waitTime < 0){
-					Thread.sleep(5);
+					Thread.sleep(10);
 				}else{
 					Thread.sleep(waitTime);
 				}
@@ -177,9 +198,9 @@ public class MainPanel extends JPanel implements Runnable{
 	}
 	
 	private void changeMap(){
-		if(curMap != mapList.size()){
-			map = new Map(mapList.get(curMap));
-			curMap++;
+		if(currentMap != mapList.size()){
+			map = new Map(mapList.get(currentMap));
+			currentMap++;
 		}
 	}
 }
