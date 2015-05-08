@@ -59,6 +59,7 @@ public class MainPanel extends JPanel implements Runnable{
 		
 		mapList.add("Maps//map1.txt");
 		mapList.add("Maps//map2.txt");
+		mapList.add("Maps//map3.txt");
 		
 		currentMap = 0;
 		
