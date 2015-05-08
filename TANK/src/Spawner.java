@@ -26,6 +26,7 @@ public class Spawner extends Block{
 	}
 
 	public void setCanSpawn(boolean canSpawn) {
+		enemyCount--;
 		this.canSpawn = canSpawn;
 	}
 	
@@ -33,7 +34,6 @@ public class Spawner extends Block{
 		if(enemyCount > 0 && canSpawn){
 			MainPanel.enemies.add(new Enemy(this.getX(), this.getY()));
 			MainPanel.enemies.get(MainPanel.enemies.size() - 1).setSpawner(this);
-			enemyCount--;
 			canSpawn = false;
 		}
 	}

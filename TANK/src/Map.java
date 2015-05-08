@@ -11,7 +11,8 @@ public class Map extends GameObject{
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
 	private Block[][] blocks;
-	
+	private Block tankSpawnPoint;
+
 	public Map(String mapPath){
 		super(0, 0, "Map");
 		
@@ -45,6 +46,10 @@ public class Map extends GameObject{
 						spawnerList.add(new Spawner(j * 32, i * 32));
 						blockList.add(new Floor(j * 32, i * 32));
 						blocks[j][i] = blockList.get(blockList.size() - 1);
+					}else if(c == 't'){
+						tankSpawnPoint = new Floor(j * 32, i * 32);
+						blockList.add(tankSpawnPoint);
+						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}
 					j++;
 				}
@@ -71,5 +76,13 @@ public class Map extends GameObject{
 	
 	public Block[][] getBlocks(){
 		return blocks;
+	}
+	
+	public Block getTankSpawnPoint() {
+		return tankSpawnPoint;
+	}
+
+	public void setTankSpawnPoint(Block tankSpawnPoint) {
+		this.tankSpawnPoint = tankSpawnPoint;
 	}
 }

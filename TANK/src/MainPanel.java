@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
@@ -13,9 +14,13 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
 	
+	private JButton startButton = new JButton("Sakt speli");
 	private JLabel healthLable = new JLabel("Dzivibas ");
 	private JLabel scoreLable = new JLabel("Punkti ");
-	private JButton startButton = new JButton("Sakt speli");
+	private JLabel calcScoreLable = new JLabel(" ");
+	private JLabel totalScoreLable = new JLabel("Kopejie punkti ");
+	private JButton nextButton = new JButton("Nakosais limenis");
+	private JButton endButton = new JButton("Uz galveno izvelni");
 	
 	private int currentMap;
 	
@@ -46,28 +51,11 @@ public class MainPanel extends JPanel implements Runnable{
 		this.setFocusable(true);
 		this.requestFocus();
 		this.setDoubleBuffered(true);
+		this.setBackground(new Color(0, 0, 0));
 		
-		healthLable.setBounds(5, 515, 200, 30);
-		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
-		this.add(healthLable);
-		healthLable.setVisible(false);
-		scoreLable.setBounds(210, 515, 200, 30);
-		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
-		this.add(scoreLable);
-		scoreLable.setVisible(false);
-		startButton.setBounds(150, 50, 200, 30);
-		startButton.setFont(new Font("Arial", Font.BOLD, 16));
-		startButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				currentGameState = GameStates.MainGame;
-				startButton.setVisible(false);
-				scoreLable.setVisible(true);
-				healthLable.setVisible(true);
-			}
-		});
-		this.add(startButton);
+		changeGameState(GameStates.MainMenu);
+		
+		guiSetUp();
 		
 		mapList.add("Maps//map1.txt");
 		mapList.add("Maps//map2.txt");
@@ -84,8 +72,63 @@ public class MainPanel extends JPanel implements Runnable{
 		}
 	}
 	
+	private void guiSetUp(){
+		healthLable.setBounds(5, 515, 200, 30);
+		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
+		healthLable.setForeground(new Color(255, 255, 255));
+		this.add(healthLable);
+		
+		scoreLable.setBounds(210, 515, 200, 30);
+		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		scoreLable.setForeground(new Color(255, 255, 255));
+		this.add(scoreLable);
+		
+		startButton.setBounds(150, 50, 200, 30);
+		startButton.setFont(new Font("Arial", Font.BOLD, 16));
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeGameState(GameStates.MainGame);
+			}
+		});
+		this.add(startButton);
+		
+		calcScoreLable.setBounds(150, 50, 200, 30);
+		calcScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		calcScoreLable.setForeground(new Color(255, 255, 255));
+		this.add(calcScoreLable);
+		
+		totalScoreLable.setBounds(150, 80, 200, 30);
+		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		totalScoreLable.setForeground(new Color(255, 255, 255));
+		this.add(totalScoreLable);
+		
+		nextButton.setBounds(150, 150, 200, 30);
+		nextButton.setFont(new Font("Arial", Font.BOLD, 16));
+		nextButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeGameState(GameStates.MainGame);
+			}
+		});
+		this.add(nextButton);
+
+		endButton.setBounds(150, 150, 200, 30);
+		endButton.setFont(new Font("Arial", Font.BOLD, 16));
+		endButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeGameState(GameStates.MainMenu);
+			}
+		});
+		this.add(endButton);
+	}
+	
 	private void init(){
-		tank = new Tank(100, 400);
+		tank = new Tank(map.getTankSpawnPoint());
 		this.addKeyListener(tank);
 		
 		for(Spawner s : map.getSpawnerList()){
@@ -127,47 +170,52 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 				}
 				
-				if(emptySpawnerCounter == map.getSpawnerList().size()){
+				if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap < mapList.size()){
 					for(Enemy e : enemies){
 						e.die();
 					}
 					enemies.clear();
 					deadList.clear();
 					changeMap();
-				}
-				
-				tank.control();
-				tank.collisionCheck();
-				
-				if(!enemies.isEmpty()){
-					for(Enemy e : enemies){
-						e.pathing();
-						e.control();
-						e.collisionCheck();
+					changeGameState(GameStates.LevelFinished);
+				}else if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()){
+					currentMap = 0;
+					changeMap();
+					changeGameState(GameStates.EndScreen);
+				}else if(tank.isDead()){
+					currentMap = 0;
+					changeMap();
+					changeGameState(GameStates.EndScreen);
+				}else{
+					tank.control();
+					tank.collisionCheck();
+					
+					if(!enemies.isEmpty()){
+						for(Enemy e : enemies){
+							e.pathing();
+							e.control();
+							e.collisionCheck();
+							
+							if(e.isDead()){
+								e.getSpawner().setCanSpawn(true);
+								tank.setScore(tank.getScore() + 20);
+								deadList.add(e);
+							}
+						}
 						
-						if(e.isDead()){
-							e.getSpawner().setCanSpawn(true);
-							tank.setScore(tank.getScore() + 20);
-							deadList.add(e);
+						for(Enemy e : deadList){
+							e.die();
+							enemies.remove(e);
+						}
+						
+						if(!deadList.isEmpty()){
+							deadList.clear();
 						}
 					}
 					
-					for(Enemy e : deadList){
-						e.die();
-						enemies.remove(e);
-					}
-					
-					if(!deadList.isEmpty()){
-						deadList.clear();
-					}
-					
-					
+					healthLable.setText("Dzivibas " + tank.getCurHp());
+					scoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
 				}
-				
-				healthLable.setText("Dzivibas " + MainPanel.tank.getCurHp());
-				scoreLable.setText("Punkti " + String.format("%08d", MainPanel.tank.getScore()));
-			}else if(currentGameState == GameStates.MainMenu){
-				
 			}
 			// ----------------------------------- Speles darbibas koda beigas
 			
@@ -197,8 +245,69 @@ public class MainPanel extends JPanel implements Runnable{
 		}
 	}
 	
+	private void changeGameState(GameStates state){
+		switch(state){
+			case MainMenu:
+				currentGameState = state;
+				startButton.setVisible(true);
+				scoreLable.setVisible(false);
+				healthLable.setVisible(false);
+				calcScoreLable.setVisible(false);
+				totalScoreLable.setVisible(false);
+				nextButton.setVisible(false);
+				endButton.setVisible(false);
+				break;
+			case MainGame:
+				currentGameState = state;
+				startButton.setVisible(false);
+				scoreLable.setVisible(true);
+				healthLable.setVisible(true);
+				calcScoreLable.setVisible(false);
+				totalScoreLable.setVisible(false);
+				nextButton.setVisible(false);
+				endButton.setVisible(false);
+				break;
+			case LevelFinished:
+				currentGameState = state;
+				startButton.setVisible(false);
+				scoreLable.setVisible(false);
+				healthLable.setVisible(false);
+				calcScoreLable.setVisible(true);
+				totalScoreLable.setVisible(true);
+				nextButton.setVisible(true);
+				endButton.setVisible(false);
+				int totalScore = tank.getScore() * tank.getCurHp();
+				tank.setScore(totalScore);
+				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = " + totalScore);
+				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", totalScore));
+				tank.setLocation(map.getTankSpawnPoint());
+				break;
+			case EndScreen:
+				currentGameState = state;
+				startButton.setVisible(false);
+				scoreLable.setVisible(false);
+				healthLable.setVisible(false);
+				calcScoreLable.setVisible(true);
+				totalScoreLable.setVisible(true);
+				nextButton.setVisible(false);
+				endButton.setVisible(true);
+				totalScore = tank.getScore();
+				calcScoreLable.setText("Speles beigas");
+				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", totalScore));
+				tank.setLocation(map.getTankSpawnPoint());
+				tank.reset();
+				for(Enemy e : enemies){
+					e.die();
+				}
+				enemies.clear();
+				break;
+			default:
+				break;
+		}
+	}
+	
 	private void changeMap(){
-		if(currentMap != mapList.size()){
+		if(currentMap < mapList.size()){
 			map = new Map(mapList.get(currentMap));
 			currentMap++;
 		}

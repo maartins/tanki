@@ -16,7 +16,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private int curHp;
 	private int score;
 
-	private final int maxHp = 3;
+	private final int maxHp = 50;
 	private final int UP = 1;
 	private final int DOWN = 3;
 	private final int LEFT = 2;
@@ -36,6 +36,35 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private ArrayList<Bullet> bulletList;
 	
 	private Thread thread;
+	
+	public Tank(Block posBlock){
+		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Test02.png");
+		
+		curTime = System.currentTimeMillis();
+		
+		bulletList = new ArrayList<Bullet>();
+		
+		curHp = maxHp;
+		score = 0;		
+		
+		veloX = 0;
+		veloY = 0;
+		
+		curDirection = UP;
+		preDirection = RIGHT;
+		
+		keyA = false;
+		keyD = false;
+		keyW = false;
+		keyS = false;
+		
+		keySPACE = false;
+		
+		if(thread == null){
+			thread = new Thread(this);
+			thread.start();
+		}
+	}
 	
 	public Tank(int posX, int posY){
 		super(posX, posY, "Tank", "Images//Test02.png");
@@ -80,6 +109,15 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+	
+	public int getMaxHp() {
+		return maxHp;
+	}
+	
+	public void setLocation(Block posBlock) {
+		setX(posBlock.getX());
+		setY(posBlock.getY());
 	}
 	
 	public void draw(Graphics g){
@@ -366,5 +404,10 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		}else{
 			return false;
 		}
+	}
+	
+	public void reset(){
+		curHp = maxHp;
+		score = 0;
 	}
 }
