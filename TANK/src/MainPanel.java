@@ -277,10 +277,9 @@ public class MainPanel extends JPanel implements Runnable{
 				totalScoreLable.setVisible(true);
 				nextButton.setVisible(true);
 				endButton.setVisible(false);
-				int totalScore = tank.getScore() * tank.getCurHp();
-				tank.setScore(totalScore);
-				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = " + totalScore);
-				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", totalScore));
+				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = " + tank.getScore() * tank.getCurHp());
+				tank.setScore(tank.getScore() * tank.getCurHp());
+				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", tank.getScore()));
 				tank.setLocation(map.getTankSpawnPoint());
 				break;
 			case EndScreen:
@@ -292,9 +291,8 @@ public class MainPanel extends JPanel implements Runnable{
 				totalScoreLable.setVisible(true);
 				nextButton.setVisible(false);
 				endButton.setVisible(true);
-				totalScore = tank.getScore();
 				calcScoreLable.setText("Speles beigas");
-				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", totalScore));
+				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", tank.getScore()));
 				tank.setLocation(map.getTankSpawnPoint());
 				tank.reset();
 				for(Enemy e : enemies){

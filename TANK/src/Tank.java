@@ -35,6 +35,9 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	
 	private ArrayList<Bullet> bulletList;
 	
+	private Sound shootSound;
+	private Sound moveSound;
+	
 	private Thread thread;
 	
 	public Tank(Block posBlock){
@@ -59,6 +62,9 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		keyS = false;
 		
 		keySPACE = false;
+		
+		shootSound = new Sound("Sounds//tank_shoot01.wav");
+		moveSound = new Sound("Sounds//tank_move01.wav");
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -88,6 +94,9 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		keyS = false;
 		
 		keySPACE = false;
+		
+		shootSound = new Sound("Sounds//tank_shoot01.wav");
+		moveSound = new Sound("Sounds//tank_move01.wav");
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -178,16 +187,20 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			veloX = 0;
 		}else if(keyA){
 			veloX = -1;
+			//moveSound.play();
 		}else if(keyD){
 			veloX = 1;
+			//moveSound.play();
 		}
 		
 		if(keyW == keyS){
 			veloY = 0;
 		}else if(keyW){
 			veloY = -1;
+			//moveSound.play();
 		}else if(keyS){
 			veloY = 1;
+			//moveSound.play();
 		}
 		
 		if(keyA && keyS || keyA && keyW){
@@ -201,6 +214,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		if(keySPACE){
 			if(System.currentTimeMillis() - shootTime > 250){
 				shootTime = System.currentTimeMillis();
+				shootSound.play();
 				shoot();
 				//System.out.println("SHOOT");
 			}
