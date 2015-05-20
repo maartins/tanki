@@ -11,6 +11,18 @@ public class Bullet extends GameObject{
 	private boolean maxDistReached;
 	private boolean collide;
 	
+	public Bullet(int posX, int posY, int curDir, String name){
+		super(posX, posY, name, "Images//Test03.png");
+		dx = posX;
+		dy = posY;
+		
+		curDirection = curDir;
+		
+		maxDistReached = false;
+		
+		collide = false;
+	}
+	
 	public Bullet(int posX, int posY, int curDir){
 		super(posX, posY, "Bullet", "Images//Test03.png");
 		dx = posX;

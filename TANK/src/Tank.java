@@ -32,18 +32,18 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private boolean keyW;
 	private boolean keyS;
 	private boolean keySPACE;
+	private boolean isRunning;
 	
 	private ArrayList<Bullet> bulletList;
 	
 	private Sound shootSound;
+	@SuppressWarnings("unused")
 	private Sound moveSound;
 	
 	private Thread thread;
 	
 	public Tank(Block posBlock){
 		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Test02.png");
-		
-		curTime = System.currentTimeMillis();
 		
 		bulletList = new ArrayList<Bullet>();
 		
@@ -65,6 +65,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		
 		shootSound = new Sound("Sounds//tank_shoot01.wav");
 		moveSound = new Sound("Sounds//tank_move01.wav");
+		
+		isRunning = true;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -75,8 +77,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	public Tank(int posX, int posY){
 		super(posX, posY, "Tank", "Images//Test02.png");
 		
-		curTime = System.currentTimeMillis();
-		
 		bulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
@@ -97,6 +97,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		
 		shootSound = new Sound("Sounds//tank_shoot01.wav");
 		moveSound = new Sound("Sounds//tank_move01.wav");
+		
+		isRunning = true;
 		
 		if(thread == null){
 			thread = new Thread(this);
@@ -149,7 +151,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	
 	@Override
 	public void run() {
-		while(true){
+		while(isRunning){
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
 			
@@ -158,6 +160,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 					if(!b.isMaxDistReached()){
 						if(!b.isCollision()){
 							b.move();
+							//System.out.println("move");
 						}
 					}
 				}
@@ -325,19 +328,19 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX + 1, posY, curDirection));
+			bulletList.add(new Bullet(posX + 1, posY, curDirection, "t-bullet"));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new Bullet(posX, posY - 1, curDirection));
+			bulletList.add(new Bullet(posX, posY - 1, curDirection, "t-bullet"));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX - 1, posY, curDirection));
+			bulletList.add(new Bullet(posX - 1, posY, curDirection, "t-bullet"));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new Bullet(posX, posY + 1, curDirection));
+			bulletList.add(new Bullet(posX, posY + 1, curDirection, "t-bullet"));
 		}
 	}
 
@@ -421,6 +424,15 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	}
 	
 	public void reset(){
+		isRunning = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		bulletList.clear();
 		curHp = maxHp;
 		score = 0;
 	}

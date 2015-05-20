@@ -30,6 +30,14 @@ public class Spawner extends Block{
 		this.canSpawn = canSpawn;
 	}
 	
+	public boolean isEmpty(){
+		if(enemyCount == 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	public void spawn(){
 		if(enemyCount > 0 && canSpawn){
 			MainPanel.enemies.add(new Enemy(this.getX(), this.getY()));
