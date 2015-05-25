@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import net.java.balloontip.BalloonTip;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
@@ -96,7 +97,8 @@ public class MainPanel extends JPanel implements Runnable{
 				if(!nameTextField.getText().isEmpty()){
 					changeGameState(GameStates.MainGame);
 				}else{
-					JOptionPane.showMessageDialog(null, "Ievadiet savu niku!");
+					@SuppressWarnings("unused")
+					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
 				}
 			}
 		});
