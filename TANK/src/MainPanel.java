@@ -5,8 +5,10 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,11 +23,12 @@ public class MainPanel extends JPanel implements Runnable{
 	private JLabel healthLable = new JLabel("Dzivibas ");
 	private JLabel scoreLable = new JLabel("Punkti ");
 	private JLabel calcScoreLable = new JLabel(" ");
-	private JLabel totalScoreLable = new JLabel("Kopejie punkti ");
+	private JLabel totalScoreLable = new JLabel();
 	private JButton nextButton = new JButton("Nakosais limenis");
 	private JButton endButton = new JButton("Uz galveno izvelni");
 	private JLabel nameLable = new JLabel("Ievadiet savu niku: ");
 	private JTextField nameTextField = new JTextField();
+	private JLabel titleLable = new JLabel();
 	
 	private int currentMap;
 	
@@ -59,25 +62,72 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		this.setBackground(new Color(0, 0, 0));
-		
-		changeGameState(GameStates.MainMenu);
-		
+			
 		guiSetUp();
 		
-		mapList.add("Maps//map1.txt");
-		//mapList.add("Maps//map2.txt");
-		//mapList.add("Maps//map3.txt");
+		changeGameState(GameStates.MainMenu);
+
+		File mapFolder = new File("Maps//");
+		getFiles(mapFolder);
 		
 		currentMap = 0;
 		changeMap();
+		
+		tank = new Tank(map.getTankSpawnPoint());
+		this.addKeyListener(tank);
+		
+		for(Spawner s : map.getSpawnerList()){
+			s.spawn();
+		}
+		
+		isRunning = true;
 		
 		if(thread == null){
 			thread = new Thread(this);
 			thread.start();
 		}
+		
+		database = new Database();
+		database.connect();
 	}
 	
-	private void guiSetUp(){
+	private void getFiles(File folder){
+	    for(File f : folder.listFiles()){
+	    	mapList.add(folder.getName() + "//" + f.getName());
+	    }
+	}
+	
+	private void guiSetUp(){		
+		startButton.setBounds(156, 200, 200, 60);
+		startButton.setFont(new Font("Arial", Font.BOLD, 16));
+		startButton.setBorderPainted(false);
+		startButton.setFocusPainted(false);
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!nameTextField.getText().isEmpty()){
+					tank.setName(nameTextField.getText());
+					nameTextField.setText("");
+					changeGameState(GameStates.MainGame);
+				}else{
+					@SuppressWarnings("unused")
+					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
+				}
+			}
+		});
+		this.add(startButton);
+		
+		nameLable.setBounds(156, 315, 200, 30);
+		nameLable.setFont(new Font("Arial", Font.BOLD, 16));
+		nameLable.setForeground(new Color(255, 255, 255));
+		this.add(nameLable);
+		
+		nameTextField.setBounds(156, 350, 200, 30);
+		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
+		nameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		this.add(nameTextField);
+		
 		healthLable.setBounds(5, 515, 200, 30);
 		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
 		healthLable.setForeground(new Color(255, 255, 255));
@@ -88,42 +138,17 @@ public class MainPanel extends JPanel implements Runnable{
 		scoreLable.setForeground(new Color(255, 255, 255));
 		this.add(scoreLable);
 		
-		startButton.setBounds(150, 50, 200, 60);
-		startButton.setFont(new Font("Arial", Font.BOLD, 16));
-		startButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!nameTextField.getText().isEmpty()){
-					changeGameState(GameStates.MainGame);
-				}else{
-					@SuppressWarnings("unused")
-					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
-				}
-			}
-		});
-		this.add(startButton);
-		
-		nameLable.setBounds(150, 165, 200, 30);
-		nameLable.setFont(new Font("Arial", Font.BOLD, 16));
-		nameLable.setForeground(new Color(255, 255, 255));
-		this.add(nameLable);
-		
-		nameTextField.setBounds(150, 200, 200, 30);
-		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
-		this.add(nameTextField);
-		
-		calcScoreLable.setBounds(150, 50, 200, 30);
+		calcScoreLable.setBounds(156, 200, 200, 30);
 		calcScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		calcScoreLable.setForeground(new Color(255, 255, 255));
 		this.add(calcScoreLable);
 		
-		totalScoreLable.setBounds(150, 80, 200, 30);
+		totalScoreLable.setBounds(156, 250, 200, 30);
 		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		totalScoreLable.setForeground(new Color(255, 255, 255));
 		this.add(totalScoreLable);
 		
-		nextButton.setBounds(150, 150, 200, 30);
+		nextButton.setBounds(156, 350, 200, 30);
 		nextButton.setFont(new Font("Arial", Font.BOLD, 16));
 		nextButton.addActionListener(new ActionListener() {
 			
@@ -134,7 +159,7 @@ public class MainPanel extends JPanel implements Runnable{
 		});
 		this.add(nextButton);
 
-		endButton.setBounds(150, 150, 200, 30);
+		endButton.setBounds(156, 350, 200, 30);
 		endButton.setFont(new Font("Arial", Font.BOLD, 16));
 		endButton.addActionListener(new ActionListener() {
 			
@@ -144,20 +169,10 @@ public class MainPanel extends JPanel implements Runnable{
 			}
 		});
 		this.add(endButton);
-	}
-	
-	private void init(){
-		database = new Database();
-		database.connect();
 		
-		tank = new Tank(map.getTankSpawnPoint());
-		this.addKeyListener(tank);
-		
-		for(Spawner s : map.getSpawnerList()){
-			s.spawn();
-		}
-		
-		isRunning = true;
+		titleLable.setBounds(0, 0, 512, 582);
+		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
+		this.add(titleLable);
 	}
 	
 	@Override
@@ -176,7 +191,6 @@ public class MainPanel extends JPanel implements Runnable{
 
 	@Override
 	public void run() {
-		init();
 		while(isRunning){
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
@@ -202,14 +216,10 @@ public class MainPanel extends JPanel implements Runnable{
 					changeMap();
 					changeGameState(GameStates.LevelFinished);
 				}else if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()){
-					database.write(nameTextField.getText(), tank.getScore());
-					
 					currentMap = 0;
 					changeMap();
 					changeGameState(GameStates.EndScreen);
 				}else if(tank.isDead()){
-					database.write(nameTextField.getText(), tank.getScore());
-					
 					currentMap = 0;
 					changeMap();
 					changeGameState(GameStates.EndScreen);
@@ -277,6 +287,7 @@ public class MainPanel extends JPanel implements Runnable{
 		switch(state){
 			case MainMenu:
 				currentGameState = state;
+				titleLable.setVisible(true);
 				startButton.setVisible(true);
 				nameLable.setVisible(true);
 				nameTextField.setVisible(true);
@@ -289,6 +300,7 @@ public class MainPanel extends JPanel implements Runnable{
 				break;
 			case MainGame:
 				currentGameState = state;
+				titleLable.setVisible(false);
 				startButton.setVisible(false);
 				nameLable.setVisible(false);
 				nameTextField.setVisible(false);
@@ -301,6 +313,7 @@ public class MainPanel extends JPanel implements Runnable{
 				break;
 			case LevelFinished:
 				currentGameState = state;
+				titleLable.setVisible(true);
 				startButton.setVisible(false);
 				nameLable.setVisible(false);
 				nameTextField.setVisible(false);
@@ -310,13 +323,15 @@ public class MainPanel extends JPanel implements Runnable{
 				totalScoreLable.setVisible(true);
 				nextButton.setVisible(true);
 				endButton.setVisible(false);
-				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = " + tank.getScore() * tank.getCurHp());
+				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = ");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", tank.getScore()));
+				database.write(tank.getName(), tank.getScore());
+				totalScoreLable.setText(String.format("%08d", tank.getScore()));
 				tank.setLocation(map.getTankSpawnPoint());
 				break;
 			case EndScreen:
 				currentGameState = state;
+				titleLable.setVisible(true);
 				startButton.setVisible(false);
 				nameLable.setVisible(false);
 				nameTextField.setVisible(false);
@@ -324,11 +339,11 @@ public class MainPanel extends JPanel implements Runnable{
 				healthLable.setVisible(false);
 				calcScoreLable.setVisible(true);
 				totalScoreLable.setVisible(true);
-				nextButton.setVisible(false);
 				endButton.setVisible(true);
-				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = " + tank.getScore() * tank.getCurHp());
+				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = ");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				totalScoreLable.setText("Kopejie punkti " + String.format("%08d", tank.getScore()));
+				database.write(tank.getName(), tank.getScore());
+				totalScoreLable.setText(String.format("%08d", tank.getScore()));
 				tank.reset();
 				tank = new Tank(map.getTankSpawnPoint());
 				this.addKeyListener(tank);

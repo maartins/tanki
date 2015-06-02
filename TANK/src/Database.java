@@ -7,9 +7,9 @@ import java.sql.Statement;
 
 public class Database {
 	
-	private String url = "jdbc:mysql://sql5.freemysqlhosting.net:3306/sql577868";
-	private String username = "sql577868";
-	private String password = "eD2%cE5!";
+	private String url = "jdbc:mysql://sql5.db4free.net:3306/tankgamedata";
+	private String username = "game12345";
+	private String password = "123qweasd";
 	
 	private Connection connection = null;
 	

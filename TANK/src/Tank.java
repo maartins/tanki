@@ -43,7 +43,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private Thread thread;
 	
 	public Tank(Block posBlock){
-		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Test02.png");
+		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Tank01.png");
 		
 		bulletList = new ArrayList<Bullet>();
 		

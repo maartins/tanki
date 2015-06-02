@@ -12,7 +12,7 @@ public class Bullet extends GameObject{
 	private boolean collide;
 	
 	public Bullet(int posX, int posY, int curDir, String name){
-		super(posX, posY, name, "Images//Test03.png");
+		super(posX, posY, name, "Images//Bullet01.png");
 		dx = posX;
 		dy = posY;
 		
@@ -24,7 +24,7 @@ public class Bullet extends GameObject{
 	}
 	
 	public Bullet(int posX, int posY, int curDir){
-		super(posX, posY, "Bullet", "Images//Test03.png");
+		super(posX, posY, "Bullet", "Images//Bullet01.png");
 		dx = posX;
 		dy = posY;
 		
