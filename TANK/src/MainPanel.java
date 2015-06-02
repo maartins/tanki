@@ -216,10 +216,24 @@ public class MainPanel extends JPanel implements Runnable{
 					changeMap();
 					changeGameState(GameStates.LevelFinished);
 				}else if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()){
+					for(Enemy e : enemies){
+						e.die();
+					}
+					
+					enemies.clear();
+					deadList.clear();
+					
 					currentMap = 0;
 					changeMap();
 					changeGameState(GameStates.EndScreen);
 				}else if(tank.isDead()){
+					for(Enemy e : enemies){
+						e.die();
+					}
+					
+					enemies.clear();
+					deadList.clear();
+					
 					currentMap = 0;
 					changeMap();
 					changeGameState(GameStates.EndScreen);
@@ -325,7 +339,6 @@ public class MainPanel extends JPanel implements Runnable{
 				endButton.setVisible(false);
 				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = ");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				database.write(tank.getName(), tank.getScore());
 				totalScoreLable.setText(String.format("%08d", tank.getScore()));
 				tank.setLocation(map.getTankSpawnPoint());
 				break;
@@ -342,8 +355,8 @@ public class MainPanel extends JPanel implements Runnable{
 				endButton.setVisible(true);
 				calcScoreLable.setText(tank.getScore() + " * " + tank.getCurHp() + " = ");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				database.write(tank.getName(), tank.getScore());
 				totalScoreLable.setText(String.format("%08d", tank.getScore()));
+				database.write(tank.getName(), tank.getScore());
 				tank.reset();
 				tank = new Tank(map.getTankSpawnPoint());
 				this.addKeyListener(tank);
