@@ -1,7 +1,9 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 
 
@@ -45,6 +47,29 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public ArrayList<String> getTopScore(){
+		ArrayList<String> topTen = new ArrayList<String>();
+		
+		try {
+			Statement statement = connection.createStatement();
+	        ResultSet resultStatment = statement.executeQuery("SELECT nickname, score FROM score_table ORDER BY score DESC");
+	        
+	        int count = 1;
+	        
+	        while(resultStatment.next() && count <= 10){
+	            String nickName = resultStatment.getString("nickname");
+	            String score = resultStatment.getLong("score") + "";
+	            System.out.println(count + ". " + nickName + " - " + score);
+	            topTen.add(count + ". " + nickName + " - " + score);
+	            count++;
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return topTen;
 	}
 	
 	public void disconnect(){
