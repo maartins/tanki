@@ -86,9 +86,6 @@ public class MainPanel extends JPanel implements Runnable{
 			thread = new Thread(this);
 			thread.start();
 		}
-		
-		database = new Database();
-		database.connect();
 	}
 	
 	private void getFiles(File folder){
@@ -191,6 +188,9 @@ public class MainPanel extends JPanel implements Runnable{
 
 	@Override
 	public void run() {
+		database = new Database();
+		database.connect();
+		
 		while(isRunning){
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
