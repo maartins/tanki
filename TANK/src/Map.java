@@ -50,6 +50,9 @@ public class Map extends GameObject{
 						tankSpawnPoint = new Floor(j * 32, i * 32);
 						blockList.add(tankSpawnPoint);
 						blocks[j][i] = blockList.get(blockList.size() - 1);
+					}else if(c == '1'){
+						blockList.add(new PwrUpSuperBullet(j * 32, i * 32));
+						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}
 					j++;
 				}

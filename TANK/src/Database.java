@@ -61,7 +61,7 @@ public class Database {
 	        while(resultStatment.next() && count <= 10){
 	            String nickName = resultStatment.getString("nickname");
 	            String score = resultStatment.getLong("score") + "";
-	            System.out.println(count + ". " + nickName + " - " + score);
+	            //System.out.println(count + ". " + nickName + " - " + score);
 	            topTen.add(count + ". " + nickName + " - " + score);
 	            count++;
 	        }

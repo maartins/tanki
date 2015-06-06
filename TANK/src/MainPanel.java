@@ -355,7 +355,7 @@ public class MainPanel extends JPanel implements Runnable{
 				tank.setScore(tank.getScore() * tank.getCurHp());
 				totalScoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
 				database.write(tank.getName(), tank.getScore());
-				tank.reset();
+				tank.die();
 				tank = new Tank(map.getTankSpawnPoint());
 				this.addKeyListener(tank);
 				for(Enemy e : enemies){

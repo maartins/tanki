@@ -4,6 +4,7 @@ public class Bullet extends GameObject{
 	private int dx;
 	private int dy;
 	private int curDirection;
+	private int damage;
 	
 	private final int SPEED = 5;
 	private final int MAXDIST = 500;
@@ -11,12 +12,28 @@ public class Bullet extends GameObject{
 	private boolean maxDistReached;
 	private boolean collide;
 	
+	public Bullet(int posX, int posY, int curDir, int damage, String name, String imagePath){
+		super(posX, posY, name, imagePath);
+		dx = posX;
+		dy = posY;
+		
+		curDirection = curDir;
+		
+		this.damage = damage;
+		
+		maxDistReached = false;
+		
+		collide = false;
+	}
+	
 	public Bullet(int posX, int posY, int curDir, String name){
 		super(posX, posY, name, "Images//Bullet01.png");
 		dx = posX;
 		dy = posY;
 		
 		curDirection = curDir;
+		
+		damage = 1;
 		
 		maxDistReached = false;
 		
@@ -29,6 +46,8 @@ public class Bullet extends GameObject{
 		dy = posY;
 		
 		curDirection = curDir;
+		
+		damage = 1;
 		
 		maxDistReached = false;
 		
@@ -71,13 +90,13 @@ public class Bullet extends GameObject{
 		
 		for(Enemy e : MainPanel.enemies){
 			if(this.getBounds().intersects(e.getBounds())){
-				e.damage();
+				e.recieveDamage(damage);
 		    	collide = true;
 		    }
 		}
 		
 		if(this.getBounds().intersects(MainPanel.tank.getBounds())){
-			MainPanel.tank.damage();
+			MainPanel.tank.recieveDamage(damage);
 	    	collide = true;
 	    }
 	}

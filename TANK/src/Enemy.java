@@ -564,8 +564,8 @@ public class Enemy extends GameObject implements Runnable{
 		}
 	}
 	
-	public void damage(){
-		curHp--;
+	public void recieveDamage(int damage){
+		curHp -= damage;
 	}
 	
 	public boolean isDead(){

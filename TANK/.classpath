@@ -4,8 +4,8 @@
 	<classpathentry including="Block_Test01.png|Enemy01.png|Floor01.png|Nav01.png|TargetingLine01.png|Test02.png|Test03.png" kind="src" path="Images"/>
 	<classpathentry including="map1.txt" kind="src" path="Maps"/>
 	<classpathentry kind="src" path="Sounds"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="mysql-connector-java-5.1.35-bin.jar"/>
 	<classpathentry kind="lib" path="balloontip-1.2.4.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

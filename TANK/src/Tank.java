@@ -15,6 +15,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private int preDirection;
 	private int curHp;
 	private int score;
+	private int superBulletCount;
 
 	private final int maxHp = 50;
 	private final int UP = 1;
@@ -48,7 +49,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		bulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
-		score = 0;		
+		score = 0;
+		superBulletCount = 0;
 		
 		veloX = 0;
 		veloY = 0;
@@ -80,7 +82,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		bulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
-		score = 0;		
+		score = 0;
+		superBulletCount = 0;
 		
 		veloX = 0;
 		veloY = 0;
@@ -218,7 +221,13 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			if(System.currentTimeMillis() - shootTime > 250){
 				shootTime = System.currentTimeMillis();
 				shootSound.play();
-				shoot();
+				
+				if(superBulletCount == 0){
+					shoot();	
+				}else{
+					superShoot();
+					superBulletCount--;
+				}
 				//System.out.println("SHOOT");
 			}
 		}
@@ -273,6 +282,14 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			        	this.setY(b.getY() - this.getHeight());
 			        }
 			    }
+			}else if(this.getBounds().intersects(b.getBounds()) && b instanceof PowerUp){
+				//System.out.println("Power up");
+				MainPanel.map.getBlockList().set(MainPanel.map.getBlockList().indexOf(b), new Floor(b.getX(), b.getY()));
+				
+				if(b instanceof PwrUpSuperBullet){
+					//System.out.println("Super Bullet");
+					superBulletCount = ((PwrUpSuperBullet) b).getBulletCount();
+				}
 			}
 		}
 		
@@ -343,6 +360,27 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			bulletList.add(new Bullet(posX, posY + 1, curDirection, "t-bullet"));
 		}
 	}
+	
+	private void superShoot(){
+		int posX = 0, posY = 0;
+		if(curDirection == RIGHT){
+			posX = this.getX() + this.getWidth();
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+		}else if(curDirection == UP){
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() - 2;
+			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+		}else if(curDirection == LEFT){
+			posX = this.getX() - 2;
+			posY = this.getY() + (this.getHeight() / 2);
+			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+		}else if(curDirection == DOWN){
+			posX = this.getX() + (this.getWidth() / 2);
+			posY = this.getY() + this.getHeight();
+			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+		}
+	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -411,8 +449,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	
-	public void damage(){
-		curHp--;
+	public void recieveDamage(int damage){
+		curHp -= damage;
 	}
 	
 	public boolean isDead(){
@@ -423,7 +461,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		}
 	}
 	
-	public void reset(){
+	public void die(){
 		isRunning = false;
 		try {
 			thread.join();
