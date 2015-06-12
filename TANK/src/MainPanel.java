@@ -49,7 +49,7 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private GameStates currentGameState;
 
-	private Database database;
+	private static Database database;
 	
 	private Thread thread;
 	
@@ -84,6 +84,11 @@ public class MainPanel extends JPanel implements Runnable{
 			thread = new Thread(this);
 			thread.start();
 		}
+	}
+	
+	public static void init(){
+		database = new Database();
+		database.connect();
 	}
 	
 	private void getFiles(File folder){
@@ -201,8 +206,7 @@ public class MainPanel extends JPanel implements Runnable{
 
 	@Override
 	public void run() {
-		database = new Database();
-		database.connect();
+		
 		
 		while(isRunning){
 			startTime = System.currentTimeMillis();

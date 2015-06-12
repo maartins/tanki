@@ -20,6 +20,7 @@ public class Main{
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		MainPanel.init();
 	}
 	
 	public static void main(String[] args) {
