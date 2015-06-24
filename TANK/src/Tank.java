@@ -167,6 +167,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 						}
 					}
 				}
+				
 				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
 					//System.out.println("delete");
 					bulletList.remove(bulletList.size() - 1);
@@ -254,6 +255,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			    }else if(insect.getX() + insect.getWidth() == this.getX() + this.getWidth()){
 			        horizontal = true;
 			    }
+			    
 			    if(insect.getY() == this.getY()){
 			        vertical = true;
 			        isTop = true;

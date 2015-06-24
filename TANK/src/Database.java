@@ -44,6 +44,7 @@ public class Database {
 		try {
 			statement = connection.createStatement();
 			statement.executeUpdate("INSERT INTO score_table (nickname, score) VALUES ('"+ text +"', "+ number +")");
+			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -65,6 +66,8 @@ public class Database {
 	            topTen.add(count + ". " + nickName + " - " + score);
 	            count++;
 	        }
+	        statement.close();
+	        resultStatment.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

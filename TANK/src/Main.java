@@ -15,7 +15,7 @@ public class Main{
 		frame.addWindowListener(new WindowAdapter() {
 		       public void windowClosing(WindowEvent windowEvent){
 		          System.exit(0);
-		       }        
+		       }
 		    });
 		frame.pack();
 		frame.setLocationRelativeTo(null);

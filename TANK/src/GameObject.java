@@ -74,7 +74,7 @@ public class GameObject {
 	
 	public BufferedImage rotate(BufferedImage img, int cdir, int pdir){
 		AffineTransform transform = new AffineTransform();
-	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth()/2, img.getHeight()/2);
+	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth() / 2, img.getHeight() / 2);
 	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
 	    img = op.filter(img, null);
 	    

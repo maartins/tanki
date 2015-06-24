@@ -267,7 +267,7 @@ public class Enemy extends GameObject implements Runnable{
 				}
 			}
 			
-			//tempBlock.setImage("Images//Test03.png");
+			//tempBlock.setImage("Images/SuperBullet01.png");
 			closedList.add(tempBlock);
 			
 			openList.clear();
@@ -358,7 +358,7 @@ public class Enemy extends GameObject implements Runnable{
 					}
 				}
 				
-				//tempBlock.setImage("Images//Test03.png");
+				//tempBlock.setImage("Images//SuperBullet01.png");
 				closedList.add(tempBlock);
 				
 				openList.clear();
@@ -395,7 +395,7 @@ public class Enemy extends GameObject implements Runnable{
 							//System.out.println("CREATING NAV   size of closed " + closedList.size());
 							//System.out.println("CREATING NAV   size of open   " + openList.size());
 							//System.out.println("CREATING NAV   size of nav    " + navList.size());
-							//closedList.get(i).getParent().setImage("Images//Test02.png");
+							//closedList.get(i).getParent().setImage("Images//Wall01.png");
 							
 							//System.out.println(closedList.get(i) + " -> " +closedList.get(i).getParent());
 							navList.add(closedList.get(i).getParent());
@@ -602,5 +602,3 @@ public class Enemy extends GameObject implements Runnable{
 		bulletList.clear();
 	}
 }
-
-

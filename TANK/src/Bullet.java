@@ -1,21 +1,21 @@
 
 public class Bullet extends GameObject{
 	
-	private int dx;
-	private int dy;
+	private int disx;
+	private int disy;
 	private int curDirection;
 	private int damage;
 	
 	private final int SPEED = 5;
-	private final int MAXDIST = 500;
+	private final int MAXDIST = 200;
 	
 	private boolean maxDistReached;
 	private boolean collide;
 	
 	public Bullet(int posX, int posY, int curDir, int damage, String name, String imagePath){
 		super(posX, posY, name, imagePath);
-		dx = posX;
-		dy = posY;
+		disx = posX;
+		disy = posY;
 		
 		curDirection = curDir;
 		
@@ -28,8 +28,8 @@ public class Bullet extends GameObject{
 	
 	public Bullet(int posX, int posY, int curDir, String name){
 		super(posX, posY, name, "Images//Bullet01.png");
-		dx = posX;
-		dy = posY;
+		disx = posX;
+		disy = posY;
 		
 		curDirection = curDir;
 		
@@ -42,8 +42,8 @@ public class Bullet extends GameObject{
 	
 	public Bullet(int posX, int posY, int curDir){
 		super(posX, posY, "Bullet", "Images//Bullet01.png");
-		dx = posX;
-		dy = posY;
+		disx = posX;
+		disy = posY;
 		
 		curDirection = curDir;
 		
@@ -58,25 +58,25 @@ public class Bullet extends GameObject{
 		switch(curDirection){
 		case 0:
 			this.setX(this.getX() + SPEED);
-			if(this.getX() - dx >= MAXDIST){
+			if(this.getX() - disx >= MAXDIST){
 				maxDistReached = true;
 			}
 			break;
 		case 1:
 			this.setY(this.getY() - SPEED);
-			if(this.getY() - dy <= -MAXDIST){
+			if(this.getY() - disy <= -MAXDIST){
 				maxDistReached = true;
 			}
 			break;
 		case 2:
 			this.setX(this.getX() - SPEED);
-			if(this.getX() - dx <= -MAXDIST){
+			if(this.getX() - disx <= -MAXDIST){
 				maxDistReached = true;
 			}
 			break;
 		case 3:
 			this.setY(this.getY() + SPEED);
-			if(this.getY() - dy >= MAXDIST){
+			if(this.getY() - disy >= MAXDIST){
 				maxDistReached = true;
 			}
 			break;
