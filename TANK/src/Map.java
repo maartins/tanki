@@ -6,12 +6,15 @@ import java.util.ArrayList;
 
 public class Map extends GameObject{
 	
+	private final int blockSize = 32;
+	
 	private String mapPath;
 	
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
 	private Block[][] blocks;
 	private Block tankSpawnPoint;
+	private Block ironBirdSpawnPoint;
 
 	public Map(String mapPath){
 		super(0, 0, "Map");
@@ -37,21 +40,29 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
-						blockList.add(new Wall(j * 32, i * 32));
+						blockList.add(new Wall(j * blockSize, i * blockSize));
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == ' '){
-						blockList.add(new Floor(j * 32, i * 32));
+						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 's'){
-						spawnerList.add(new Spawner(j * 32, i * 32));
-						blockList.add(new Floor(j * 32, i * 32));
+						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
+						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 't'){
-						tankSpawnPoint = new Floor(j * 32, i * 32);
+						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == '1'){
-						blockList.add(new PwrUpSuperBullet(j * 32, i * 32));
+						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
+						blocks[j][i] = blockList.get(blockList.size() - 1);
+					}else if(c == 'b'){
+						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
+						blockList.add(ironBirdSpawnPoint);
+						blocks[j][i] = blockList.get(blockList.size() - 1);
+					}else{
+						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
+						blockList.add(tankSpawnPoint);
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}
 					j++;
@@ -87,5 +98,13 @@ public class Map extends GameObject{
 
 	public void setTankSpawnPoint(Block tankSpawnPoint) {
 		this.tankSpawnPoint = tankSpawnPoint;
+	}
+	
+	public Block getIronBirdSpawnPoint() {
+		return ironBirdSpawnPoint;
+	}
+
+	public void setIronBirdSpawnPoint(Block ironBirdSpawnPoint) {
+		this.ironBirdSpawnPoint = ironBirdSpawnPoint;
 	}
 }

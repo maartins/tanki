@@ -33,6 +33,7 @@ public class Enemy extends GameObject implements Runnable{
 	private ArrayList<Block> openList;
 	private ArrayList<Block> navList;
 	private ArrayList<Bullet> bulletList;
+	private ArrayList<Bullet> deadBulletList;
 	
 	private Spawner spawner;
 	
@@ -47,6 +48,7 @@ public class Enemy extends GameObject implements Runnable{
 		openList = new ArrayList<Block>();
 		navList = new ArrayList<Block>();
 		bulletList = new ArrayList<Bullet>();
+		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		
@@ -98,13 +100,25 @@ public class Enemy extends GameObject implements Runnable{
 					if(!b.isMaxDistReached()){
 						if(!b.isCollision()){
 							b.move();
+						}else{
+							deadBulletList.add(b);
 						}
+					}else{
+						deadBulletList.add(b);
 					}
 				}
-				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
-					//System.out.println("delete");
-					bulletList.remove(bulletList.size() - 1);
+				
+				for(Bullet b : deadBulletList){
+					bulletList.remove(b);
 				}
+				
+				if(!deadBulletList.isEmpty()){
+					deadBulletList.clear();
+				}
+				//if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
+					//System.out.println("delete");
+					//bulletList.remove(bulletList.size() - 1);
+				//}
 			}
 			
 			
@@ -112,7 +126,7 @@ public class Enemy extends GameObject implements Runnable{
 			waitTime = (1000 / 60) - curTime;
 			try{
 				if(waitTime < 0){
-					Thread.sleep(5);
+					Thread.sleep(10);
 				}else{
 					Thread.sleep(waitTime);
 				}
@@ -127,19 +141,19 @@ public class Enemy extends GameObject implements Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX + 1, posY, curDirection));
+			bulletList.add(new Bullet(posX + 3, posY, curDirection));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new Bullet(posX, posY - 1, curDirection));
+			bulletList.add(new Bullet(posX, posY - 3, curDirection));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX - 1, posY, curDirection));
+			bulletList.add(new Bullet(posX - 3, posY, curDirection));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new Bullet(posX, posY + 1, curDirection));
+			bulletList.add(new Bullet(posX, posY + 3, curDirection));
 		}
 	}
 	
@@ -180,8 +194,26 @@ public class Enemy extends GameObject implements Runnable{
 	
 	public void pathing(){
 		Map mainMap = MainPanel.map;
-		Block tankPos = MainPanel.tank.getPositionOnMap();
 		Block enemyPos = this.getPositionOnMap();
+		Block targetPos;
+		
+		Block tankPos = MainPanel.tank.getPositionOnMap();
+		Block birdPos = MainPanel.bird.getPositionOnMap();
+		
+		int tankValue = (10 * (Math.abs(tankPos.getTileX() - (this.getPositionOnMap().getTileX())) 
+				   			+ Math.abs(tankPos.getTileY() - this.getPositionOnMap().getTileY()))) + 10;
+		int birdValue = (10 * (Math.abs(birdPos.getTileX() - (this.getPositionOnMap().getTileX())) 
+	   						+ Math.abs(birdPos.getTileY() - this.getPositionOnMap().getTileY()))) + 10;
+		
+		//System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
+		
+		if(tankValue > birdValue){
+			targetPos = birdPos;
+		}else if(birdValue > tankValue){
+			targetPos = tankPos;
+		}else{
+			targetPos = birdPos;
+		}
 		
 		if(isPathingStart){
 			//System.out.println("PATHING START   size of closed " + closedList.size());
@@ -192,10 +224,10 @@ public class Enemy extends GameObject implements Runnable{
 			}
 			navList.clear();
 			
-			Block tempTank = mainMap.getBlocks()[tankPos.getTileX()][tankPos.getTileY()];
-			if(tempTank.isWalkable()){
+			Block tempTarget = mainMap.getBlocks()[targetPos.getTileX()][targetPos.getTileY()];
+			if(tempTarget.isWalkable()){
 				//tempTank.setImage("Images//Nav01.png");
-				closedList.add(tempTank);
+				closedList.add(tempTarget);
 			}
 			
 			Block enemyTemp = mainMap.getBlocks()[enemyPos.getTileX()][enemyPos.getTileY()];
@@ -363,19 +395,19 @@ public class Enemy extends GameObject implements Runnable{
 				
 				openList.clear();
 				
-				if(tempBlock.getTileX() + 1 == tankPos.getTileX() && tempBlock.getTileY() == tankPos.getTileY()){
+				if(tempBlock.getTileX() + 1 == targetPos.getTileX() && tempBlock.getTileY() == targetPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE");
-				}else if(tempBlock.getTileX() - 1 == tankPos.getTileX() && tempBlock.getTileY() == tankPos.getTileY()){
+				}else if(tempBlock.getTileX() - 1 == targetPos.getTileX() && tempBlock.getTileY() == targetPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE");
-				}else if(tempBlock.getTileY() + 1 == tankPos.getTileY() && tempBlock.getTileX() == tankPos.getTileX()){
+				}else if(tempBlock.getTileY() + 1 == targetPos.getTileY() && tempBlock.getTileX() == targetPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE");
-				}else if(tempBlock.getTileY() - 1 == tankPos.getTileY() && tempBlock.getTileX() == tankPos.getTileX()){
+				}else if(tempBlock.getTileY() - 1 == targetPos.getTileY() && tempBlock.getTileX() == targetPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE");
@@ -407,7 +439,7 @@ public class Enemy extends GameObject implements Runnable{
 			}
 		}
 		
-		if(tankPos.getTileX() != closedList.get(0).getTileX() || tankPos.getTileY() != closedList.get(0).getTileY()){
+		if(targetPos.getTileX() != closedList.get(0).getTileX() || targetPos.getTileY() != closedList.get(0).getTileY()){
 			for(Block b : closedList){
 				b.reset();
 			}
@@ -562,6 +594,50 @@ public class Enemy extends GameObject implements Runnable{
 		        }
 		    }
 		}
+		
+		if(this.getBounds().intersects(MainPanel.bird.getBounds())){
+		    Rectangle insect = this.getBounds().intersection(MainPanel.bird.getBounds());
+
+		    boolean vertical = false;
+		    boolean horizontal = false;
+		    boolean isLeft = false;
+		    boolean isTop = false;
+
+		    if(insect.getX() == this.getX()){
+		        horizontal = true;
+		        isLeft = true;
+		    }else if(insect.getX() + insect.getWidth() == this.getX() + this.getWidth()){
+		        horizontal = true;
+		    }
+		    if(insect.getY() == this.getY()){
+		        vertical = true;
+		        isTop = true;
+		    }else if(insect.getY() + insect.getHeight() == this.getY() + this.getHeight()){
+		        vertical = true;
+		    }
+
+		    if(horizontal && vertical){
+		        if(insect.getWidth() > insect.getHeight()){
+		            horizontal = false;
+		        }else{
+		            vertical = false;
+		        }
+		    }
+			
+		    if(horizontal){
+		        if(isLeft){
+		        	this.setX(MainPanel.bird.getX() + MainPanel.bird.getWidth());
+		        }else{
+		        	this.setX(MainPanel.bird.getX() - this.getWidth());
+		        }
+		    }else if(vertical){
+		        if(isTop){
+		        	this.setY(MainPanel.bird.getY() + MainPanel.bird.getHeight());
+		        }else{
+		        	this.setY(MainPanel.bird.getY() - this.getHeight());
+		        }
+		    }
+		}
 	}
 	
 	public void recieveDamage(int damage){
@@ -600,5 +676,6 @@ public class Enemy extends GameObject implements Runnable{
 		}
 		navList.clear();
 		bulletList.clear();
+		deadBulletList.clear();
 	}
 }

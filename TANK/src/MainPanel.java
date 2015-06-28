@@ -40,6 +40,7 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private boolean isRunning;
 	
+	public static IronBird bird;
 	public static Tank tank;
 	public static Map map;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
@@ -73,6 +74,8 @@ public class MainPanel extends JPanel implements Runnable{
 		
 		currentMap = 0;
 		changeMap();
+		
+		bird = new IronBird(map.getIronBirdSpawnPoint());
 		
 		tank = new Tank(map.getTankSpawnPoint());
 		this.addKeyListener(tank);
@@ -194,10 +197,13 @@ public class MainPanel extends JPanel implements Runnable{
 		
 		if(currentGameState == GameStates.MainGame){
 			map.draw(g);
+			bird.draw(g);
 			tank.draw(g);
 			
-			for(Enemy e : enemies){
-				e.draw(g);
+			synchronized (enemies) {
+				for(Enemy e : enemies){
+					e.draw(g);
+				}
 			}
 		}
 	}
@@ -240,6 +246,17 @@ public class MainPanel extends JPanel implements Runnable{
 					changeMap();
 					changeGameState(GameStates.EndScreen);
 				}else if(tank.isDead()){
+					for(Enemy e : enemies){
+						e.die();
+					}
+					
+					enemies.clear();
+					deadList.clear();
+					
+					currentMap = 0;
+					changeMap();
+					changeGameState(GameStates.EndScreen);
+				}else if(bird.isDead()){
 					for(Enemy e : enemies){
 						e.die();
 					}

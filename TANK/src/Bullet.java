@@ -7,7 +7,7 @@ public class Bullet extends GameObject{
 	private int damage;
 	
 	private final int SPEED = 5;
-	private final int MAXDIST = 200;
+	private final int MAXDIST = 500;
 	
 	private boolean maxDistReached;
 	private boolean collide;
@@ -85,6 +85,7 @@ public class Bullet extends GameObject{
 		for(Block b : MainPanel.map.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && b.isShootable()){
 		    	collide = true;
+		    	//b.recieveDamage(damage);
 		    }
 		}
 		
@@ -99,6 +100,11 @@ public class Bullet extends GameObject{
 			MainPanel.tank.recieveDamage(damage);
 	    	collide = true;
 	    }
+		
+		if(this.getBounds().intersects(MainPanel.bird.getBounds())){
+			MainPanel.bird.recieveDamage(damage);
+			collide = true;
+		}
 	}
 	
 	public boolean isMaxDistReached(){

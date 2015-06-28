@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Tank extends GameObject implements KeyListener, Runnable{
 	
@@ -36,6 +37,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private boolean isRunning;
 	
 	private ArrayList<Bullet> bulletList;
+	private ArrayList<Bullet> deadBulletList;
 	
 	private Sound shootSound;
 	@SuppressWarnings("unused")
@@ -47,6 +49,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Tank01.png");
 		
 		bulletList = new ArrayList<Bullet>();
+		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		score = 0;
@@ -80,6 +83,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		super(posX, posY, "Tank", "Images//Test02.png");
 		
 		bulletList = new ArrayList<Bullet>();
+		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		score = 0;
@@ -159,19 +163,45 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			Toolkit.getDefaultToolkit().sync();
 			
 			if(!bulletList.isEmpty()){
-				for(Bullet b : bulletList){
+				/*for(Bullet b : bulletList){
 					if(!b.isMaxDistReached()){
 						if(!b.isCollision()){
 							b.move();
 							//System.out.println("move");
+						}else{
+							deadBulletList.add(b);
 						}
+					}else{
+						deadBulletList.add(b);
+					}
+				}*/
+				
+				Iterator<Bullet> iterator = bulletList.iterator();
+				while(iterator.hasNext()){
+					Bullet b = iterator.next();
+					if(!b.isMaxDistReached()){
+						if(!b.isCollision()){
+							b.move();
+							//System.out.println("move");
+						}else{
+							deadBulletList.add(b);
+						}
+					}else{
+						deadBulletList.add(b);
 					}
 				}
 				
-				if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
-					//System.out.println("delete");
-					bulletList.remove(bulletList.size() - 1);
+				for(Bullet b : deadBulletList){
+					bulletList.remove(b);
 				}
+				
+				if(!deadBulletList.isEmpty()){
+					deadBulletList.clear();
+				}
+				//if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
+					//System.out.println("delete");
+					//bulletList.remove(bulletList.size() - 1);
+				//}
 			}
 			
 			
@@ -179,7 +209,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			waitTime = (1000 / 60) - curTime;
 			try{
 				if(waitTime < 0){
-					Thread.sleep(5);
+					Thread.sleep(10);
 				}else{
 					Thread.sleep(waitTime);
 				}
@@ -224,7 +254,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 				shootSound.play();
 				
 				if(superBulletCount == 0){
-					shoot();	
+					shoot();
 				}else{
 					superShoot();
 					superBulletCount--;
@@ -340,6 +370,50 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			    }
 			}
 		}
+		
+		if(this.getBounds().intersects(MainPanel.bird.getBounds())){
+		    Rectangle insect = this.getBounds().intersection(MainPanel.bird.getBounds());
+
+		    boolean vertical = false;
+		    boolean horizontal = false;
+		    boolean isLeft = false;
+		    boolean isTop = false;
+
+		    if(insect.getX() == this.getX()){
+		        horizontal = true;
+		        isLeft = true;
+		    }else if(insect.getX() + insect.getWidth() == this.getX() + this.getWidth()){
+		        horizontal = true;
+		    }
+		    if(insect.getY() == this.getY()){
+		        vertical = true;
+		        isTop = true;
+		    }else if(insect.getY() + insect.getHeight() == this.getY() + this.getHeight()){
+		        vertical = true;
+		    }
+
+		    if(horizontal && vertical){
+		        if(insect.getWidth() > insect.getHeight()){
+		            horizontal = false;
+		        }else{
+		            vertical = false;
+		        }
+		    }
+			
+		    if(horizontal){
+		        if(isLeft){
+		        	this.setX(MainPanel.bird.getX() + MainPanel.bird.getWidth());
+		        }else{
+		        	this.setX(MainPanel.bird.getX() - this.getWidth());
+		        }
+		    }else if(vertical){
+		        if(isTop){
+		        	this.setY(MainPanel.bird.getY() + MainPanel.bird.getHeight());
+		        }else{
+		        	this.setY(MainPanel.bird.getY() - this.getHeight());
+		        }
+		    }
+		}
 	}
 	
 	private void shoot(){
@@ -347,19 +421,19 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX + 1, posY, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX + 3, posY, curDirection, "t-bullet"));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new Bullet(posX, posY - 1, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX, posY - 3, curDirection, "t-bullet"));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX - 1, posY, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX - 3, posY, curDirection, "t-bullet"));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new Bullet(posX, posY + 1, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX, posY + 3, curDirection, "t-bullet"));
 		}
 	}
 	
@@ -368,19 +442,19 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+			bulletList.add(new SuperBullet(posX + 3, posY, curDirection));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+			bulletList.add(new SuperBullet(posX, posY - 3, curDirection));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+			bulletList.add(new SuperBullet(posX - 3, posY, curDirection));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new SuperBullet(posX + 1, posY, curDirection));
+			bulletList.add(new SuperBullet(posX, posY + 3, curDirection));
 		}
 	}
 
@@ -473,6 +547,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		}
 		
 		bulletList.clear();
+		deadBulletList.clear();
 		curHp = maxHp;
 		score = 0;
 	}

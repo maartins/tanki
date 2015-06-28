@@ -4,6 +4,8 @@ public class Block extends GameObject{
 	private int value;
 	private int tileX;
 	private int tileY;
+	private int maxHp;
+	private int curHp;
 	
 	private boolean isWalkable;
 	private boolean isShootable;
@@ -19,6 +21,9 @@ public class Block extends GameObject{
 	*/
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name){	
 		super(posX, posY, name);
+		
+		maxHp = 3;
+		curHp = maxHp;
 		
 		tileX = posX / 32;
 		tileY = posY / 32;
@@ -41,6 +46,9 @@ public class Block extends GameObject{
 	*/
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
+		
+		maxHp = 3;
+		curHp = maxHp;
 		
 		tileX = posX / 32;
 		tileY = posY / 32;
@@ -104,6 +112,10 @@ public class Block extends GameObject{
 	public void reset(){
 		value = 0;
 		parent = null;
+	}
+	
+	public void recieveDamage(int damage){
+		curHp -= damage;
 	}
 	
 	public String toString(){
