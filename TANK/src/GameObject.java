@@ -72,6 +72,11 @@ public class GameObject {
 		}
 	}
 	
+	public BufferedImage crop(BufferedImage src, Rectangle rect) {
+	      BufferedImage dest = src.getSubimage(0, 0, rect.width, rect.height);
+	      return dest; 
+	}
+	
 	public BufferedImage rotate(BufferedImage img, int cdir, int pdir){
 		AffineTransform transform = new AffineTransform();
 	    transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth() / 2, img.getHeight() / 2);

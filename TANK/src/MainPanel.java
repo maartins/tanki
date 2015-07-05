@@ -46,7 +46,8 @@ public class MainPanel extends JPanel implements Runnable{
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
 	private ArrayList<String> mapList = new ArrayList<String>();
-	private ArrayList<Enemy> deadList = new ArrayList<Enemy>();
+	private ArrayList<Enemy> deadEnemyList = new ArrayList<Enemy>();
+	private ArrayList<Block> deadBlockList = new ArrayList<Block>();
 	
 	private GameStates currentGameState;
 
@@ -231,7 +232,7 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 					
 					enemies.clear();
-					deadList.clear();
+					deadEnemyList.clear();
 					changeMap();
 					changeGameState(GameStates.LevelFinished);
 				}else if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()){
@@ -240,7 +241,7 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 					
 					enemies.clear();
-					deadList.clear();
+					deadEnemyList.clear();
 					
 					currentMap = 0;
 					changeMap();
@@ -251,7 +252,7 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 					
 					enemies.clear();
-					deadList.clear();
+					deadEnemyList.clear();
 					
 					currentMap = 0;
 					changeMap();
@@ -262,7 +263,7 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 					
 					enemies.clear();
-					deadList.clear();
+					deadEnemyList.clear();
 					
 					currentMap = 0;
 					changeMap();
@@ -280,18 +281,32 @@ public class MainPanel extends JPanel implements Runnable{
 							if(e.isDead()){
 								e.getSpawner().setCanSpawn(true);
 								tank.setScore(tank.getScore() + 20);
-								deadList.add(e);
+								deadEnemyList.add(e);
 							}
 						}
 						
-						for(Enemy e : deadList){
-							e.die();
-							enemies.remove(e);
-						}
+						if(!deadEnemyList.isEmpty()){
+							for(Enemy e : deadEnemyList){
+								e.die();
+								enemies.remove(e);
+							}
 						
-						if(!deadList.isEmpty()){
-							deadList.clear();
+							deadEnemyList.clear();
 						}
+					}
+					
+					for(Block b : map.getBlockList()){
+						if(b.isDead()){
+							deadBlockList.add(b);
+						}
+					}
+					
+					if(!deadBlockList.isEmpty()){
+						for(Block b : deadBlockList){
+							map.getBlockList().remove(b);
+						}
+					
+						deadBlockList.clear();
 					}
 					
 					healthLable.setText("Dzivibas " + tank.getCurHp());

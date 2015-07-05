@@ -421,19 +421,19 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX + 3, posY, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX + 2, posY, curDirection, "t-bullet"));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new Bullet(posX, posY - 3, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX, posY - 2, curDirection, "t-bullet"));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX - 3, posY, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX - 2, posY, curDirection, "t-bullet"));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new Bullet(posX, posY + 3, curDirection, "t-bullet"));
+			bulletList.add(new Bullet(posX, posY + 2, curDirection, "t-bullet"));
 		}
 	}
 	

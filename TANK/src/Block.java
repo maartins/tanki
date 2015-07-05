@@ -1,3 +1,5 @@
+import java.awt.Rectangle;
+
 
 public class Block extends GameObject{
 	
@@ -9,6 +11,7 @@ public class Block extends GameObject{
 	
 	private boolean isWalkable;
 	private boolean isShootable;
+	private boolean isShot;
 
 	private Block parent;
 	
@@ -22,7 +25,7 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name){	
 		super(posX, posY, name);
 		
-		maxHp = 3;
+		maxHp = 32;
 		curHp = maxHp;
 		
 		tileX = posX / 32;
@@ -32,6 +35,7 @@ public class Block extends GameObject{
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
+		isShot = false;
 		
 		parent = null;
 	}
@@ -47,7 +51,7 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
 		
-		maxHp = 3;
+		maxHp = 32;
 		curHp = maxHp;
 		
 		tileX = posX / 32;
@@ -57,10 +61,11 @@ public class Block extends GameObject{
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
+		isShot = false;
 		
 		parent = null;
 	}
-	
+
 	public boolean isWalkable() {
 		return isWalkable;
 	}
@@ -114,8 +119,58 @@ public class Block extends GameObject{
 		parent = null;
 	}
 	
-	public void recieveDamage(int damage){
-		curHp -= damage;
+	public void recieveDamage(int damage, int dir){
+		if(!isShot){
+			
+			isShot = true;
+		}
+		if(dir == 0){
+			curHp -= damage;
+			
+			if(curHp <= 0){
+				isShootable = false;
+				isWalkable = true;
+			}else{
+				setX(getX() + damage);
+				setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
+			}
+		}else if(dir == 1){
+			curHp -= damage;
+			
+			if(curHp <= 0){
+				isShootable = false;
+				isWalkable = true;
+			}else{
+				setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+			}
+		}else if(dir == 2){
+			curHp -= damage;
+			
+			if(curHp <= 0){
+				isShootable = false;
+				isWalkable = true;
+			}else{
+				setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
+			}
+		}else if(dir == 3){
+			curHp -= damage;
+			
+			if(curHp <= 0){
+				isShootable = false;
+				isWalkable = true;
+			}else{
+				setY(getY() + damage);
+				setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+			}
+		}
+	}
+
+	public boolean isDead(){
+		if(curHp <= 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	public String toString(){

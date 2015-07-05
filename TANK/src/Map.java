@@ -40,6 +40,7 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : ss.toCharArray()){
 					if(c == '#'){
+						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blockList.add(new Wall(j * blockSize, i * blockSize));
 						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == ' '){

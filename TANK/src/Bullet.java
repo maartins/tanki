@@ -85,7 +85,7 @@ public class Bullet extends GameObject{
 		for(Block b : MainPanel.map.getBlockList()){
 			if(this.getBounds().intersects(b.getBounds()) && b.isShootable()){
 		    	collide = true;
-		    	//b.recieveDamage(damage);
+		    	b.recieveDamage(8, curDirection);
 		    }
 		}
 		

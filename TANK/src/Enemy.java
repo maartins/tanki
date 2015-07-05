@@ -141,19 +141,19 @@ public class Enemy extends GameObject implements Runnable{
 		if(curDirection == RIGHT){
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX + 3, posY, curDirection));
+			bulletList.add(new Bullet(posX + 2, posY, curDirection));
 		}else if(curDirection == UP){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
-			bulletList.add(new Bullet(posX, posY - 3, curDirection));
+			bulletList.add(new Bullet(posX, posY - 2, curDirection));
 		}else if(curDirection == LEFT){
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new Bullet(posX - 3, posY, curDirection));
+			bulletList.add(new Bullet(posX - 2, posY, curDirection));
 		}else if(curDirection == DOWN){
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
-			bulletList.add(new Bullet(posX, posY + 3, curDirection));
+			bulletList.add(new Bullet(posX, posY + 2, curDirection));
 		}
 	}
 	
@@ -224,18 +224,15 @@ public class Enemy extends GameObject implements Runnable{
 			}
 			navList.clear();
 			
-			Block tempTarget = mainMap.getBlocks()[targetPos.getTileX()][targetPos.getTileY()];
-			if(tempTarget.isWalkable()){
+			if(targetPos.isWalkable()){
 				//tempTank.setImage("Images//Nav01.png");
-				closedList.add(tempTarget);
+				closedList.add(targetPos);
 			}
 			
-			Block enemyTemp = mainMap.getBlocks()[enemyPos.getTileX()][enemyPos.getTileY()];
-			if(enemyTemp.isWalkable()){
+			if(enemyPos.isWalkable()){
 				//enemyTemp.setImage("Images//Nav01.png");
-				closedList.add(enemyTemp);
+				closedList.add(enemyPos);
 			}
-			
 			
 			if(!closedList.contains(mainMap.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()])){
 				if(mainMap.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()].isWalkable()){
@@ -246,7 +243,7 @@ public class Enemy extends GameObject implements Runnable{
 					
 					tempb.setValue(temp);
 					//tempb.setImage("Images//Nav01.png");
-					tempb.setParent(closedList.get(1));
+
 					openList.add(tempb);
 				}	
 			}
@@ -259,7 +256,7 @@ public class Enemy extends GameObject implements Runnable{
 					
 					tempb.setValue(temp);
 					//tempb.setImage("Images//Nav01.png");
-					tempb.setParent(closedList.get(1));
+
 					openList.add(tempb);
 				}
 			}
@@ -272,7 +269,7 @@ public class Enemy extends GameObject implements Runnable{
 					
 					tempb.setValue(temp);
 					//tempb.setImage("Images//Nav01.png");
-					tempb.setParent(closedList.get(1));
+
 					openList.add(tempb);
 				}
 			}
@@ -285,12 +282,10 @@ public class Enemy extends GameObject implements Runnable{
 					
 					tempb.setValue(temp);
 					//tempb.setImage("Images//Nav01.png");
-					tempb.setParent(closedList.get(1));
+
 					openList.add(tempb);
 				}
 			}
-			
-			
 			
 			Block tempBlock = openList.get(0);
 			for(Block b : openList){
@@ -300,6 +295,7 @@ public class Enemy extends GameObject implements Runnable{
 			}
 			
 			//tempBlock.setImage("Images/SuperBullet01.png");
+			tempBlock.setParent(closedList.get(1));
 			closedList.add(tempBlock);
 			
 			openList.clear();
@@ -322,8 +318,7 @@ public class Enemy extends GameObject implements Runnable{
 						
 						tempb.setValue(temp);
 						//tempb.setImage("Images//Nav01.png");
-						if(tempb.getParent() == null)
-							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
+
 						openList.add(tempb);
 						
 						//System.out.println("U adding - " + tempb);
@@ -338,8 +333,7 @@ public class Enemy extends GameObject implements Runnable{
 						
 						tempb.setValue(temp);
 						//tempb.setImage("Images//Nav01.png");
-						if(tempb.getParent() == null)
-							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
+
 						openList.add(tempb);
 						
 						//System.out.println("D adding - " + tempb);
@@ -354,8 +348,7 @@ public class Enemy extends GameObject implements Runnable{
 						
 						tempb.setValue(temp);
 						//tempb.setImage("Images//Nav01.png");
-						if(tempb.getParent() == null)
-							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
+
 						openList.add(tempb);
 						
 						//System.out.println("L adding - " + tempb);
@@ -370,8 +363,7 @@ public class Enemy extends GameObject implements Runnable{
 						
 						tempb.setValue(temp);
 						//tempb.setImage("Images//Nav01.png");
-						if(tempb.getParent() == null)
-							tempb.setParent(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY()]);
+						
 						openList.add(tempb);
 						
 						//System.out.println("R adding - " + tempb);
@@ -391,6 +383,10 @@ public class Enemy extends GameObject implements Runnable{
 				}
 				
 				//tempBlock.setImage("Images//SuperBullet01.png");
+				
+				if(tempBlock.getParent() == null){
+					tempBlock.setParent(closedList.get(closedList.size() - 1));
+				}
 				closedList.add(tempBlock);
 				
 				openList.clear();
