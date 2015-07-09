@@ -123,6 +123,13 @@ public class MainPanel extends JPanel implements Runnable{
 		nameTextField.setBounds(156, 290, 200, 30);
 		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
 		nameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		nameTextField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startButton.doClick();
+			}
+		});
 		this.add(nameTextField);
 		
 		scorePanel.setBounds(156, 200, 200, 170);
