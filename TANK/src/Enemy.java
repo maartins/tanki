@@ -108,11 +108,11 @@ public class Enemy extends GameObject implements Runnable{
 					}
 				}
 				
-				for(Bullet b : deadBulletList){
-					bulletList.remove(b);
-				}
-				
 				if(!deadBulletList.isEmpty()){
+					for(Bullet b : deadBulletList){
+						bulletList.remove(b);
+					}
+				
 					deadBulletList.clear();
 				}
 				//if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
@@ -234,54 +234,54 @@ public class Enemy extends GameObject implements Runnable{
 				closedList.add(enemyPos);
 			}
 			
-			if(!closedList.contains(mainMap.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()])){
-				if(mainMap.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()].isWalkable()){
-					Block tempb = mainMap.getBlocks()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()];
+			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()])){
+				if(mainMap.navMap()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()].isWalkable()){
+					Block tempb = mainMap.navMap()[closedList.get(1).getTileX() + 1][closedList.get(1).getTileY()];
 					//System.out.println(tempb + " 1");
 					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX() + 1)) 
 								   + Math.abs(closedList.get(0).getTileY() - closedList.get(1).getTileY()))) + 10;
 					
 					tempb.setValue(temp);
-					//tempb.setImage("Images//Nav01.png");
+					tempb.setImage("Images//Nav01.png");
 
 					openList.add(tempb);
 				}	
 			}
-			if(!closedList.contains(mainMap.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()])){
-				if(mainMap.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()].isWalkable()){
-					Block tempb = mainMap.getBlocks()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()];
+			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()])){
+				if(mainMap.navMap()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()].isWalkable()){
+					Block tempb = mainMap.navMap()[closedList.get(1).getTileX() - 1][closedList.get(1).getTileY()];
 					//System.out.println(tempb + " 2");
 					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX() - 1)) 
 							   + Math.abs(closedList.get(0).getTileY() - closedList.get(1).getTileY()))) + 10;
 					
 					tempb.setValue(temp);
-					//tempb.setImage("Images//Nav01.png");
+					tempb.setImage("Images//Nav01.png");
 
 					openList.add(tempb);
 				}
 			}
-			if(!closedList.contains(mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1])){
-				if(mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1].isWalkable()){
-					Block tempb = mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1];
+			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1])){
+				if(mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1].isWalkable()){
+					Block tempb = mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() + 1];
 					//System.out.println(tempb + " 3");
 					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX())) 
 							   + Math.abs(closedList.get(0).getTileY() - (closedList.get(1).getTileY() + 1)))) + 10;
 					
 					tempb.setValue(temp);
-					//tempb.setImage("Images//Nav01.png");
+					tempb.setImage("Images//Nav01.png");
 
 					openList.add(tempb);
 				}
 			}
-			if(!closedList.contains(mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1])){
-				if(mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1].isWalkable()){
-					Block tempb = mainMap.getBlocks()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1];
+			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1])){
+				if(mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1].isWalkable()){
+					Block tempb = mainMap.navMap()[closedList.get(1).getTileX()][closedList.get(1).getTileY() - 1];
 					//System.out.println(tempb + " 4");
 					int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(1).getTileX())) 
 							   + Math.abs(closedList.get(0).getTileY() - (closedList.get(1).getTileY() - 1)))) + 10;
 					
 					tempb.setValue(temp);
-					//tempb.setImage("Images//Nav01.png");
+					tempb.setImage("Images//Nav01.png");
 
 					openList.add(tempb);
 				}
@@ -294,7 +294,7 @@ public class Enemy extends GameObject implements Runnable{
 				}
 			}
 			
-			//tempBlock.setImage("Images/SuperBullet01.png");
+			tempBlock.setImage("Images/SuperBullet01.png");
 			tempBlock.setParent(closedList.get(1));
 			closedList.add(tempBlock);
 			
@@ -308,70 +308,113 @@ public class Enemy extends GameObject implements Runnable{
 			//System.out.println("PATHING   size of closed " + closedList.size());
 			//System.out.println("PATHING   size of open   " + openList.size());
 			//System.out.println("PATHING   size of nav    " + navList.size());
+			
+			int stuckCounter = 0;
+			
 			for(int i = 2; i < closedList.size(); i++){
-				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()])){
-					if(mainMap.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()].isWalkable()){
-						Block tempb = mainMap.getBlocks()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()];
+				boolean test1 = false, test2 = false, test3 = false, test4 = false;
+				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()])){
+					if(mainMap.navMap()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()].isWalkable()){
+						Block tempb = mainMap.navMap()[closedList.get(i).getTileX() + 1][closedList.get(i).getTileY()];
 						//System.out.println(tempb + " 1");
 						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX() + 1)) 
 								   + Math.abs(closedList.get(0).getTileY() - closedList.get(i).getTileY()))) + 10;
 						
 						tempb.setValue(temp);
-						//tempb.setImage("Images//Nav01.png");
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
 						//System.out.println("U adding - " + tempb);
-					}	
+					}else{
+						test1 = true;
+					}
+				}else{
+					test1 = true;
 				}
-				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()])){
-					if(mainMap.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()].isWalkable()){
-						Block tempb = mainMap.getBlocks()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()];
+				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()])){
+					if(mainMap.navMap()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()].isWalkable()){
+						Block tempb = mainMap.navMap()[closedList.get(i).getTileX() - 1][closedList.get(i).getTileY()];
 						//System.out.println(tempb + " 2");
 						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX() - 1)) 
 								   + Math.abs(closedList.get(0).getTileY() - closedList.get(i).getTileY()))) + 10;
 						
 						tempb.setValue(temp);
-						//tempb.setImage("Images//Nav01.png");
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
 						//System.out.println("D adding - " + tempb);
+					}else{
+						test2 = true;
 					}
+				}else{
+					test2 = true;
 				}
-				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1])){
-					if(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1].isWalkable()){
-						Block tempb = mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1];
+				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1])){
+					if(mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1].isWalkable()){
+						Block tempb = mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() + 1];
 						//System.out.println(tempb + " 3");
 						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX())) 
 								   + Math.abs(closedList.get(0).getTileY() - (closedList.get(i).getTileY() + 1)))) + 10;
 						
 						tempb.setValue(temp);
-						//tempb.setImage("Images//Nav01.png");
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
 						//System.out.println("L adding - " + tempb);
+					}else{
+						test3 = true;
 					}
+				}else{
+					test3 = true;
 				}
-				if(!closedList.contains(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1])){
-					if(mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1].isWalkable()){
-						Block tempb = mainMap.getBlocks()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1];
+				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1])){
+					if(mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1].isWalkable()){
+						Block tempb = mainMap.navMap()[closedList.get(i).getTileX()][closedList.get(i).getTileY() - 1];
 						//System.out.println(tempb + " 4");
 						int temp = (10 * (Math.abs(closedList.get(0).getTileX() - (closedList.get(i).getTileX())) 
 								   + Math.abs(closedList.get(0).getTileY() - (closedList.get(i).getTileY() - 1)))) + 10;
 						
 						tempb.setValue(temp);
-						//tempb.setImage("Images//Nav01.png");
+						tempb.setImage("Images//Nav01.png");
 						
 						openList.add(tempb);
 						
 						//System.out.println("R adding - " + tempb);
+					}else{
+						test4 = true;
 					}
-				}				
+				}else{
+					test4 = true;
+				}
+				
+				if(test1){
+					if(test2){
+						if(test3){
+							if(test4){
+								stuckCounter++;
+								if(stuckCounter == closedList.size() - 2){
+									System.out.println("Stuck");
+									Block newPos = closedList.get(closedList.size() - 1);
+									System.out.println("" + newPos.getTileX() + " " + newPos.getTileY());
+									newPos.setParent(null);
+									closedList.clear();
+									closedList.add(targetPos);
+									closedList.add(newPos);
+									closedList.add(newPos);
+									openList.clear();
+									stuckCounter = 0;
+									
+								}
+							}
+						}
+					}
+				}
 			}
 			
-		
+			System.out.println("" + targetPos.getTileX() + " " + targetPos.getTileY());
 			
 			if(!openList.isEmpty()){
 				//System.out.println("CALCULATE BLOCK WIEGHT");
@@ -382,7 +425,7 @@ public class Enemy extends GameObject implements Runnable{
 					}
 				}
 				
-				//tempBlock.setImage("Images//SuperBullet01.png");
+				tempBlock.setImage("Images//SuperBullet01.png");
 				
 				if(tempBlock.getParent() == null){
 					tempBlock.setParent(closedList.get(closedList.size() - 1));

@@ -30,7 +30,7 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private int currentMap;
 	
-	private final int FPS = 60;
+	private final int FPS = 10;
 
 	private long startTime;
 	private long currentTime;
@@ -328,7 +328,7 @@ public class MainPanel extends JPanel implements Runnable{
 			waitTime = (1000 / FPS) - currentTime;
 			try{
 				if(waitTime < 0){
-					Thread.sleep(5);
+					Thread.sleep(10);
 				}else{
 					Thread.sleep(waitTime);
 				}

@@ -11,9 +11,39 @@ public class Block extends GameObject{
 	
 	private boolean isWalkable;
 	private boolean isShootable;
+	private boolean isSolid;
 	private boolean isShot;
 
 	private Block parent;
+	
+	/**
+	 * 
+	 * @param posX
+	 * @param posY
+	 * @param isWalkable
+	 * @param isShootable
+	 * @param isSolid
+	 * @param name
+	 * @param imagePath
+	 */
+	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, boolean isSolid, String name, String imagePath){	
+		super(posX, posY, name, imagePath);
+		
+		maxHp = 32;
+		curHp = maxHp;
+		
+		tileX = posX / 32;
+		tileY = posY / 32;
+		
+		value = 0;
+		
+		this.isWalkable = isWalkable;
+		this.isShootable = isShootable;
+		this.isSolid = isSolid;
+		isShot = false;
+		
+		parent = null;
+	}
 	
 	/**
 	* @param  pos x
@@ -35,6 +65,7 @@ public class Block extends GameObject{
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
+		isSolid = false;
 		isShot = false;
 		
 		parent = null;
@@ -61,6 +92,7 @@ public class Block extends GameObject{
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
+		isSolid = false;
 		isShot = false;
 		
 		parent = null;
@@ -120,47 +152,49 @@ public class Block extends GameObject{
 	}
 	
 	public void recieveDamage(int damage, int dir){
-		if(!isShot){
-			
-			isShot = true;
-		}
-		if(dir == 0){
-			curHp -= damage;
-			
-			if(curHp <= 0){
-				isShootable = false;
-				isWalkable = true;
-			}else{
-				setX(getX() + damage);
-				setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
+		if(!isSolid){
+			if(!isShot){
+				
+				isShot = true;
 			}
-		}else if(dir == 1){
-			curHp -= damage;
-			
-			if(curHp <= 0){
-				isShootable = false;
-				isWalkable = true;
-			}else{
-				setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
-			}
-		}else if(dir == 2){
-			curHp -= damage;
-			
-			if(curHp <= 0){
-				isShootable = false;
-				isWalkable = true;
-			}else{
-				setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
-			}
-		}else if(dir == 3){
-			curHp -= damage;
-			
-			if(curHp <= 0){
-				isShootable = false;
-				isWalkable = true;
-			}else{
-				setY(getY() + damage);
-				setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+			if(dir == 0){
+				curHp -= damage;
+				
+				if(curHp <= 0){
+					isShootable = false;
+					isWalkable = true;
+				}else{
+					setX(getX() + damage);
+					setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
+				}
+			}else if(dir == 1){
+				curHp -= damage;
+				
+				if(curHp <= 0){
+					isShootable = false;
+					isWalkable = true;
+				}else{
+					setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+				}
+			}else if(dir == 2){
+				curHp -= damage;
+				
+				if(curHp <= 0){
+					isShootable = false;
+					isWalkable = true;
+				}else{
+					setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
+				}
+			}else if(dir == 3){
+				curHp -= damage;
+				
+				if(curHp <= 0){
+					isShootable = false;
+					isWalkable = true;
+				}else{
+					setY(getY() + damage);
+					setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+				}
 			}
 		}
 	}

@@ -12,7 +12,7 @@ public class Map extends GameObject{
 	
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
-	private Block[][] blocks;
+	private int[][] navMap;
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
 
@@ -23,55 +23,61 @@ public class Map extends GameObject{
 		
 		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
-		blocks = new Block[16][16];
+		navMap = new int[15][15];
+		
+		for(int i = 0; i < 15; i++){
+			for(int j = 0; j < 15; j++){
+				navMap[i][j] = 0;
+			}
+		}
 		
 		makeMap();
 	}
 	
 	private void makeMap(){
-		BufferedReader br = null;
+		BufferedReader bufReader = null;
 		
 		try {
-			String ss;
-			br = new BufferedReader(new FileReader(mapPath));
+			String curLine;
+			bufReader = new BufferedReader(new FileReader(mapPath));
 
 			int i = 0;
-			while((ss = br.readLine()) != null){
+			while((curLine = bufReader.readLine()) != null){
 				int j = 0;
-				for(char c : ss.toCharArray()){
+				for(char c : curLine.toCharArray()){
 					if(c == '#'){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blockList.add(new Wall(j * blockSize, i * blockSize));
-						blocks[j][i] = blockList.get(blockList.size() - 1);
+						navMap[i][j] = 1;
+					}else if(c == '%'){
+						blockList.add(new SolidWall(j * blockSize, i * blockSize));
+						navMap[i][j] = 1;
 					}else if(c == ' '){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
-						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 's'){
 						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
 						blockList.add(new Floor(j * blockSize, i * blockSize));
-						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 't'){
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == '1'){
 						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
-						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}else if(c == 'b'){
 						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(ironBirdSpawnPoint);
-						blocks[j][i] = blockList.get(blockList.size() - 1);
+						navMap[i][j] = 1;
 					}else{
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						blocks[j][i] = blockList.get(blockList.size() - 1);
 					}
 					j++;
 				}
 				i++;
 			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -89,8 +95,8 @@ public class Map extends GameObject{
 		return blockList;
 	}
 	
-	public Block[][] getBlocks(){
-		return blocks;
+	public int[][] navMap(){
+		return navMap;
 	}
 	
 	public Block getTankSpawnPoint() {
