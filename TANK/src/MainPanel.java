@@ -30,7 +30,7 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private int currentMap;
 	
-	private final int FPS = 10;
+	private final int FPS = 60;
 
 	private long startTime;
 	private long currentTime;

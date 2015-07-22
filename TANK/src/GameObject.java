@@ -86,19 +86,29 @@ public class GameObject {
 	    return img;
 	}
 	
-	public Block getPositionOnMap(){
-		Block closestTile = new Block(-32, -32, true, false, "test");
-		int temp = 0;
-		int distance = (int) Math.sqrt(Math.pow(this.getX() - MainPanel.map.navMap()[0][0].getX(), 2) + Math.pow(this.getY() - MainPanel.map.navMap()[0][0].getY(), 2));
-		for(Block b : MainPanel.map.getBlockList()){
-			temp = (int) Math.sqrt(Math.pow(this.getX() - b.getX(), 2) + Math.pow(this.getY() - b.getY(), 2));
-			if(temp < distance){
-				distance = temp;
-				closestTile = b;
-			}
+	public NavTile getPositionOnMap(){
+		int x = this.x / 32;
+		int y = this.y / 32;
+		
+		double xDec = this.x / 32;
+		double yDec = this.y / 32;
+		
+		xDec = xDec - x;
+		yDec = yDec - y;
+		
+		if(xDec > 0.5){
+			x = Math.round(this.x / 32);
+		}else{
+			x = (int)Math.floor(this.x / 32);
 		}
-		//System.out.println(closestTile.getName() + " x" + closestTile.getTileX() + " y" + closestTile.getTileY());
-		return closestTile;
+		
+		if(yDec > 0.5){
+			y = Math.round(this.y / 32);
+		}else{
+			y = (int)Math.floor(this.y / 32);
+		}
+		
+		return new NavTile(x, y, false);
 	}
 
 	public int getX() {

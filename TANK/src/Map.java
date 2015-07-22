@@ -12,7 +12,7 @@ public class Map extends GameObject{
 	
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
-	private int[][] navMap;
+	private NavTile[][] navMap;
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
 
@@ -23,13 +23,7 @@ public class Map extends GameObject{
 		
 		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
-		navMap = new int[15][15];
-		
-		for(int i = 0; i < 15; i++){
-			for(int j = 0; j < 15; j++){
-				navMap[i][j] = 0;
-			}
-		}
+		navMap = new NavTile[15][15];
 		
 		makeMap();
 	}
@@ -48,27 +42,32 @@ public class Map extends GameObject{
 					if(c == '#'){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blockList.add(new Wall(j * blockSize, i * blockSize));
-						navMap[i][j] = 1;
+						navMap[i][j] = new NavTile(i, j, true);
 					}else if(c == '%'){
 						blockList.add(new SolidWall(j * blockSize, i * blockSize));
-						navMap[i][j] = 1;
+						navMap[i][j] = new NavTile(i, j, true);
 					}else if(c == ' '){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i, j, false);
 					}else if(c == 's'){
 						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
 						blockList.add(new Floor(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i, j, false);
 					}else if(c == 't'){
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
+						navMap[i][j] = new NavTile(i, j, false);
 					}else if(c == '1'){
 						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i, j, false);
 					}else if(c == 'b'){
 						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(ironBirdSpawnPoint);
-						navMap[i][j] = 1;
+						navMap[i][j] = new NavTile(i, j, true);
 					}else{
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
+						navMap[i][j] = new NavTile(i, j, false);
 					}
 					j++;
 				}
@@ -95,7 +94,7 @@ public class Map extends GameObject{
 		return blockList;
 	}
 	
-	public int[][] navMap(){
+	public NavTile[][] navMap(){
 		return navMap;
 	}
 	

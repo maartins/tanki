@@ -3,7 +3,6 @@ import java.awt.Rectangle;
 
 public class Block extends GameObject{
 	
-	private int value;
 	private int tileX;
 	private int tileY;
 	private int maxHp;
@@ -13,8 +12,6 @@ public class Block extends GameObject{
 	private boolean isShootable;
 	private boolean isSolid;
 	private boolean isShot;
-
-	private Block parent;
 	
 	/**
 	 * 
@@ -35,14 +32,10 @@ public class Block extends GameObject{
 		tileX = posX / 32;
 		tileY = posY / 32;
 		
-		value = 0;
-		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		this.isSolid = isSolid;
 		isShot = false;
-		
-		parent = null;
 	}
 	
 	/**
@@ -61,14 +54,10 @@ public class Block extends GameObject{
 		tileX = posX / 32;
 		tileY = posY / 32;
 		
-		value = 0;
-		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		isSolid = false;
 		isShot = false;
-		
-		parent = null;
 	}
 	
 	/**
@@ -88,14 +77,10 @@ public class Block extends GameObject{
 		tileX = posX / 32;
 		tileY = posY / 32;
 		
-		value = 0;
-		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		isSolid = false;
 		isShot = false;
-		
-		parent = null;
 	}
 
 	public boolean isWalkable() {
@@ -113,14 +98,6 @@ public class Block extends GameObject{
 	public void setShootable(boolean isShootable) {
 		this.isShootable = isShootable;
 	}
-	
-	public int getValue() {
-		return value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
-	}
 
 	public int getTileX() {
 		return tileX;
@@ -136,19 +113,6 @@ public class Block extends GameObject{
 
 	public void setTileY(int y) {
 		tileY = y;
-	}
-	
-	public Block getParent() {
-		return parent;
-	}
-
-	public void setParent(Block parent) {
-		this.parent = parent;
-	}
-	
-	public void reset(){
-		value = 0;
-		parent = null;
 	}
 	
 	public void recieveDamage(int damage, int dir){
@@ -208,6 +172,6 @@ public class Block extends GameObject{
 	}
 	
 	public String toString(){
-		return getName() + " x" + tileX + " y" + tileY + " h" + value; 
+		return getName() + " x" + tileX + " y" + tileY; 
 	}
 }
