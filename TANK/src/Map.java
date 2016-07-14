@@ -33,48 +33,49 @@ public class Map extends GameObject{
 		try {
 			String curLine;
 			bufReader = new BufferedReader(new FileReader(mapPath));
-
+			int blockSize = 32;
+			
 			int i = 0;
 			while((curLine = bufReader.readLine()) != null){
 				int j = 0;
 				for(char c : curLine.toCharArray()){
 					if(c == '#'){
-						blockList.add(new Floor(j, i));
-						blockList.add(new Wall(j, i));
-						navMap[i][j] = new NavTile(i, j, true);
+						blockList.add(new Floor(j * blockSize, i * blockSize));
+						blockList.add(new Wall(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
 						navList.add(navMap[i][j]);
 					}else if(c == '%'){
-						blockList.add(new SolidWall(j, i));
-						navMap[i][j] = new NavTile(i, j, true);
+						blockList.add(new SolidWall(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
 						navList.add(navMap[i][j]);
 					}else if(c == ' '){
-						blockList.add(new Floor(j, i));
-						navMap[i][j] = new NavTile(i, j, false);
+						blockList.add(new Floor(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
 						navList.add(navMap[i][j]);
 					}else if(c == 's'){
-						spawnerList.add(new Spawner(j, i));
-						blockList.add(new Floor(j, i));
-						navMap[i][j] = new NavTile(i, j, false);
+						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
+						blockList.add(new Floor(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
 						navList.add(navMap[i][j]);
 					}else if(c == 't'){
-						tankSpawnPoint = new Floor(j, i);
+						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						navMap[i][j] = new NavTile(i, j, false);
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
 						navList.add(navMap[i][j]);
 					}else if(c == '1'){
-						blockList.add(new PwrUpSuperBullet(j, i));
-						navMap[i][j] = new NavTile(i, j, false);
+						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
 						navList.add(navMap[i][j]);
 					}else if(c == 'b'){
-						ironBirdSpawnPoint = new Floor(j, i);
+						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(ironBirdSpawnPoint);
-						navMap[i][j] = new NavTile(i, j, true);
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
 						navList.add(navMap[i][j]);
 					}else{
 						// never
-						tankSpawnPoint = new Floor(j, i);
+						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						navMap[i][j] = new NavTile(i, j, false);
+						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
 						navList.add(navMap[i][j]);
 					}
 					j++;

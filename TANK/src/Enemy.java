@@ -66,6 +66,34 @@ public class Enemy extends GameObject implements Runnable{
 		}
 	}
 	
+	public Enemy(Block posBlock){
+		super(posBlock.getX(), posBlock.getY(), "Enemy", "Images//Enemy01.png");
+		
+		curTime = System.currentTimeMillis();
+		
+		closedList = new ArrayList<NavTile>();
+		openList = new ArrayList<NavTile>();
+		navList = new ArrayList<NavTile>();
+		bulletList = new ArrayList<Bullet>();
+		
+		curHp = maxHp;
+		
+		veloX = 0;
+		veloY = 0;
+		
+		curDirection = UP;
+		preDirection = RIGHT;
+		this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		
+		isPathingStart = true;
+		isRunning = true;
+		
+		if(thread == null){
+			thread = new Thread(this);
+			thread.start();
+		}
+	}
+	
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

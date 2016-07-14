@@ -79,7 +79,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	
 	public Tank(int posX, int posY){
 		super(posX, posY, "Tank", "Images//Test02.png");
-		
+
 		bulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
@@ -159,20 +159,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			startTime = System.currentTimeMillis();
 			Toolkit.getDefaultToolkit().sync();
 			
-			if(!bulletList.isEmpty()){
-				/*for(Bullet b : bulletList){
-					if(!b.isMaxDistReached()){
-						if(!b.isCollision()){
-							b.move();
-							//System.out.println("move");
-						}else{
-							deadBulletList.add(b);
-						}
-					}else{
-						deadBulletList.add(b);
-					}
-				}*/
-				
+			if(!bulletList.isEmpty()){		
 				ArrayList<Bullet> deadBulletList = new ArrayList<Bullet>();
 				
 				Iterator<Bullet> iterator = bulletList.iterator();
@@ -181,7 +168,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 					if(!b.isMaxDistReached()){
 						if(!b.isCollision()){
 							b.move();
-							//System.out.println("move");
 						}else{
 							deadBulletList.add(b);
 						}
@@ -197,10 +183,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 				if(!deadBulletList.isEmpty()){
 					deadBulletList.clear();
 				}
-				//if(bulletList.get(bulletList.size() - 1).isMaxDistReached() || bulletList.get(bulletList.size() - 1).isCollision()){
-					//System.out.println("delete");
-					//bulletList.remove(bulletList.size() - 1);
-				//}
 			}
 			
 			
@@ -548,5 +530,9 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		bulletList.clear();
 		curHp = maxHp;
 		score = 0;
+	}
+	
+	public String toString(){
+		return getName() + " - x:" + getX() + " y:" + getY() + " veloX:" + veloX + " veloY:" + veloY; 
 	}
 }

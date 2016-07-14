@@ -1,8 +1,4 @@
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-
 
 public class Block extends GameObject{
 	
@@ -77,15 +73,6 @@ public class Block extends GameObject{
 		isSolid = false;
 		isShot = false;
 		isDead = false;
-	}
-	
-	public void draw(Graphics g){
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		if(this.getImage() != null){
-			g2d.drawImage(this.getImage(), this.getX() * 32, this.getY() * 32, null);
-		}
 	}
 
 	public boolean isWalkable() {

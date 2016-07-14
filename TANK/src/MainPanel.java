@@ -242,31 +242,10 @@ public class MainPanel extends JPanel implements Runnable{
 					
 					enemies.clear();
 					deadEnemyList.clear();
+					
 					changeMap();
 					changeGameState(GameStates.LevelFinished);
-				}else if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()){
-					for(Enemy e : enemies){
-						e.die();
-					}
-					
-					enemies.clear();
-					deadEnemyList.clear();
-					
-					currentMap = 0;
-					changeMap();
-					changeGameState(GameStates.EndScreen);
-				}else if(tank.isDead()){
-					for(Enemy e : enemies){
-						e.die();
-					}
-					
-					enemies.clear();
-					deadEnemyList.clear();
-					
-					currentMap = 0;
-					changeMap();
-					changeGameState(GameStates.EndScreen);
-				}else if(bird.isDead()){
+				}else if((emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()) || (tank.isDead() || bird.isDead())){
 					for(Enemy e : enemies){
 						e.die();
 					}
@@ -283,7 +262,7 @@ public class MainPanel extends JPanel implements Runnable{
 					
 					if(!enemies.isEmpty()){
 						for(Enemy e : enemies){
-							e.pathing();
+							//e.pathing();
 							e.control();
 							e.collisionCheck();
 							
