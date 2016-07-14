@@ -34,6 +34,7 @@ public class Map extends GameObject{
 			String curLine;
 			bufReader = new BufferedReader(new FileReader(mapPath));
 			int blockSize = 32;
+			int globalCounter = 0;
 			
 			int i = 0;
 			while((curLine = bufReader.readLine()) != null){
@@ -42,49 +43,65 @@ public class Map extends GameObject{
 					if(c == '#'){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
 						blockList.add(new Wall(j * blockSize, i * blockSize));
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, true);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == '%'){
 						blockList.add(new SolidWall(j * blockSize, i * blockSize));
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, true);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == ' '){
 						blockList.add(new Floor(j * blockSize, i * blockSize));
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, false);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == 's'){
 						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
 						blockList.add(new Floor(j * blockSize, i * blockSize));
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, false);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == 't'){
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, false);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == '1'){
 						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, false);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else if(c == 'b'){
 						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(ironBirdSpawnPoint);
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, true);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, true);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}else{
 						// never
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						blockList.add(tankSpawnPoint);
-						navMap[i][j] = new NavTile(i * blockSize, j * blockSize, false);
+						navMap[i][j] = new NavTile(j * blockSize,i * blockSize, false);
+						navMap[i][j].setName(globalCounter + "");
 						navList.add(navMap[i][j]);
 					}
 					j++;
+					globalCounter++;
 				}
 				i++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		/*for (int k = 0; k < 15; k++) {
+			for (int l = 0; l < 15; l++) {
+				System.out.print(navMap[k][l] + "  <>  ");
+			}
+			System.out.println("");
+		}*/
 	}
 	
 	public void draw(Graphics g){

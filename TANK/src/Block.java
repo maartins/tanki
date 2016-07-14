@@ -11,6 +11,19 @@ public class Block extends GameObject{
 	private boolean isShot;
 	private boolean isDead;
 	
+	public Block(int posX, int posY, boolean isSolid, String name){	
+		super(posX, posY, name);
+		
+		tileX = posX / 32;
+		tileY = posY / 32;
+		
+		this.isWalkable = true;
+		this.isShootable = false;
+		this.isSolid = isSolid;
+		isShot = false;
+		isDead = false;
+	}
+	
 	/**
 	 * 
 	 * @param posX
@@ -24,8 +37,8 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, boolean isSolid, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
 		
-		tileX = posX;
-		tileY = posY;
+		tileX = posX / 32;
+		tileY = posY / 32;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
@@ -44,8 +57,8 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name){	
 		super(posX, posY, name);
 
-		tileX = posX;
-		tileY = posY;
+		tileX = posX / 32;
+		tileY = posY / 32;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
@@ -65,8 +78,8 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
 		
-		tileX = posX;
-		tileY = posY;
+		tileX = posX / 32;
+		tileY = posY / 32;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;

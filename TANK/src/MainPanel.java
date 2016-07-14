@@ -262,7 +262,7 @@ public class MainPanel extends JPanel implements Runnable{
 					
 					if(!enemies.isEmpty()){
 						for(Enemy e : enemies){
-							//e.pathing();
+							e.pathing();
 							e.control();
 							e.collisionCheck();
 							

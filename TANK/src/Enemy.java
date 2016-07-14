@@ -223,95 +223,80 @@ public class Enemy extends GameObject implements Runnable{
 	
 	public void pathing(){
 		Map mainMap = MainPanel.map;
-		NavTile enemyPos = this.getPositionOnMap();
+		
+		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
+		enemyPos.setImage("Images\\Nav01.png");
+		
 		NavTile targetPos;
 		
-		NavTile tankPos = MainPanel.tank.getPositionOnMap();
-		NavTile birdPos = MainPanel.bird.getPositionOnMap();
+		NavTile tankPos =  mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap().getX()];
+		NavTile birdPos = mainMap.navMap()[MainPanel.bird.getPositionOnMap().getY()][MainPanel.bird.getPositionOnMap().getX()];
 		
-		//System.out.println("-------------------"
-		//				+ "\ntank pos: " + tankPos 
-		//				+ "\nenemy pos: " + enemyPos 
-		//				+ "\nbird pos: " + birdPos);
+		int tankValue = (10 * (Math.abs(tankPos.getTileX() - (enemyPos.getTileX())) 
+				   			+ Math.abs(tankPos.getTileY() - enemyPos.getTileY()))) + 10;
+		int birdValue = (10 * (Math.abs(birdPos.getTileX() - (enemyPos.getTileX())) 
+	   						+ Math.abs(birdPos.getTileY() - enemyPos.getTileY()))) + 10;
+		System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
 		
-		int tankValue = (10 * (Math.abs(tankPos.getX() - (enemyPos.getX())) 
-				   			+ Math.abs(tankPos.getY() - enemyPos.getY()))) + 10;
-		int birdValue = (10 * (Math.abs(birdPos.getX() - (enemyPos.getX())) 
-	   						+ Math.abs(birdPos.getY() - enemyPos.getY()))) + 10;
-		
-		//System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
+		//enemyPos.setValue(tankValue);
 		
 		if(tankValue > birdValue){
 			targetPos = birdPos;
+			enemyPos.setValue(birdValue);
 		}else if(birdValue > tankValue){
 			targetPos = tankPos;
+			enemyPos.setValue(tankValue);
 		}else{
 			targetPos = birdPos;
+			enemyPos.setValue(birdValue);
 		}
-		
-		targetPos = tankPos;
+		//System.out.println("Tank: " + tankValue);
+		//targetPos = tankPos;
 		
 		if(isPathingStart){
-			//System.out.println("PATHING START   size of closed " + closedList.size());
-			//System.out.println("PATHING START   size of open   " + openList.size());
-			//System.out.println("PATHING START   size of nav    " + navList.size());
 			for(NavTile b : navList){
 				b.reset();
 			}
 			navList.clear();
 			
-			closedList.add(targetPos);
-			
 			closedList.add(enemyPos);
 			
+			//System.out.println("Enemy: " + enemyPos);
+		
+			NavTile tempb = mainMap.navMap()[enemyPos.getTileY() + 1][enemyPos.getTileX()];
+			if(!tempb.isBlocking()){			
+				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+				
+				tempb.setValue(value);
+				openList.add(tempb);
+			}	
 			
-			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getX() + 1][closedList.get(1).getY()])){
-				if(!mainMap.navMap()[closedList.get(1).getX() + 1][closedList.get(1).getY()].isBlocking()){
-					NavTile tempb = mainMap.navMap()[closedList.get(1).getX() + 1][closedList.get(1).getY()];
-					//System.out.println(tempb + " 1");
-					int value = (10 * (Math.abs(closedList.get(0).getX() - (closedList.get(1).getX() + 1)) 
-								   + Math.abs(closedList.get(0).getY() - closedList.get(1).getY()))) + 10;
-					
-					tempb.setValue(value);
-
-					openList.add(tempb);
-				}	
-			}
-			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getX() - 1][closedList.get(1).getY()])){
-				if(!mainMap.navMap()[closedList.get(1).getX() - 1][closedList.get(1).getY()].isBlocking()){
-					NavTile tempb = mainMap.navMap()[closedList.get(1).getX() - 1][closedList.get(1).getY()];
-					//System.out.println(tempb + " 2");
-					int value = (10 * (Math.abs(closedList.get(0).getX() - (closedList.get(1).getX() - 1)) 
-							   + Math.abs(closedList.get(0).getY() - closedList.get(1).getY()))) + 10;
+			tempb = mainMap.navMap()[enemyPos.getTileY() - 1][enemyPos.getTileX()];
+			if(!tempb.isBlocking()){			
+				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
 				
-					tempb.setValue(value);
-
-					openList.add(tempb);
-				}
+				tempb.setValue(value);
+				openList.add(tempb);
 			}
-			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getX()][closedList.get(1).getY() + 1])){
-				if(!mainMap.navMap()[closedList.get(1).getX() - 1][closedList.get(1).getY() + 1].isBlocking()){
-					NavTile tempb = mainMap.navMap()[closedList.get(1).getX()][closedList.get(1).getY() + 1];
-					//System.out.println(tempb + " 2");
-					int value = (10 * (Math.abs(closedList.get(0).getX() - closedList.get(1).getX()) 
-							   + Math.abs(closedList.get(0).getY() - (closedList.get(1).getY() + 1)))) + 10;
+			
+			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() + 1];
+			if(!tempb.isBlocking()){			
+				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
 				
-					tempb.setValue(value);
-
-					openList.add(tempb);
-				}
+				tempb.setValue(value);
+				openList.add(tempb);
 			}
-			if(!closedList.contains(mainMap.navMap()[closedList.get(1).getX()][closedList.get(1).getY() - 1])){
-				if(!mainMap.navMap()[closedList.get(1).getX() - 1][closedList.get(1).getY() - 1].isBlocking()){
-					NavTile tempb = mainMap.navMap()[closedList.get(1).getX()][closedList.get(1).getY() - 1];
-					//System.out.println(tempb + " 2");
-					int value = (10 * (Math.abs(closedList.get(0).getX() - closedList.get(1).getX()) 
-							   + Math.abs(closedList.get(0).getY() - (closedList.get(1).getY() - 1)))) + 10;
+			
+			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() - 1];
+			if(!tempb.isBlocking()){			
+				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
 				
-					tempb.setValue(value);
-
-					openList.add(tempb);
-				}
+				tempb.setValue(value);
+				openList.add(tempb);
 			}
 			
 			NavTile tempBlock = openList.get(0);
@@ -321,8 +306,11 @@ public class Enemy extends GameObject implements Runnable{
 				}
 			}
 			
-			tempBlock.setParent(closedList.get(1));
+			tempBlock.setParent(enemyPos);
+			tempBlock.setImage("Images\\Nav01.png");
 			closedList.add(tempBlock);
+			
+			//System.out.println("$ " + tempBlock + " " + closedList.size());
 			
 			for(NavTile b : openList){
 				b.reset();
@@ -333,117 +321,60 @@ public class Enemy extends GameObject implements Runnable{
 			isPathingStart = false;
 		}
 		
-		if(isPathing){
-			//System.out.println("PATHING   size of closed " + closedList.size());
-			//System.out.println("PATHING   size of open   " + openList.size());
-			//System.out.println("PATHING   size of nav    " + navList.size());
-			
-			int stuckCounter = 0;
-			
-			for(int i = 2; i < closedList.size(); i++){
-				boolean test1 = false, test2 = false, test3 = false, test4 = false;
-				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getX() + 1][closedList.get(i).getY()])){
-					if(!mainMap.navMap()[closedList.get(i).getX() + 1][closedList.get(i).getY()].isBlocking()){
-						NavTile tempb = mainMap.navMap()[closedList.get(i).getX() + 1][closedList.get(i).getY()];
-						//System.out.println(tempb + " 1");
-						int value = (10 * (Math.abs(closedList.get(0).getX() - (closedList.get(i).getX() + 1)) 
-								   + Math.abs(closedList.get(0).getY() - closedList.get(i).getY()))) + 10;
+		if(isPathing){		
+			for(int i = 0; i < closedList.size(); i++){
+				
+				NavTile tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
+				if(!closedList.contains(tempb)){
+					if(!tempb.isBlocking()){
+						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
 						
 						tempb.setValue(value);
-						tempb.setImage("Images//Nav01.png");
+						tempb.setImage("Images//Nav02.png");
 						
 						openList.add(tempb);
-						
-						//System.out.println("U adding - " + tempb);
-					}else{
-						test1 = true;
 					}
-				}else{
-					test1 = true;
-				}
-				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getX() - 1][closedList.get(i).getY()])){
-					if(!mainMap.navMap()[closedList.get(i).getX() - 1][closedList.get(i).getY()].isBlocking()){
-						NavTile tempb = mainMap.navMap()[closedList.get(i).getX() - 1][closedList.get(i).getY()];
-						//System.out.println(tempb + " 1");
-						int value = (10 * (Math.abs(closedList.get(0).getX() - (closedList.get(i).getX() - 1)) 
-								   + Math.abs(closedList.get(0).getY() - closedList.get(i).getY()))) + 10;
-						
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav01.png");
-
-						openList.add(tempb);
-						
-						//System.out.println("U adding - " + tempb);
-					}else{
-						test2 = true;
-					}
-				}else{
-					test2 = true;
-				}
-				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() + 1])){
-					if(!mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() + 1].isBlocking()){
-						NavTile tempb = mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() + 1];
-						//System.out.println(tempb + " 1");
-						int value = (10 * (Math.abs(closedList.get(0).getX() - closedList.get(i).getX()) 
-								   + Math.abs(closedList.get(0).getY() - (closedList.get(i).getY() + 1)))) + 10;
-						
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav01.png");
-
-						openList.add(tempb);
-						
-						//System.out.println("U adding - " + tempb);
-					}else{
-						test3 = true;
-					}
-				}else{
-					test3 = true;
-				}
-				if(!closedList.contains(mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() - 1])){
-					if(!mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() - 1].isBlocking()){
-						NavTile tempb = mainMap.navMap()[closedList.get(i).getX()][closedList.get(i).getY() - 1];
-						//System.out.println(tempb + " 1");
-						int value = (10 * (Math.abs(closedList.get(0).getX() - closedList.get(i).getX()) 
-								   + Math.abs(closedList.get(0).getY() - (closedList.get(i).getY() - 1)))) + 10;
-						
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav01.png");
-
-						openList.add(tempb);
-						
-						//System.out.println("U adding - " + tempb);
-					}else{
-						test4 = true;
-					}
-				}else{
-					test4 = true;
 				}
 				
-				if(test1){
-					if(test2){
-						if(test3){
-							if(test4){
-								stuckCounter++;
-								if(stuckCounter == closedList.size() - 2){
-									//System.out.println("Stuck");
-									NavTile newPos = closedList.get(closedList.size() - 1);
-									//System.out.println("" + newPos.getX() + " " + newPos.getY());
-									newPos.setParent(null);
-									closedList.clear();
-									closedList.add(targetPos);
-									closedList.add(newPos);
-									closedList.add(newPos);
-									
-									for(NavTile b : openList){
-										b.reset();
-									}
-									openList.clear();
-									stuckCounter = 0;
-								}
-							}
-						}
+				tempb = mainMap.navMap()[closedList.get(i).getTileY() - 1][closedList.get(i).getTileX()];
+				if(!closedList.contains(tempb)){
+					if(!tempb.isBlocking()){
+						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						
+						tempb.setValue(value);
+						tempb.setImage("Images//Nav02.png");
+
+						openList.add(tempb);
 					}
 				}
+				
+				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() + 1];
+				if(!closedList.contains(tempb)){
+					if(!tempb.isBlocking()){
+						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						
+						tempb.setValue(value);
+						tempb.setImage("Images//Nav02.png");
+
+						openList.add(tempb);
+					}
+				}
+				
+				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() - 1];
+				if(!closedList.contains(tempb)){
+					if(!tempb.isBlocking()){
+						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
+								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						
+						tempb.setValue(value);
+						tempb.setImage("Images//Nav02.png");
+
+						openList.add(tempb);
+					}
+				}			
 			}
 			
 			//System.out.println("" + targetPos.getX() + " " + targetPos.getY());
@@ -460,6 +391,7 @@ public class Enemy extends GameObject implements Runnable{
 				if(tempBlock.getParent() == null){
 					tempBlock.setParent(closedList.get(closedList.size() - 1));
 				}
+				
 				closedList.add(tempBlock);
 				
 				for(NavTile b : openList){
@@ -467,19 +399,19 @@ public class Enemy extends GameObject implements Runnable{
 				}
 				openList.clear();
 				
-				if(tempBlock.getX() + 1 == targetPos.getX() && tempBlock.getY() == targetPos.getY()){
+				if(tempBlock.getTileX() + 1 == targetPos.getTileX() && tempBlock.getTileY()  == targetPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE " + targetPos);
-				}else if(tempBlock.getX() - 1 == targetPos.getX() && tempBlock.getY() == targetPos.getY()){
+				}else if(tempBlock.getTileX() - 1 == targetPos.getTileX() && tempBlock.getTileY()  == targetPos.getTileY()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE " + targetPos);
-				}else if(tempBlock.getY() + 1 == targetPos.getY() && tempBlock.getX() == targetPos.getX()){
+				}else if(tempBlock.getTileY() + 1 == targetPos.getTileY() && tempBlock.getTileX() == targetPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE " + targetPos);
-				}else if(tempBlock.getY() - 1 == targetPos.getY() && tempBlock.getX() == targetPos.getX()){
+				}else if(tempBlock.getTileY()  - 1 == targetPos.getTileY() && tempBlock.getTileX() == targetPos.getTileX()){
 					isPathing = false;
 					isPathDone = false;
 					//System.out.println("PATHING DONE " + targetPos);
@@ -487,30 +419,34 @@ public class Enemy extends GameObject implements Runnable{
 			}
 		}else{
 			if(!isPathDone){
+				//for (NavTile n : closedList) {
+				//	System.out.println(n);
+				//}
 				navList.add(closedList.get(closedList.size() - 1));
 				
 				for(int i = closedList.size() - 1; i > 0; i--){
 					if(closedList.get(i).getParent() == null){
+						//System.out.println("parent null");
 						break;
 					}else{	
 						if(closedList.get(i).getParent().equals(enemyPos)){
+							//System.out.println("last parent");
 							break;
 						}else{
-							//System.out.println("CREATING NAV   size of closed " + closedList.size());
-							//System.out.println("CREATING NAV   size of open   " + openList.size());
-							//System.out.println("CREATING NAV   size of nav    " + navList.size());
-
-							//System.out.println(closedList.get(i) + " -> " +closedList.get(i).getParent());
 							navList.add(closedList.get(i).getParent());
 						}
 					}
 				}
-				//System.out.println("NAV LIST DONE");
+				System.out.println("NAV LIST DONE");
 				isPathDone = true;
 			}
 		}
 		
-		if(targetPos.getX() != closedList.get(0).getX() || targetPos.getY() != closedList.get(0).getY()){
+		for (NavTile n : navList) {
+			n.setImage("Images//Nav01.png");
+		}
+		
+		if(targetPos.getX() == closedList.get(0).getX() || targetPos.getY() == closedList.get(0).getY()){
 			for(NavTile b : closedList){
 				b.reset();
 			}
@@ -522,10 +458,6 @@ public class Enemy extends GameObject implements Runnable{
 			openList.clear();
 			
 			isPathingStart = true;
-			
-			//System.out.println("RESET   size of closed " + closedList.size());
-			//System.out.println("RESET   size of open   " + openList.size());
-			//System.out.println("RESET   size of nav    " + navList.size());
 		}
 	}
 	
