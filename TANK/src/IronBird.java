@@ -1,3 +1,6 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 public class IronBird extends GameObject{
 	
@@ -16,6 +19,15 @@ public class IronBird extends GameObject{
 		
 		maxHp = 50;
 		curHp = maxHp;
+	}
+	
+	public void draw(Graphics g){
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		if(this.getImage() != null){
+			g2d.drawImage(this.getImage(), this.getX() * 32, this.getY() * 32, null);
+		}
 	}
 	
 	public void recieveDamage(int damage){

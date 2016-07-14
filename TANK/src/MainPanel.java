@@ -29,8 +29,6 @@ public class MainPanel extends JPanel implements Runnable{
 	private JPanel scorePanel = new JPanel();
 	
 	private int currentMap;
-	
-	private final int FPS = 60;
 
 	private long startTime;
 	private long currentTime;
@@ -68,8 +66,12 @@ public class MainPanel extends JPanel implements Runnable{
 		guiSetUp();
 		
 		database = new Database();
-		database.connect();
-
+		try{
+			database.connect();
+		}catch(Exception ex){
+			
+		}
+		
 		File mapFolder = new File("Maps//");
 		getFiles(mapFolder);
 		
@@ -316,6 +318,8 @@ public class MainPanel extends JPanel implements Runnable{
 						deadBlockList.clear();
 					}
 					
+					//System.out.println("block count: " + map.getBlockList().size());
+					
 					healthLable.setText("Dzivibas " + tank.getCurHp());
 					scoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
 				}
@@ -325,7 +329,7 @@ public class MainPanel extends JPanel implements Runnable{
 			this.repaint();
 			
 			currentTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / FPS) - currentTime;
+			waitTime = (1000 / Settings.framesPerSecond.value()) - currentTime;
 			try{
 				if(waitTime < 0){
 					Thread.sleep(10);

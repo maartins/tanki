@@ -10,6 +10,9 @@ public class Spawner extends Block{
 		
 		enemyCount = 3;
 		
+		this.setX(posX * 32);
+		this.setY(posY * 32);
+		
 		canSpawn = true;
 	}
 	

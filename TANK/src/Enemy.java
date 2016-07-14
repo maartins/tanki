@@ -33,7 +33,6 @@ public class Enemy extends GameObject implements Runnable{
 	private ArrayList<NavTile> openList;
 	private ArrayList<NavTile> navList;
 	private ArrayList<Bullet> bulletList;
-	private ArrayList<Bullet> deadBulletList;
 	
 	private Spawner spawner;
 	
@@ -48,7 +47,6 @@ public class Enemy extends GameObject implements Runnable{
 		openList = new ArrayList<NavTile>();
 		navList = new ArrayList<NavTile>();
 		bulletList = new ArrayList<Bullet>();
-		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		
@@ -95,6 +93,8 @@ public class Enemy extends GameObject implements Runnable{
 				shoot();
 			}
 			
+			ArrayList<Bullet> deadBulletList = new ArrayList<Bullet>();
+			
 			if(!bulletList.isEmpty()){
 				for(Bullet b : bulletList){
 					if(!b.isMaxDistReached()){
@@ -123,7 +123,7 @@ public class Enemy extends GameObject implements Runnable{
 			
 			
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / 60) - curTime;
+			waitTime = (1000 / Settings.framesPerSecond.value()) - curTime;
 			try{
 				if(waitTime < 0){
 					Thread.sleep(10);
@@ -220,6 +220,8 @@ public class Enemy extends GameObject implements Runnable{
 		}else{
 			targetPos = birdPos;
 		}
+		
+		targetPos = tankPos;
 		
 		if(isPathingStart){
 			//System.out.println("PATHING START   size of closed " + closedList.size());
@@ -320,7 +322,8 @@ public class Enemy extends GameObject implements Runnable{
 								   + Math.abs(closedList.get(0).getY() - closedList.get(i).getY()))) + 10;
 						
 						tempb.setValue(value);
-
+						tempb.setImage("Images//Nav01.png");
+						
 						openList.add(tempb);
 						
 						//System.out.println("U adding - " + tempb);
@@ -338,6 +341,7 @@ public class Enemy extends GameObject implements Runnable{
 								   + Math.abs(closedList.get(0).getY() - closedList.get(i).getY()))) + 10;
 						
 						tempb.setValue(value);
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
@@ -356,6 +360,7 @@ public class Enemy extends GameObject implements Runnable{
 								   + Math.abs(closedList.get(0).getY() - (closedList.get(i).getY() + 1)))) + 10;
 						
 						tempb.setValue(value);
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
@@ -374,6 +379,7 @@ public class Enemy extends GameObject implements Runnable{
 								   + Math.abs(closedList.get(0).getY() - (closedList.get(i).getY() - 1)))) + 10;
 						
 						tempb.setValue(value);
+						tempb.setImage("Images//Nav01.png");
 
 						openList.add(tempb);
 						
@@ -391,9 +397,9 @@ public class Enemy extends GameObject implements Runnable{
 							if(test4){
 								stuckCounter++;
 								if(stuckCounter == closedList.size() - 2){
-									System.out.println("Stuck");
+									//System.out.println("Stuck");
 									NavTile newPos = closedList.get(closedList.size() - 1);
-									System.out.println("" + newPos.getX() + " " + newPos.getY());
+									//System.out.println("" + newPos.getX() + " " + newPos.getY());
 									newPos.setParent(null);
 									closedList.clear();
 									closedList.add(targetPos);
@@ -422,7 +428,7 @@ public class Enemy extends GameObject implements Runnable{
 						tempBlock = b;
 					}
 				}
-				System.out.println(tempBlock);
+				//System.out.println(tempBlock);
 				if(tempBlock.getParent() == null){
 					tempBlock.setParent(closedList.get(closedList.size() - 1));
 				}
@@ -713,6 +719,5 @@ public class Enemy extends GameObject implements Runnable{
 		}
 		navList.clear();
 		bulletList.clear();
-		deadBulletList.clear();
 	}
 }

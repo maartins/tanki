@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Map extends GameObject{
-	
-	private final int blockSize = 32;
-	
 	private String mapPath;
 	
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
+	private ArrayList<NavTile> navList;
 	private NavTile[][] navMap;
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
@@ -24,6 +22,7 @@ public class Map extends GameObject{
 		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
 		navMap = new NavTile[15][15];
+		navList = new ArrayList<NavTile>();
 		
 		makeMap();
 	}
@@ -40,41 +39,48 @@ public class Map extends GameObject{
 				int j = 0;
 				for(char c : curLine.toCharArray()){
 					if(c == '#'){
-						blockList.add(new Floor(j * blockSize, i * blockSize));
-						blockList.add(new Wall(j * blockSize, i * blockSize));
+						blockList.add(new Floor(j, i));
+						blockList.add(new Wall(j, i));
 						navMap[i][j] = new NavTile(i, j, true);
+						navList.add(navMap[i][j]);
 					}else if(c == '%'){
-						blockList.add(new SolidWall(j * blockSize, i * blockSize));
+						blockList.add(new SolidWall(j, i));
 						navMap[i][j] = new NavTile(i, j, true);
+						navList.add(navMap[i][j]);
 					}else if(c == ' '){
-						blockList.add(new Floor(j * blockSize, i * blockSize));
+						blockList.add(new Floor(j, i));
 						navMap[i][j] = new NavTile(i, j, false);
+						navList.add(navMap[i][j]);
 					}else if(c == 's'){
-						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
-						blockList.add(new Floor(j * blockSize, i * blockSize));
+						spawnerList.add(new Spawner(j, i));
+						blockList.add(new Floor(j, i));
 						navMap[i][j] = new NavTile(i, j, false);
+						navList.add(navMap[i][j]);
 					}else if(c == 't'){
-						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
+						tankSpawnPoint = new Floor(j, i);
 						blockList.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(i, j, false);
+						navList.add(navMap[i][j]);
 					}else if(c == '1'){
-						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
+						blockList.add(new PwrUpSuperBullet(j, i));
 						navMap[i][j] = new NavTile(i, j, false);
+						navList.add(navMap[i][j]);
 					}else if(c == 'b'){
-						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
+						ironBirdSpawnPoint = new Floor(j, i);
 						blockList.add(ironBirdSpawnPoint);
 						navMap[i][j] = new NavTile(i, j, true);
+						navList.add(navMap[i][j]);
 					}else{
-						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
+						// never
+						tankSpawnPoint = new Floor(j, i);
 						blockList.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(i, j, false);
+						navList.add(navMap[i][j]);
 					}
 					j++;
 				}
 				i++;
 			}
-			
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -83,6 +89,10 @@ public class Map extends GameObject{
 	public void draw(Graphics g){
 		for(Block b : blockList){
 			b.draw(g);
+		}
+		
+		for(NavTile n : navList){
+			n.draw(g);
 		}
 	}
 	

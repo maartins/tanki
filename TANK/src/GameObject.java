@@ -51,6 +51,13 @@ public class GameObject {
 		
 		try{
 			image = ImageIO.read(new File(imagePath));
+			
+			//int scale = Settings.scale.value();
+			//scale = scale == 1 ? scale : scale / 10 + 1;
+			
+			
+			//image = scale(image, scale);
+			
 		}catch(IOException e){
 			System.out.println("Failed to load image.");
 		}
@@ -59,6 +66,7 @@ public class GameObject {
 	public void draw(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
 		if(image != null){
 			g2d.drawImage(image, x, y, null);
 		}
@@ -76,6 +84,18 @@ public class GameObject {
 	      BufferedImage dest = src.getSubimage(0, 0, rect.width, rect.height);
 	      return dest; 
 	}
+	
+	public static BufferedImage scale(BufferedImage img, double scale) {
+		int w = img.getWidth();
+		int h = img.getHeight();
+		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		AffineTransform at = new AffineTransform();
+		at.scale(scale, scale);
+		AffineTransformOp scaleOp =  new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		after = scaleOp.filter(img, after);
+
+        return after;
+    }
 	
 	public BufferedImage rotate(BufferedImage img, int cdir, int pdir){
 		AffineTransform transform = new AffineTransform();

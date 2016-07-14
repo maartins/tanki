@@ -1,17 +1,19 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 
 
 public class Block extends GameObject{
 	
 	private int tileX;
 	private int tileY;
-	private int maxHp;
-	private int curHp;
 	
 	private boolean isWalkable;
 	private boolean isShootable;
 	private boolean isSolid;
 	private boolean isShot;
+	private boolean isDead;
 	
 	/**
 	 * 
@@ -26,16 +28,14 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, boolean isSolid, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
 		
-		maxHp = 32;
-		curHp = maxHp;
-		
-		tileX = posX / 32;
-		tileY = posY / 32;
+		tileX = posX;
+		tileY = posY;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		this.isSolid = isSolid;
 		isShot = false;
+		isDead = false;
 	}
 	
 	/**
@@ -47,17 +47,15 @@ public class Block extends GameObject{
 	*/
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name){	
 		super(posX, posY, name);
-		
-		maxHp = 32;
-		curHp = maxHp;
-		
-		tileX = posX / 32;
-		tileY = posY / 32;
+
+		tileX = posX;
+		tileY = posY;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		isSolid = false;
 		isShot = false;
+		isDead = false;
 	}
 	
 	/**
@@ -71,16 +69,23 @@ public class Block extends GameObject{
 	public Block(int posX, int posY, boolean isWalkable, boolean isShootable, String name, String imagePath){	
 		super(posX, posY, name, imagePath);
 		
-		maxHp = 32;
-		curHp = maxHp;
-		
-		tileX = posX / 32;
-		tileY = posY / 32;
+		tileX = posX;
+		tileY = posY;
 		
 		this.isWalkable = isWalkable;
 		this.isShootable = isShootable;
 		isSolid = false;
 		isShot = false;
+		isDead = false;
+	}
+	
+	public void draw(Graphics g){
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		if(this.getImage() != null){
+			g2d.drawImage(this.getImage(), this.getX() * 32, this.getY() * 32, null);
+		}
 	}
 
 	public boolean isWalkable() {
@@ -118,57 +123,43 @@ public class Block extends GameObject{
 	public void recieveDamage(int damage, int dir){
 		if(!isSolid){
 			if(!isShot){
-				
 				isShot = true;
 			}
-			if(dir == 0){
-				curHp -= damage;
-				
-				if(curHp <= 0){
-					isShootable = false;
-					isWalkable = true;
-				}else{
+			
+			if((getWidth() - damage <= 0 && (dir == 0 || dir == 2)) || (getHeight() - damage <= 0 && (dir == 1 || dir == 3))){
+				isShootable = false;
+				isWalkable = true;
+				isDead = true;
+			}else{
+				if(dir == 0){
+					if(getWidth() - damage <= 0)
+						damage = damage + (getWidth() - damage);
+						
 					setX(getX() + damage);
-					setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
-				}
-			}else if(dir == 1){
-				curHp -= damage;
-				
-				if(curHp <= 0){
-					isShootable = false;
-					isWalkable = true;
-				}else{
-					setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
-				}
-			}else if(dir == 2){
-				curHp -= damage;
-				
-				if(curHp <= 0){
-					isShootable = false;
-					isWalkable = true;
-				}else{
-					setImage(crop(getImage(), new Rectangle(curHp, getHeight())));
-				}
-			}else if(dir == 3){
-				curHp -= damage;
-				
-				if(curHp <= 0){
-					isShootable = false;
-					isWalkable = true;
-				}else{
+					setImage(crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
+				}else if(dir == 1){
+					if(getHeight() - damage <= 0)
+						damage = damage + (getHeight() - damage);
+					
+					setImage(crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
+				}else if(dir == 2){
+					if(getWidth() - damage <= 0)
+						damage = damage + (getWidth() - damage);
+					
+					setImage(crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
+				}else if(dir == 3){
+					if(getHeight() - damage <= 0)
+						damage = damage + (getHeight() - damage);
+					
 					setY(getY() + damage);
-					setImage(crop(getImage(), new Rectangle(getWidth(), curHp)));
+					setImage(crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
 				}
 			}
 		}
 	}
 
 	public boolean isDead(){
-		if(curHp <= 0){
-			return true;
-		}else{
-			return false;
-		}
+		return isDead;
 	}
 	
 	public String toString(){

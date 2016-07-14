@@ -37,7 +37,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 	private boolean isRunning;
 	
 	private ArrayList<Bullet> bulletList;
-	private ArrayList<Bullet> deadBulletList;
 	
 	private Sound shootSound;
 	@SuppressWarnings("unused")
@@ -49,7 +48,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Tank01.png");
 		
 		bulletList = new ArrayList<Bullet>();
-		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		score = 0;
@@ -83,7 +81,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		super(posX, posY, "Tank", "Images//Test02.png");
 		
 		bulletList = new ArrayList<Bullet>();
-		deadBulletList = new ArrayList<Bullet>();
 		
 		curHp = maxHp;
 		score = 0;
@@ -176,6 +173,8 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 					}
 				}*/
 				
+				ArrayList<Bullet> deadBulletList = new ArrayList<Bullet>();
+				
 				Iterator<Bullet> iterator = bulletList.iterator();
 				while(iterator.hasNext()){
 					Bullet b = iterator.next();
@@ -206,7 +205,7 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 			
 			
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / 60) - curTime;
+			waitTime = (1000 / Settings.framesPerSecond.value()) - curTime;
 			try{
 				if(waitTime < 0){
 					Thread.sleep(10);
@@ -547,7 +546,6 @@ public class Tank extends GameObject implements KeyListener, Runnable{
 		}
 		
 		bulletList.clear();
-		deadBulletList.clear();
 		curHp = maxHp;
 		score = 0;
 	}

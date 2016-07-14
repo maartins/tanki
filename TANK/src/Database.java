@@ -15,9 +15,7 @@ public class Database {
 	
 	private Connection connection = null;
 	
-	public Database(){
-		
-	}
+	public Database(){}
 	
 	public void connect(){
 		try {

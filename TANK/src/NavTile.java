@@ -1,5 +1,8 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
-public class NavTile {
+public class NavTile extends GameObject{
 
 	private int x;
 	private int y;
@@ -10,6 +13,7 @@ public class NavTile {
 	private NavTile parent;
 
 	public NavTile(int x, int y, boolean isBlocking){
+		super(x, y, "navtile");
 		this.x = x;
 		this.y = y;
 		
@@ -18,6 +22,15 @@ public class NavTile {
 		this.isBlocking = isBlocking;
 		
 		parent = null;
+	}
+	
+	public void draw(Graphics g){
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		if(this.getImage() != null){
+			g2d.drawImage(this.getImage(), this.getX() * 32, this.getY() * 32, null);
+		}
 	}
 	
 	public int getX() {
@@ -42,6 +55,10 @@ public class NavTile {
 
 	public void setValue(int value) {
 		this.value = value;
+	}
+	
+	public void setImage(String path){
+		this.setImage(path);
 	}
 
 	public boolean isBlocking() {
