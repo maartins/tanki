@@ -202,8 +202,8 @@ public class MainPanel extends JPanel implements Runnable{
 		
 		if(currentGameState == GameStates.MainGame){
 			map.draw(g);
-			bird.draw(g);
 			tank.draw(g);
+			bird.draw(g);
 			
 			synchronized (enemies) {
 				for(Enemy e : enemies){
@@ -260,7 +260,7 @@ public class MainPanel extends JPanel implements Runnable{
 					if(!enemies.isEmpty()){
 						for(Enemy e : enemies){
 							e.pathing();
-							e.control();
+							//e.control();
 							e.collisionCheck();
 							
 							if(e.isDead()){

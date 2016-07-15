@@ -225,15 +225,12 @@ public class Enemy extends GameObject implements Runnable{
 		Map mainMap = MainPanel.map;
 		
 		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
-		enemyPos.setImage("Images\\Nav01.png");
-		
-		NavTile targetPos;
-		
+		enemyPos.setImage("Images\\Nav01.png");	
 		NavTile tankPos = mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap().getX()];
 		tankPos.setImage("Images\\Nav01.png");
 		NavTile birdPos = mainMap.navMap()[MainPanel.bird.getPositionOnMap().getY()][MainPanel.bird.getPositionOnMap().getX()];
-		System.out.println(birdPos);
 		birdPos.setImage("Images\\Nav01.png");
+		NavTile targetPos;
 		
 		int tankValue = (10 * (Math.abs(tankPos.getTileX() - (enemyPos.getTileX())) 
 				   			+ Math.abs(tankPos.getTileY() - enemyPos.getTileY()))) + 10;
@@ -256,12 +253,16 @@ public class Enemy extends GameObject implements Runnable{
 		//System.out.println("Tank: " + tankValue);
 		//targetPos = tankPos;
 		
+		//System.out.println(targetPos.getTileX());
+		//System.out.println(enemyPos);
+		
 		if(isPathingStart){
 			for(NavTile b : navList){
 				b.reset();
 			}
 			navList.clear();
 			
+			closedList.add(targetPos); // important set iterators to 1 in closed list loops
 			closedList.add(enemyPos);
 			
 			//System.out.println("Enemy: " + enemyPos);
@@ -324,8 +325,8 @@ public class Enemy extends GameObject implements Runnable{
 			isPathingStart = false;
 		}
 		
-		if(isPathing){		
-			for(int i = 0; i < closedList.size(); i++){
+		if(isPathing){
+			for(int i = 1; i < closedList.size(); i++){
 				
 				NavTile tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
 				if(!closedList.contains(tempb)){
@@ -380,7 +381,7 @@ public class Enemy extends GameObject implements Runnable{
 				}			
 			}
 			
-			//System.out.println("" + targetPos.getX() + " " + targetPos.getY());
+			//System.out.println(openList.get(0));
 			
 			if(!openList.isEmpty()){
 				//System.out.println("CALCULATE BLOCK WIEGHT");
@@ -427,7 +428,7 @@ public class Enemy extends GameObject implements Runnable{
 				//}
 				navList.add(closedList.get(closedList.size() - 1));
 				
-				for(int i = closedList.size() - 1; i > 0; i--){
+				for(int i = closedList.size() - 1; i > 1; i--){
 					if(closedList.get(i).getParent() == null){
 						//System.out.println("parent null");
 						break;
@@ -449,7 +450,7 @@ public class Enemy extends GameObject implements Runnable{
 			n.setImage("Images//Nav01.png");
 		}
 		
-		if(targetPos.getX() == closedList.get(0).getX() || targetPos.getY() == closedList.get(0).getY()){
+		if(targetPos.getTileX() != closedList.get(0).getTileX() || targetPos.getTileY() != closedList.get(0).getTileY()){
 			for(NavTile b : closedList){
 				b.reset();
 			}
