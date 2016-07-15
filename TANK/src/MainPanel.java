@@ -43,7 +43,6 @@ public class MainPanel extends JPanel implements Runnable{
 	public static Map map;
 	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
-	private ArrayList<String> mapList = new ArrayList<String>();
 	private ArrayList<Enemy> deadEnemyList = new ArrayList<Enemy>();
 	private ArrayList<Block> deadBlockList = new ArrayList<Block>();
 	
@@ -55,7 +54,6 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	public MainPanel(){
 		this.setLayout(null);
-		
 		this.setFocusable(true);
 		this.requestFocus();
 		this.setDoubleBuffered(true);
@@ -72,11 +70,14 @@ public class MainPanel extends JPanel implements Runnable{
 			
 		}
 		
-		File mapFolder = new File("Maps//");
-		getFiles(mapFolder);
+		map = new Map();
+		
+		File folder = new File("Maps//");
+		map.getFiles(folder);
 		
 		currentMap = 0;
-		changeMap();
+		map.changeMap(currentMap);
+		currentMap++;
 		
 		bird = new IronBird(map.getIronBirdSpawnPoint());
 		
@@ -93,12 +94,6 @@ public class MainPanel extends JPanel implements Runnable{
 			thread = new Thread(this);
 			thread.start();
 		}
-	}
-	
-	private void getFiles(File folder){
-	    for(File f : folder.listFiles()){
-	    	mapList.add(folder.getName() + "//" + f.getName());
-	    }
 	}
 	
 	private void guiSetUp(){		
@@ -235,7 +230,7 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 				}
 				
-				if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap < mapList.size()){
+				if(emptySpawnerCounter == map.getSpawnerList().size() && currentMap < map.getMapList().size()){
 					for(Enemy e : enemies){
 						e.die();
 					}
@@ -243,9 +238,10 @@ public class MainPanel extends JPanel implements Runnable{
 					enemies.clear();
 					deadEnemyList.clear();
 					
-					changeMap();
+					map.changeMap(currentMap);
+					currentMap++;
 					changeGameState(GameStates.LevelFinished);
-				}else if((emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= mapList.size()) || (tank.isDead() || bird.isDead())){
+				}else if((emptySpawnerCounter == map.getSpawnerList().size() && currentMap >= map.getMapList().size()) || (tank.isDead() || bird.isDead())){
 					for(Enemy e : enemies){
 						e.die();
 					}
@@ -254,7 +250,8 @@ public class MainPanel extends JPanel implements Runnable{
 					deadEnemyList.clear();
 					
 					currentMap = 0;
-					changeMap();
+					map.changeMap(currentMap);
+					currentMap++;
 					changeGameState(GameStates.EndScreen);
 				}else{
 					tank.control();
@@ -387,13 +384,6 @@ public class MainPanel extends JPanel implements Runnable{
 				break;
 			default:
 				break;
-		}
-	}
-	
-	private void changeMap(){
-		if(currentMap < mapList.size()){
-			map = new Map(mapList.get(currentMap));
-			currentMap++;
 		}
 	}
 }

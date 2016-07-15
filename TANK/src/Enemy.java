@@ -229,14 +229,17 @@ public class Enemy extends GameObject implements Runnable{
 		
 		NavTile targetPos;
 		
-		NavTile tankPos =  mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap().getX()];
+		NavTile tankPos = mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap().getX()];
+		tankPos.setImage("Images\\Nav01.png");
 		NavTile birdPos = mainMap.navMap()[MainPanel.bird.getPositionOnMap().getY()][MainPanel.bird.getPositionOnMap().getX()];
+		System.out.println(birdPos);
+		birdPos.setImage("Images\\Nav01.png");
 		
 		int tankValue = (10 * (Math.abs(tankPos.getTileX() - (enemyPos.getTileX())) 
 				   			+ Math.abs(tankPos.getTileY() - enemyPos.getTileY()))) + 10;
 		int birdValue = (10 * (Math.abs(birdPos.getTileX() - (enemyPos.getTileX())) 
 	   						+ Math.abs(birdPos.getTileY() - enemyPos.getTileY()))) + 10;
-		System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
+		//System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
 		
 		//enemyPos.setValue(tankValue);
 		

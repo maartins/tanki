@@ -1,5 +1,6 @@
 import java.awt.Graphics;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,24 +8,23 @@ import java.util.ArrayList;
 public class Map extends GameObject{
 	private String mapPath;
 	
+	private ArrayList<String> mapList;
 	private ArrayList<Spawner> spawnerList;
 	private ArrayList<Block> blockList;
 	private ArrayList<NavTile> navList;
+	
 	private NavTile[][] navMap;
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
 
-	public Map(String mapPath){
+	public Map(){
 		super(0, 0, "Map");
 		
-		this.mapPath = mapPath;
-		
+		mapList = new ArrayList<String>();
 		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
 		navMap = new NavTile[15][15];
 		navList = new ArrayList<NavTile>();
-		
-		makeMap();
 	}
 	
 	private void makeMap(){
@@ -104,6 +104,28 @@ public class Map extends GameObject{
 		}*/
 	}
 	
+	public void changeMap(int currentMap){
+		spawnerList = new ArrayList<Spawner>();
+		blockList = new ArrayList<Block>();
+		navMap = new NavTile[15][15];
+		navList = new ArrayList<NavTile>();
+		
+		if(currentMap < mapList.size()){
+			mapPath = mapList.get(currentMap);
+		}else{
+			mapPath = mapList.get(0);
+		}
+		
+		makeMap();
+	}
+	
+	public void getFiles(File folder){
+	    for(File f : folder.listFiles()){
+	    	mapList.add(folder.getName() + "//" + f.getName());
+	    	//System.out.println(folder.getName() + "//" + f.getName());
+	    }
+	}
+	
 	public void draw(Graphics g){
 		for(Block b : blockList){
 			b.draw(g);
@@ -112,6 +134,10 @@ public class Map extends GameObject{
 		for(NavTile n : navList){
 			n.draw(g);
 		}
+	}
+	
+	public ArrayList<String> getMapList(){
+		return mapList;
 	}
 	
 	public ArrayList<Spawner> getSpawnerList(){
