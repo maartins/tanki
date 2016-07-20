@@ -96,12 +96,13 @@ public class Map extends GameObject{
 			e.printStackTrace();
 		}
 		
-		for (int k = 0; k < 15; k++) {
-			for (int l = 0; l < 15; l++) {
-				System.out.print(navMap[k][l] + "  <>  ");
-			}
-			System.out.println("");
-		}
+		// Print map
+		//for (int k = 0; k < 15; k++) {
+		//	for (int l = 0; l < 15; l++) {
+		//		System.out.print(navMap[k][l] + "  <>  ");
+		//	}
+		//	System.out.println("");
+		//}
 	}
 	
 	public void changeMap(int currentMap){

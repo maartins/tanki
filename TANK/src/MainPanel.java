@@ -58,10 +58,10 @@ public class MainPanel extends JPanel implements Runnable{
 		this.requestFocus();
 		this.setDoubleBuffered(true);
 		this.setBackground(new Color(0, 0, 0));
-		
-		changeGameState(GameStates.MainMenu);
 			
 		guiSetUp();
+		
+		changeGameState(GameStates.MainGame); // default: MainMenu
 		
 		database = new Database();
 		try{
@@ -70,17 +70,14 @@ public class MainPanel extends JPanel implements Runnable{
 			
 		}
 		
-		map = new Map();
-		
 		File folder = new File("Maps//");
-		map.getFiles(folder);
-		
 		currentMap = 0;
+		map = new Map();
+		map.getFiles(folder);
 		map.changeMap(currentMap);
 		currentMap++;
 		
 		bird = new IronBird(map.getIronBirdSpawnPoint());
-		
 		tank = new Tank(map.getTankSpawnPoint());
 		this.addKeyListener(tank);
 		
@@ -94,106 +91,6 @@ public class MainPanel extends JPanel implements Runnable{
 			thread = new Thread(this);
 			thread.start();
 		}
-	}
-	
-	private void guiSetUp(){		
-		startButton.setBounds(156, 200, 200, 60);
-		startButton.setFont(new Font("Arial", Font.BOLD, 16));
-		startButton.setBorderPainted(false);
-		startButton.setFocusPainted(false);
-		startButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!nameTextField.getText().isEmpty() && !nameTextField.getText().contains("Ievadiet niku")){
-					tank.setName(nameTextField.getText());
-					nameTextField.setText("");
-					changeGameState(GameStates.MainGame);
-				}else{
-					@SuppressWarnings("unused")
-					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
-				}
-			}
-		});
-		this.add(startButton);
-		
-		nameTextField.setBounds(156, 290, 200, 30);
-		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
-		nameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		nameTextField.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				startButton.doClick();
-			}
-		});
-		this.add(nameTextField);
-		
-		scorePanel.setBounds(156, 200, 200, 170);
-		scorePanel.setLayout(null);
-		this.add(scorePanel);
-		
-		multiButton.setBounds(156, 380, 200, 25);
-		multiButton.setFont(new Font("Arial", Font.BOLD, 16));
-		multiButton.setBorderPainted(false);
-		multiButton.setFocusPainted(false);
-		multiButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(currentGameState == GameStates.MainMenu){
-					if(multiButton.getText() == "Top 10"){
-						startButton.setVisible(false);
-						nameTextField.setVisible(false);
-						multiButton.setText("Atpakal");
-						ArrayList<String> topTen = database.getTopScore();
-						
-						int count = 0;
-						
-						for(String s : topTen){
-							JLabel item = new JLabel(s);
-							item.setBounds(0, count * 15, 200, 30);
-							scorePanel.add(item);
-							count++;
-						}
-						
-						scorePanel.setVisible(true);
-					}else{
-						scorePanel.removeAll();
-						scorePanel.setVisible(false);
-						startButton.setVisible(true);
-						nameTextField.setVisible(true);
-						multiButton.setText("Top 10");
-					}
-				}else if(currentGameState == GameStates.LevelFinished){
-					changeGameState(GameStates.MainGame);
-					multiButton.setText("Top 10");
-				}else{
-					changeGameState(GameStates.MainMenu);
-					multiButton.setText("Top 10");
-				}
-			}
-		});
-		this.add(multiButton);
-		
-		healthLable.setBounds(5, 515, 200, 30);
-		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
-		healthLable.setForeground(new Color(255, 255, 255));
-		this.add(healthLable);
-		
-		scoreLable.setBounds(210, 515, 200, 30);
-		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
-		scoreLable.setForeground(new Color(255, 255, 255));
-		this.add(scoreLable);
-		
-		totalScoreLable.setBounds(156, 200, 200, 30);
-		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
-		totalScoreLable.setForeground(new Color(255, 255, 255));
-		this.add(totalScoreLable);
-		
-		titleLable.setBounds(0, 0, 512, 582);
-		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
-		this.add(titleLable);
 	}
 	
 	@Override
@@ -293,9 +190,7 @@ public class MainPanel extends JPanel implements Runnable{
 					
 						deadBlockList.clear();
 					}
-					
-					//System.out.println("block count: " + map.getBlockList().size());
-					
+
 					healthLable.setText("Dzivibas " + tank.getCurHp());
 					scoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
 				}
@@ -349,6 +244,7 @@ public class MainPanel extends JPanel implements Runnable{
 				scoreLable.setVisible(true);
 				healthLable.setVisible(true);
 				totalScoreLable.setVisible(false);
+				scorePanel.setVisible(false);
 				multiButton.setVisible(false);
 				break;
 			case LevelFinished:
@@ -385,5 +281,105 @@ public class MainPanel extends JPanel implements Runnable{
 			default:
 				break;
 		}
+	}
+
+	private void guiSetUp(){		
+		startButton.setBounds(156, 200, 200, 60);
+		startButton.setFont(new Font("Arial", Font.BOLD, 16));
+		startButton.setBorderPainted(false);
+		startButton.setFocusPainted(false);
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!nameTextField.getText().isEmpty() && !nameTextField.getText().contains("Ievadiet niku")){
+					tank.setName(nameTextField.getText());
+					nameTextField.setText("");
+					changeGameState(GameStates.MainGame);
+				}else{
+					@SuppressWarnings("unused")
+					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
+				}
+			}
+		});
+		this.add(startButton);
+		
+		nameTextField.setBounds(156, 290, 200, 30);
+		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
+		nameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		nameTextField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startButton.doClick();
+			}
+		});
+		this.add(nameTextField);
+		
+		scorePanel.setBounds(156, 200, 200, 170);
+		scorePanel.setLayout(null);
+		this.add(scorePanel);
+		
+		multiButton.setBounds(156, 380, 200, 25);
+		multiButton.setFont(new Font("Arial", Font.BOLD, 16));
+		multiButton.setBorderPainted(false);
+		multiButton.setFocusPainted(false);
+		multiButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(currentGameState == GameStates.MainMenu){
+					if(multiButton.getText() == "Top 10"){
+						startButton.setVisible(false);
+						nameTextField.setVisible(false);
+						multiButton.setText("Atpakal");
+						ArrayList<String> topTen = database.getTopScore();
+						
+						int count = 0;
+						
+						for(String s : topTen){
+							JLabel item = new JLabel(s);
+							item.setBounds(0, count * 15, 200, 30);
+							scorePanel.add(item);
+							count++;
+						}
+						
+						scorePanel.setVisible(true);
+					}else{
+						scorePanel.removeAll();
+						scorePanel.setVisible(false);
+						startButton.setVisible(true);
+						nameTextField.setVisible(true);
+						multiButton.setText("Top 10");
+					}
+				}else if(currentGameState == GameStates.LevelFinished){
+					changeGameState(GameStates.MainGame);
+					multiButton.setText("Top 10");
+				}else{
+					changeGameState(GameStates.MainMenu);
+					multiButton.setText("Top 10");
+				}
+			}
+		});
+		this.add(multiButton);
+		
+		healthLable.setBounds(5, 515, 200, 30);
+		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
+		healthLable.setForeground(new Color(255, 255, 255));
+		this.add(healthLable);
+		
+		scoreLable.setBounds(210, 515, 200, 30);
+		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		scoreLable.setForeground(new Color(255, 255, 255));
+		this.add(scoreLable);
+		
+		totalScoreLable.setBounds(156, 200, 200, 30);
+		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
+		totalScoreLable.setForeground(new Color(255, 255, 255));
+		this.add(totalScoreLable);
+		
+		titleLable.setBounds(0, 0, 512, 582);
+		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
+		this.add(titleLable);
 	}
 }
