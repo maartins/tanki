@@ -191,24 +191,24 @@ public class Enemy extends GameObject implements Runnable{
 			
 			preDirection = curDirection;
 			
-			if(navList.get(navList.size() - 1).getX() * 32 < this.getX()){
+			if(navList.get(navList.size() - 1).getX() < this.getX()){
 				curDirection = LEFT;
 				veloX = -1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() * 32 > this.getX()){
+			}else if(navList.get(navList.size() - 1).getX() > this.getX()){
 				curDirection = RIGHT;
 				veloX = 1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() * 32 < this.getY()){
+			}else if(navList.get(navList.size() - 1).getY() < this.getY()){
 				curDirection = UP;
 				veloY = -1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() * 32 > this.getY()){
+			}else if(navList.get(navList.size() - 1).getY() > this.getY()){
 				curDirection = DOWN;
 				veloY = 1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() * 32 == this.getX() 
-				  && navList.get(navList.size() - 1).getY() * 32 == this.getY()){
+			}else if(navList.get(navList.size() - 1).getX() == this.getX() 
+				  && navList.get(navList.size() - 1).getY() == this.getY()){
 				veloX = 0;
 				veloY = 0;
 				navList.get(navList.size() - 1).reset();
@@ -232,10 +232,10 @@ public class Enemy extends GameObject implements Runnable{
 		birdPos.setImage("Images\\Nav01.png");
 		NavTile targetPos;
 		
-		int tankValue = (10 * (Math.abs(tankPos.getTileX() - (enemyPos.getTileX())) 
-				   			+ Math.abs(tankPos.getTileY() - enemyPos.getTileY()))) + 10;
-		int birdValue = (10 * (Math.abs(birdPos.getTileX() - (enemyPos.getTileX())) 
-	   						+ Math.abs(birdPos.getTileY() - enemyPos.getTileY()))) + 10;
+		int tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
+				   + Math.abs(enemyPos.getTileY() - tankPos.getTileY() )) + 10;
+		int birdValue = ((Math.abs((enemyPos.getTileX()) - birdPos.getTileX()))
+				   + Math.abs(enemyPos.getTileY() - birdPos.getTileY() )) + 10;
 		//System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
 		
 		//enemyPos.setValue(tankValue);
@@ -262,15 +262,15 @@ public class Enemy extends GameObject implements Runnable{
 			}
 			navList.clear();
 			
-			closedList.add(targetPos); // important set iterators to 1 in closed list loops
+			closedList.add(targetPos); // important: set iterators to 1 in closed list loops
 			closedList.add(enemyPos);
 			
 			//System.out.println("Enemy: " + enemyPos);
 		
 			NavTile tempb = mainMap.navMap()[enemyPos.getTileY() + 1][enemyPos.getTileX()];
 			if(!tempb.isBlocking()){			
-				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+						   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 				
 				tempb.setValue(value);
 				openList.add(tempb);
@@ -278,8 +278,8 @@ public class Enemy extends GameObject implements Runnable{
 			
 			tempb = mainMap.navMap()[enemyPos.getTileY() - 1][enemyPos.getTileX()];
 			if(!tempb.isBlocking()){			
-				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+						   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 				
 				tempb.setValue(value);
 				openList.add(tempb);
@@ -287,8 +287,8 @@ public class Enemy extends GameObject implements Runnable{
 			
 			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() + 1];
 			if(!tempb.isBlocking()){			
-				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+						   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 				
 				tempb.setValue(value);
 				openList.add(tempb);
@@ -296,8 +296,8 @@ public class Enemy extends GameObject implements Runnable{
 			
 			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() - 1];
 			if(!tempb.isBlocking()){			
-				int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-							   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+						   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 				
 				tempb.setValue(value);
 				openList.add(tempb);
@@ -331,8 +331,8 @@ public class Enemy extends GameObject implements Runnable{
 				NavTile tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
 				if(!closedList.contains(tempb)){
 					if(!tempb.isBlocking()){
-						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+								   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 						
 						tempb.setValue(value);
 						tempb.setImage("Images//Nav02.png");
@@ -344,8 +344,8 @@ public class Enemy extends GameObject implements Runnable{
 				tempb = mainMap.navMap()[closedList.get(i).getTileY() - 1][closedList.get(i).getTileX()];
 				if(!closedList.contains(tempb)){
 					if(!tempb.isBlocking()){
-						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+								   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 						
 						tempb.setValue(value);
 						tempb.setImage("Images//Nav02.png");
@@ -357,8 +357,8 @@ public class Enemy extends GameObject implements Runnable{
 				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() + 1];
 				if(!closedList.contains(tempb)){
 					if(!tempb.isBlocking()){
-						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+								   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 						
 						tempb.setValue(value);
 						tempb.setImage("Images//Nav02.png");
@@ -370,8 +370,8 @@ public class Enemy extends GameObject implements Runnable{
 				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() - 1];
 				if(!closedList.contains(tempb)){
 					if(!tempb.isBlocking()){
-						int value = (10 * (Math.abs(targetPos.getTileX()  - (tempb.getTileX()  + 1)) 
-								   + Math.abs(targetPos.getTileY()  - tempb.getTileY() ))) + 10;
+						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
+								   + Math.abs(tempb.getTileY() - targetPos.getTileY() )) + 10;
 						
 						tempb.setValue(value);
 						tempb.setImage("Images//Nav02.png");
@@ -386,21 +386,26 @@ public class Enemy extends GameObject implements Runnable{
 			if(!openList.isEmpty()){
 				//System.out.println("CALCULATE BLOCK WIEGHT");
 			    NavTile tempBlock = openList.get(0);
-				for(NavTile b : openList){
+			    //System.out.println("----------------------------------");
+			    //for(NavTile b : openList){
+			    //	System.out.println(b);
+				//}
+			    
+			    for(NavTile b : openList){
 					if(b.getValue() <= tempBlock.getValue()){
 						tempBlock = b;
 					}
 				}
-				//System.out.println(tempBlock);
+				
+				//System.out.println("$ " + tempBlock);
+				//System.out.println(mainMap.navMap()[6][10]);
+				
 				if(tempBlock.getParent() == null){
 					tempBlock.setParent(closedList.get(closedList.size() - 1));
 				}
 				
 				closedList.add(tempBlock);
-				
-				for(NavTile b : openList){
-					b.reset();
-				}
+
 				openList.clear();
 				
 				if(tempBlock.getTileX() + 1 == targetPos.getTileX() && tempBlock.getTileY()  == targetPos.getTileY()){
@@ -423,9 +428,9 @@ public class Enemy extends GameObject implements Runnable{
 			}
 		}else{
 			if(!isPathDone){
-				//for (NavTile n : closedList) {
-				//	System.out.println(n);
-				//}
+				for (NavTile n : closedList) {
+					System.out.println(n);
+				}
 				navList.add(closedList.get(closedList.size() - 1));
 				
 				for(int i = closedList.size() - 1; i > 1; i--){
@@ -440,28 +445,43 @@ public class Enemy extends GameObject implements Runnable{
 							navList.add(closedList.get(i).getParent());
 						}
 					}
-				}
-				System.out.println("NAV LIST DONE");
+				}	
+				
 				isPathDone = true;
+				
+				System.out.println("NAV LIST DONE");
+				for (NavTile n : navList) {
+					n.setImage("Images//Nav01.png");
+					//System.out.println(n);
+				}
 			}
 		}
 		
-		for (NavTile n : navList) {
-			n.setImage("Images//Nav01.png");
+		
+		
+		boolean reset = false;
+		if(targetPos.getTileX() != closedList.get(0).getTileX() || targetPos.getTileY() != closedList.get(0).getTileY()){
+			reset = true;
 		}
 		
-		if(targetPos.getTileX() != closedList.get(0).getTileX() || targetPos.getTileY() != closedList.get(0).getTileY()){
+		if(reset){
 			for(NavTile b : closedList){
 				b.reset();
 			}
 			for(NavTile b : openList){
 				b.reset();
 			}
+			for(NavTile b : navList){
+				b.reset();
+			}
 			
 			closedList.clear();
 			openList.clear();
+			navList.clear();
 			
 			isPathingStart = true;
+			isPathing = false;
+			isPathDone = false;
 		}
 	}
 	
