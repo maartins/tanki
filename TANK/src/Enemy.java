@@ -188,27 +188,28 @@ public class Enemy extends GameObject implements Runnable{
 	public void control(){	
 		if(!navList.isEmpty()){
 			//System.out.println("Moving");
-			
+			veloX = 0;
+			veloY = 0;
 			preDirection = curDirection;
 			
-			if(navList.get(navList.size() - 1).getX() < this.getX()){
+			if(navList.get(navList.size() - 1).getTileX() < this.getPositionOnMap().getX()){
 				curDirection = LEFT;
 				veloX = -1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() > this.getX()){
+			}else if(navList.get(navList.size() - 1).getTileX() > this.getPositionOnMap().getX()){
 				curDirection = RIGHT;
 				veloX = 1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() < this.getY()){
+			}else if(navList.get(navList.size() - 1).getTileY() < this.getPositionOnMap().getY()){
 				curDirection = UP;
 				veloY = -1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getY() > this.getY()){
+			}else if(navList.get(navList.size() - 1).getTileY() > this.getPositionOnMap().getY()){
 				curDirection = DOWN;
 				veloY = 1;
 				this.setImage(rotate(this.getImage(), curDirection, preDirection));
-			}else if(navList.get(navList.size() - 1).getX() == this.getX() 
-				  && navList.get(navList.size() - 1).getY() == this.getY()){
+			}else if(navList.get(navList.size() - 1).getTileX() == this.getPositionOnMap().getX() 
+				  && navList.get(navList.size() - 1).getTileY() == this.getPositionOnMap().getY()){
 				veloX = 0;
 				veloY = 0;
 				navList.get(navList.size() - 1).reset();
