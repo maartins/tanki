@@ -1,8 +1,8 @@
 
 public enum Settings {
 	framesPerSecond (60),
-	width  (518),
-	height (582),
+	width  (486),
+	height (570),
 	scale  (1);
 	
 	private final int value;

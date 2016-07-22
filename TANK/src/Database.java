@@ -39,12 +39,14 @@ public class Database {
 	
 	public void write(String text, int number){
 		Statement statement;
-		try {
-			statement = connection.createStatement();
-			statement.executeUpdate("INSERT INTO score_table (nickname, score) VALUES ('"+ text +"', "+ number +")");
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(connection != null){
+			try {
+				statement = connection.createStatement();
+				statement.executeUpdate("INSERT INTO score_table (nickname, score) VALUES ('"+ text +"', "+ number +")");
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

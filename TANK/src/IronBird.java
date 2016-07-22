@@ -17,6 +17,10 @@ public class IronBird extends GameObject{
 		curHp = maxHp;
 	}
 	
+	public int getCurHP(){
+		return curHp;
+	}
+	
 	public void recieveDamage(int damage){
 		curHp -= damage;
 	}

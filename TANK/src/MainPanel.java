@@ -19,8 +19,9 @@ public class MainPanel extends JPanel implements Runnable{
 	
 	private JButton startButton = new JButton("Play");
 	private JButton multiButton = new JButton("Top 10");
-	private JLabel healthLable = new JLabel("Life ");
-	private JLabel scoreLable = new JLabel("Score ");
+	private JLabel healthLable1 = new JLabel("Tank HP: ");
+	private JLabel healthLable2 = new JLabel("Bird HP: ");
+	private JLabel scoreLable = new JLabel("Score: ");
 	private JLabel totalScoreLable = new JLabel();
 	private JTextField nameTextField = new JTextField("Tank name");
 	private JLabel titleLable = new JLabel();
@@ -58,6 +59,9 @@ public class MainPanel extends JPanel implements Runnable{
 		this.setBackground(new Color(0, 0, 0));
 			
 		guiSetUp();
+
+		Sound loadShoot = new Sound("Sounds\\tank_shoot01.wav");
+		loadShoot.play(-100.0f);
 		
 		changeGameState(GameStates.MainMenu); // default: MainMenu
 		
@@ -189,8 +193,9 @@ public class MainPanel extends JPanel implements Runnable{
 						deadBlockList.clear();
 					}
 
-					healthLable.setText("Life " + tank.getCurHp());
-					scoreLable.setText("Score " + String.format("%08d", tank.getScore()));
+					healthLable1.setText("Tank HP: " + tank.getCurHp());
+					healthLable2.setText("Bird HP: " + bird.getCurHP());
+					scoreLable.setText("Score: " + String.format("%08d", tank.getScore()));
 				}
 			}
 			// ----------------------------------- Speles darbibas koda beigas
@@ -230,7 +235,8 @@ public class MainPanel extends JPanel implements Runnable{
 				startButton.setVisible(true);
 				nameTextField.setVisible(true);
 				scoreLable.setVisible(false);
-				healthLable.setVisible(false);
+				healthLable1.setVisible(false);
+				healthLable2.setVisible(false);
 				totalScoreLable.setVisible(false);
 				scorePanel.setVisible(false);
 				break;
@@ -240,7 +246,8 @@ public class MainPanel extends JPanel implements Runnable{
 				startButton.setVisible(false);
 				nameTextField.setVisible(false);
 				scoreLable.setVisible(true);
-				healthLable.setVisible(true);
+				healthLable1.setVisible(true);
+				healthLable2.setVisible(true);
 				totalScoreLable.setVisible(false);
 				scorePanel.setVisible(false);
 				multiButton.setVisible(false);
@@ -249,7 +256,8 @@ public class MainPanel extends JPanel implements Runnable{
 				currentGameState = state;
 				titleLable.setVisible(true);
 				scoreLable.setVisible(false);
-				healthLable.setVisible(false);
+				healthLable1.setVisible(false);
+				healthLable2.setVisible(false);
 				totalScoreLable.setVisible(true);
 				multiButton.setVisible(true);
 				multiButton.setText("Continue");
@@ -261,7 +269,8 @@ public class MainPanel extends JPanel implements Runnable{
 				currentGameState = state;
 				titleLable.setVisible(true);
 				scoreLable.setVisible(false);
-				healthLable.setVisible(false);
+				healthLable1.setVisible(false);
+				healthLable2.setVisible(false);
 				totalScoreLable.setVisible(true);
 				multiButton.setVisible(true);
 				multiButton.setText("End game");
@@ -282,7 +291,7 @@ public class MainPanel extends JPanel implements Runnable{
 	}
 
 	private void guiSetUp(){		
-		startButton.setBounds(156, 200, 200, 60);
+		startButton.setBounds(140, 200, 200, 60);
 		startButton.setFont(new Font("Arial", Font.BOLD, 16));
 		startButton.setBorderPainted(false);
 		startButton.setFocusPainted(false);
@@ -301,7 +310,7 @@ public class MainPanel extends JPanel implements Runnable{
 		});
 		this.add(startButton);
 		
-		nameTextField.setBounds(156, 290, 200, 30);
+		nameTextField.setBounds(140, 290, 200, 30);
 		nameTextField.setFont(new Font("Arial", Font.BOLD, 16));
 		nameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		nameTextField.addActionListener(new ActionListener() {
@@ -313,11 +322,11 @@ public class MainPanel extends JPanel implements Runnable{
 		});
 		this.add(nameTextField);
 		
-		scorePanel.setBounds(156, 200, 200, 170);
+		scorePanel.setBounds(140, 200, 200, 170);
 		scorePanel.setLayout(null);
 		this.add(scorePanel);
 		
-		multiButton.setBounds(156, 380, 200, 25);
+		multiButton.setBounds(140, 380, 200, 25);
 		multiButton.setFont(new Font("Arial", Font.BOLD, 16));
 		multiButton.setBorderPainted(false);
 		multiButton.setFocusPainted(false);
@@ -360,22 +369,27 @@ public class MainPanel extends JPanel implements Runnable{
 		});
 		this.add(multiButton);
 		
-		healthLable.setBounds(5, 515, 200, 30);
-		healthLable.setFont(new Font("Arial", Font.BOLD, 16));
-		healthLable.setForeground(new Color(255, 255, 255));
-		this.add(healthLable);
+		healthLable1.setBounds(5, 485, 200, 30);
+		healthLable1.setFont(new Font("Arial", Font.BOLD, 16));
+		healthLable1.setForeground(new Color(255, 255, 255));
+		this.add(healthLable1);
 		
-		scoreLable.setBounds(210, 515, 200, 30);
+		healthLable2.setBounds(10, 510, 200, 30);
+		healthLable2.setFont(new Font("Arial", Font.BOLD, 16));
+		healthLable2.setForeground(new Color(255, 255, 255));
+		this.add(healthLable2);
+		
+		scoreLable.setBounds(340, 510, 200, 30);
 		scoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		scoreLable.setForeground(new Color(255, 255, 255));
 		this.add(scoreLable);
 		
-		totalScoreLable.setBounds(156, 200, 200, 30);
+		totalScoreLable.setBounds(140, 200, 200, 30);
 		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		totalScoreLable.setForeground(new Color(255, 255, 255));
 		this.add(totalScoreLable);
 		
-		titleLable.setBounds(0, 0, 512, 582);
+		titleLable.setBounds(0, 0, Settings.width.value(), Settings.height.value());
 		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
 		this.add(titleLable);
 	}
