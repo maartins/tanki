@@ -14,17 +14,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.java.balloontip.BalloonTip;
-
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
 	
-	private JButton startButton = new JButton("Sakt speli");
+	private JButton startButton = new JButton("Play");
 	private JButton multiButton = new JButton("Top 10");
-	private JLabel healthLable = new JLabel("Dzivibas ");
-	private JLabel scoreLable = new JLabel("Punkti ");
+	private JLabel healthLable = new JLabel("Life ");
+	private JLabel scoreLable = new JLabel("Score ");
 	private JLabel totalScoreLable = new JLabel();
-	private JTextField nameTextField = new JTextField("Ievadiet niku");
+	private JTextField nameTextField = new JTextField("Tank name");
 	private JLabel titleLable = new JLabel();
 	private JPanel scorePanel = new JPanel();
 	
@@ -61,7 +59,7 @@ public class MainPanel extends JPanel implements Runnable{
 			
 		guiSetUp();
 		
-		changeGameState(GameStates.MainGame); // default: MainMenu
+		changeGameState(GameStates.MainMenu); // default: MainMenu
 		
 		database = new Database();
 		try{
@@ -157,7 +155,7 @@ public class MainPanel extends JPanel implements Runnable{
 					if(!enemies.isEmpty()){
 						for(Enemy e : enemies){
 							e.pathing();
-							//e.control();
+							e.control();
 							e.collisionCheck();
 							
 							if(e.isDead()){
@@ -191,8 +189,8 @@ public class MainPanel extends JPanel implements Runnable{
 						deadBlockList.clear();
 					}
 
-					healthLable.setText("Dzivibas " + tank.getCurHp());
-					scoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
+					healthLable.setText("Life " + tank.getCurHp());
+					scoreLable.setText("Score " + String.format("%08d", tank.getScore()));
 				}
 			}
 			// ----------------------------------- Speles darbibas koda beigas
@@ -254,9 +252,9 @@ public class MainPanel extends JPanel implements Runnable{
 				healthLable.setVisible(false);
 				totalScoreLable.setVisible(true);
 				multiButton.setVisible(true);
-				multiButton.setText("Turpinat");
+				multiButton.setText("Continue");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				totalScoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
+				totalScoreLable.setText("Score " + String.format("%08d", tank.getScore()));
 				tank.setLocation(map.getTankSpawnPoint());
 				break;
 			case EndScreen:
@@ -266,9 +264,9 @@ public class MainPanel extends JPanel implements Runnable{
 				healthLable.setVisible(false);
 				totalScoreLable.setVisible(true);
 				multiButton.setVisible(true);
-				multiButton.setText("Beigt speli");
+				multiButton.setText("End game");
 				tank.setScore(tank.getScore() * tank.getCurHp());
-				totalScoreLable.setText("Punkti " + String.format("%08d", tank.getScore()));
+				totalScoreLable.setText("Score " + String.format("%08d", tank.getScore()));
 				database.write(tank.getName(), tank.getScore());
 				tank.die();
 				tank = new Tank(map.getTankSpawnPoint());
@@ -292,13 +290,12 @@ public class MainPanel extends JPanel implements Runnable{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!nameTextField.getText().isEmpty() && !nameTextField.getText().contains("Ievadiet niku")){
+				if(!nameTextField.getText().isEmpty() || nameTextField.getText().equals(" ")){
 					tank.setName(nameTextField.getText());
-					nameTextField.setText("");
+					nameTextField.setText("Tank name");
 					changeGameState(GameStates.MainGame);
 				}else{
-					@SuppressWarnings("unused")
-					BalloonTip tip = new BalloonTip(nameTextField, "Ievadiet niku!");
+					nameTextField.setText("Tank name");
 				}
 			}
 		});
@@ -332,7 +329,7 @@ public class MainPanel extends JPanel implements Runnable{
 					if(multiButton.getText() == "Top 10"){
 						startButton.setVisible(false);
 						nameTextField.setVisible(false);
-						multiButton.setText("Atpakal");
+						multiButton.setText("Back");
 						ArrayList<String> topTen = database.getTopScore();
 						
 						int count = 0;

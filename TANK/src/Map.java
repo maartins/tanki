@@ -132,9 +132,9 @@ public class Map extends GameObject{
 			b.draw(g);
 		}
 		
-		for(NavTile n : navList){
-			n.draw(g);
-		}
+		//for(NavTile n : navList){
+		//	n.draw(g);
+		//}
 	}
 	
 	public ArrayList<String> getMapList(){

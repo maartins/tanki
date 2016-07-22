@@ -428,9 +428,9 @@ public class Enemy extends GameObject implements Runnable{
 			}
 		}else{
 			if(!isPathDone){
-				for (NavTile n : closedList) {
-					System.out.println(n);
-				}
+				//for (NavTile n : closedList) {
+				//	System.out.println(n);
+				//}
 				navList.add(closedList.get(closedList.size() - 1));
 				
 				for(int i = closedList.size() - 1; i > 1; i--){
@@ -449,7 +449,7 @@ public class Enemy extends GameObject implements Runnable{
 				
 				isPathDone = true;
 				
-				System.out.println("NAV LIST DONE");
+				//System.out.println("NAV LIST DONE");
 				for (NavTile n : navList) {
 					n.setImage("Images//Nav01.png");
 					//System.out.println(n);
