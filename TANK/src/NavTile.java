@@ -46,6 +46,6 @@ public class NavTile extends Block{
 	}
 	
 	public String toString(){
-		return "isBlocking:" + isBlocking + " navtile:" + getName() + " x:" + getTileX() + " y:" + getTileY() + " value:" + value + " parent:" + parent;
+		return "isBlocking:" + isBlocking + " navtile:" + getName() + "\t x:" + getTileX() + "\t y:" + getTileY() + "\t value:" + value + " parent:" + parent;
 	}
 }
