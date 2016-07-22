@@ -38,8 +38,9 @@ public class Database {
 	}
 	
 	public void write(String text, int number){
-		Statement statement;
 		if(connection != null){
+			Statement statement;
+		
 			try {
 				statement = connection.createStatement();
 				statement.executeUpdate("INSERT INTO score_table (nickname, score) VALUES ('"+ text +"', "+ number +")");
@@ -53,25 +54,26 @@ public class Database {
 	public ArrayList<String> getTopScore(){
 		ArrayList<String> topTen = new ArrayList<String>();
 		
-		try {
-			Statement statement = connection.createStatement();
-	        ResultSet resultStatment = statement.executeQuery("SELECT nickname, score FROM score_table ORDER BY score DESC");
-	        
-	        int count = 1;
-	        
-	        while(resultStatment.next() && count <= 10){
-	            String nickName = resultStatment.getString("nickname");
-	            String score = resultStatment.getLong("score") + "";
-	            //System.out.println(count + ". " + nickName + " - " + score);
-	            topTen.add(count + ". " + nickName + " - " + score);
-	            count++;
-	        }
-	        statement.close();
-	        resultStatment.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(connection != null){
+			try {
+				Statement statement = connection.createStatement();
+		        ResultSet resultStatment = statement.executeQuery("SELECT nickname, score FROM score_table ORDER BY score DESC");
+		        
+		        int count = 1;
+		        
+		        while(resultStatment.next() && count <= 10){
+		            String nickName = resultStatment.getString("nickname");
+		            String score = resultStatment.getLong("score") + "";
+		            //System.out.println(count + ". " + nickName + " - " + score);
+		            topTen.add(count + ". " + nickName + " - " + score);
+		            count++;
+		        }
+		        statement.close();
+		        resultStatment.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		
 		return topTen;
 	}
 	

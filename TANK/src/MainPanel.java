@@ -293,6 +293,8 @@ public class MainPanel extends JPanel implements Runnable{
 	private void guiSetUp(){		
 		startButton.setBounds(140, 200, 200, 60);
 		startButton.setFont(new Font("Arial", Font.BOLD, 16));
+		startButton.setBackground(new Color(182, 149, 67));
+		startButton.setForeground(Color.WHITE);
 		startButton.setBorderPainted(false);
 		startButton.setFocusPainted(false);
 		startButton.addActionListener(new ActionListener() {
@@ -328,6 +330,8 @@ public class MainPanel extends JPanel implements Runnable{
 		
 		multiButton.setBounds(140, 380, 200, 25);
 		multiButton.setFont(new Font("Arial", Font.BOLD, 16));
+		multiButton.setBackground(new Color(182, 149, 67));
+		multiButton.setForeground(Color.WHITE);
 		multiButton.setBorderPainted(false);
 		multiButton.setFocusPainted(false);
 		multiButton.addActionListener(new ActionListener() {
