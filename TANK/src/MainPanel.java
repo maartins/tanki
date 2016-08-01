@@ -73,7 +73,7 @@ public class MainPanel extends JPanel implements Runnable{
 		}
 		
 		File folder = new File("Maps//");
-		currentMap = 0;
+		currentMap = 2;
 		map = new Map();
 		map.getFiles(folder);
 		map.changeMap(currentMap);
