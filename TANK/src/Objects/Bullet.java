@@ -1,3 +1,6 @@
+package Objects;
+import Main.IDamagable;
+import Main.MainPanel;
 
 public class Bullet extends GameObject {
 
@@ -83,28 +86,11 @@ public class Bullet extends GameObject {
 				break;
 			}
 
-			for (Block b : MainPanel.map.getBlockList()) {
-				if (this.getBounds().intersects(b.getBounds()) && b.isShootable()) {
+			for (IDamagable damagable : MainPanel.damagableObjects) {
+				if (this.getBounds().intersects(((GameObject) damagable).getBounds())) {
 					isCollision = true;
-					b.recieveDamage(8, direction);
+					damagable.recieveDamage(3, direction);
 				}
-			}
-
-			for (Enemy e : MainPanel.enemies) {
-				if (this.getBounds().intersects(e.getBounds())) {
-					e.recieveDamage(damage);
-					isCollision = true;
-				}
-			}
-
-			if (this.getBounds().intersects(MainPanel.tank.getBounds())) {
-				MainPanel.tank.recieveDamage(damage);
-				isCollision = true;
-			}
-
-			if (this.getBounds().intersects(MainPanel.bird.getBounds())) {
-				MainPanel.bird.recieveDamage(damage);
-				isCollision = true;
 			}
 		}
 	}
@@ -129,6 +115,7 @@ public class Bullet extends GameObject {
 		setY(-1);
 	}
 
+	@Override
 	public String toString() {
 		return getName() + ": " + getX() + ", " + getY() + " h: " + isHidden();
 	}

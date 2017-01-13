@@ -1,6 +1,10 @@
+package Main;
 import java.awt.Dimension;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.RepaintManager;
 
 public class Main{
 	
@@ -13,7 +17,8 @@ public class Main{
 		frame.setContentPane(new MainPanel());
 		RepaintManager.currentManager(frame).setDoubleBufferingEnabled(true);
 		frame.addWindowListener(new WindowAdapter() {
-		       public void windowClosing(WindowEvent windowEvent){
+		       @Override
+			public void windowClosing(WindowEvent windowEvent){
 		          System.exit(0);
 		       }
 		    });

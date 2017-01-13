@@ -1,3 +1,5 @@
+package Objects;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -8,7 +10,16 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Tank extends GameObject implements KeyListener, Runnable {
+import Blocks.Block;
+import Blocks.Floor;
+import Main.IDamagable;
+import Main.MainPanel;
+import Main.PowerUp;
+import Main.PwrUpSuperBullet;
+import Main.Settings;
+import Main.Sound;
+
+public class Tank extends GameObject implements KeyListener, Runnable, IDamagable {
 
 	private int veloX;
 	private int veloY;
@@ -142,6 +153,7 @@ public class Tank extends GameObject implements KeyListener, Runnable {
 		setY(posBlock.getY());
 	}
 
+	@Override
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -249,7 +261,7 @@ public class Tank extends GameObject implements KeyListener, Runnable {
 
 	public void collisionCheck() {
 		for (Block b : MainPanel.map.getBlockList()) {
-			if (this.getBounds().intersects(b.getBounds()) && !b.isWalkable()) {
+			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
 				Rectangle insect = this.getBounds().intersection(b.getBounds());
 
 				boolean vertical = false;
@@ -526,10 +538,17 @@ public class Tank extends GameObject implements KeyListener, Runnable {
 	public void keyTyped(KeyEvent e) {
 	}
 
-	public void recieveDamage(int damage) {
+	public void recieveDamage2(int damage) {
 		curHp -= damage;
 	}
 
+	@Override
+	public void recieveDamage(int damage, int dir) {
+		curHp -= damage;
+		// updateUI(curHP);
+	}
+
+	@Override
 	public boolean isDead() {
 		if (curHp <= 0) {
 			return true;
@@ -551,6 +570,7 @@ public class Tank extends GameObject implements KeyListener, Runnable {
 		score = 0;
 	}
 
+	@Override
 	public String toString() {
 		return getName() + " - x:" + getX() + " y:" + getY() + " veloX:" + veloX + " veloY:" + veloY;
 	}

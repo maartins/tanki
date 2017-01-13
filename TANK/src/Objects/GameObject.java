@@ -1,3 +1,4 @@
+package Objects;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -9,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import Blocks.NavTile;
 
 public class GameObject {
 

@@ -1,3 +1,4 @@
+package Main;
 
 public enum Settings {
 	framesPerSecond (60),

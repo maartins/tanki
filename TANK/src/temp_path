@@ -1,0 +1,204 @@
+Map mainMap = MainPanel.map;
+
+		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
+		enemyPos.setImage("Images\\Nav01.png");
+		NavTile tankPos = mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap()
+				.getX()];
+		tankPos.setImage("Images\\Nav01.png");
+		NavTile birdPos = mainMap.navMap()[MainPanel.bird.getPositionOnMap().getY()][MainPanel.bird.getPositionOnMap()
+				.getX()];
+		birdPos.setImage("Images\\Nav01.png");
+		NavTile targetPos;
+
+		float tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
+				+ Math.abs(enemyPos.getTileY() - tankPos.getTileY())) + 10;
+		float birdValue = ((Math.abs((enemyPos.getTileX()) - birdPos.getTileX()))
+				+ Math.abs(enemyPos.getTileY() - birdPos.getTileY())) + 10;
+		// System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
+
+		// enemyPos.setValue(tankValue);
+
+		if (tankValue > birdValue) {
+			targetPos = birdPos;
+			enemyPos.setValue(birdValue);
+		} else if (birdValue > tankValue) {
+			targetPos = tankPos;
+			enemyPos.setValue(tankValue);
+		} else {
+			targetPos = birdPos;
+			enemyPos.setValue(birdValue);
+		}
+		// System.out.println("Tank: " + tankValue);
+		// targetPos = tankPos;
+
+		// System.out.println(targetPos.getTileX());
+		// System.out.println(enemyPos);
+
+		if (isPathingStart) {
+			for (NavTile b : navList) {
+				b.reset();
+			}
+			navList.clear();
+
+			closedList.add(targetPos); // important: set iterators to 1 in closed list loops
+			closedList.add(enemyPos);
+
+			isPathing = true;
+			isPathingStart = false;
+		}
+
+		if (isPathing) {
+			// for (int i = 1; i < closedList.size(); i++) {
+			int i = closedList.size() - 1;
+
+			NavTile tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
+			valueTile(tempb, targetPos);
+
+			tempb = mainMap.navMap()[closedList.get(i).getTileY() - 1][closedList.get(i).getTileX()];
+			valueTile(tempb, targetPos);
+
+			tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() + 1];
+			valueTile(tempb, targetPos);
+
+			tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() - 1];
+			valueTile(tempb, targetPos);
+			// }
+
+			// System.out.println(openList.get(0));
+
+			if (!openList.isEmpty()) {
+				// System.out.println("CALCULATE BLOCK WIEGHT: " + openList.size());
+				NavTile tempBlock = openList.get(0);
+				// System.out.println("----------------------------------");
+
+				for (NavTile b : openList) {
+					// System.out.println(b);
+					if (b.getValue() <= tempBlock.getValue()) {
+						tempBlock = b;
+					}
+				}
+
+				ArrayList<NavTile> toCheckList = new ArrayList<NavTile>();
+				for (NavTile b : openList) {
+					if (tempBlock.getValue() == b.getValue() && tempBlock != b) {
+						toCheckList.add(b);
+					}
+				}
+
+				toCheckList.add(tempBlock);
+
+				if (toCheckList.size() > 1) {
+					openList.clear();
+
+					for (NavTile b : toCheckList) {
+						tempb = mainMap.navMap()[b.getTileY() + 1][b.getTileX()];
+						valueTile(tempb, targetPos);
+
+						tempb = mainMap.navMap()[b.getTileY() - 1][b.getTileX()];
+						valueTile(tempb, targetPos);
+
+						tempb = mainMap.navMap()[b.getTileY()][b.getTileX() + 1];
+						valueTile(tempb, targetPos);
+
+						tempb = mainMap.navMap()[b.getTileY()][b.getTileX() - 1];
+						valueTile(tempb, targetPos);
+					}
+
+					for (NavTile b : openList) {
+						if (b.getValue() <= tempBlock.getValue()) {
+							tempBlock.setParent(closedList.get(closedList.size() - 1));
+							closedList.add(tempBlock);
+							b.setParent(tempBlock);
+							closedList.add(b);
+						}
+					}
+				} else {
+					// System.out.println(eqCounter);
+					// System.out.println(mainMap.navMap()[6][10]);
+
+					if (tempBlock.getParent() == null) {
+						tempBlock.setParent(closedList.get(closedList.size() - 1));
+					}
+
+					closedList.add(tempBlock);
+				}
+
+				openList.clear();
+
+				if (tempBlock.getTileX() + 1 == targetPos.getTileX() && tempBlock.getTileY() == targetPos.getTileY()) {
+					isPathing = false;
+					isPathDone = false;
+					System.out.println("PATHING DONE " + targetPos);
+				} else if (tempBlock.getTileX() - 1 == targetPos.getTileX()
+						&& tempBlock.getTileY() == targetPos.getTileY()) {
+					isPathing = false;
+					isPathDone = false;
+					System.out.println("PATHING DONE " + targetPos);
+				} else if (tempBlock.getTileY() + 1 == targetPos.getTileY()
+						&& tempBlock.getTileX() == targetPos.getTileX()) {
+					isPathing = false;
+					isPathDone = false;
+					System.out.println("PATHING DONE " + targetPos);
+				} else if (tempBlock.getTileY() - 1 == targetPos.getTileY()
+						&& tempBlock.getTileX() == targetPos.getTileX()) {
+					isPathing = false;
+					isPathDone = false;
+					System.out.println("PATHING DONE " + targetPos);
+				}
+			}
+		}
+		if (!isPathDone) {
+			System.out.println("asfasg");
+
+			navList.add(closedList.get(closedList.size() - 1));
+
+			for (int i = closedList.size() - 1; i > 1; i--) {
+				if (closedList.get(i).getParent() == null) {
+					// System.out.println("parent null");
+					break;
+				} else {
+					if (closedList.get(i).getParent().equals(enemyPos)) {
+						// System.out.println("last parent");
+						break;
+					} else {
+						navList.add(closedList.get(i).getParent());
+					}
+				}
+			}
+
+			isPathDone = true;
+			navCounter = navList.size();
+
+			// System.out.println("NAV LIST DONE");
+			for (NavTile n : navList) {
+				n.setImage("Images//Nav01.png");
+				// System.out.println(n);
+			}
+		}
+
+		boolean reset = false;
+		if (targetPos.getTileX() != closedList.get(0).getTileX()
+				|| targetPos.getTileY() != closedList.get(0).getTileY()) {
+			reset = true;
+		}
+
+		if (reset) {
+			System.out.println("Reset");
+			for (NavTile b : closedList) {
+				b.reset();
+			}
+			for (NavTile b : openList) {
+				b.reset();
+			}
+			for (NavTile b : navList) {
+				b.reset();
+			}
+
+			closedList.clear();
+			openList.clear();
+			navList.clear();
+
+			isPathingStart = true;
+			isPathing = false;
+			isPathDone = true;
+		}

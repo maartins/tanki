@@ -1,27 +1,27 @@
-public class NavTile extends Block{
+package Blocks;
+public class NavTile extends Block {
 
-	private int value;
-	
+	private float value;
+
 	private boolean isBlocking;
-	
+
 	private NavTile parent;
 
-	public NavTile(int x, int y, boolean isBlocking){
+	public NavTile(int x, int y, boolean isBlocking) {
 		super(x, y, isBlocking, "navtile");
-		
+
 		value = 0;
-		
+
 		this.isBlocking = isBlocking;
-		
+
 		parent = null;
 	}
-	
 
-	public int getValue() {
+	public float getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(float value) {
 		this.value = value;
 	}
 
@@ -40,12 +40,14 @@ public class NavTile extends Block{
 	public void setParent(NavTile parent) {
 		this.parent = parent;
 	}
-	
-	public void reset(){
+
+	public void reset() {
 		value = 0;
 	}
-	
-	public String toString(){
-		return "isBlocking:" + isBlocking + " navtile:" + getName() + "\t x:" + getTileX() + "\t y:" + getTileY() + "\t value:" + value + " parent:" + parent;
+
+	@Override
+	public String toString() {
+		return "isBlocking:" + isBlocking + " navtile:" + getName() + "\t x:" + getTileX() + "\t y:" + getTileY()
+				+ "\t value:" + value + " parent:" + parent;
 	}
 }

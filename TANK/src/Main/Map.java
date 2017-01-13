@@ -1,3 +1,4 @@
+package Main;
 import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.File;
@@ -5,26 +6,31 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import Blocks.Block;
+import Blocks.Floor;
+import Blocks.NavTile;
+import Blocks.SolidWall;
+import Blocks.Wall;
+import Objects.GameObject;
+
 public class Map extends GameObject {
+
+	private int currentMap = 0;
+
 	private String mapPath;
 
-	private ArrayList<String> mapList;
-	private ArrayList<Spawner> spawnerList;
-	private ArrayList<Block> blockList;
-	private ArrayList<NavTile> navList;
+	private ArrayList<String> mapList = new ArrayList<String>();
+	private ArrayList<Spawner> spawnerList = new ArrayList<Spawner>();
+	private ArrayList<Block> blockList = new ArrayList<Block>();
+	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
+	private ArrayList<IDamagable> damagableObjects = new ArrayList<IDamagable>();
 
-	private NavTile[][] navMap;
+	private NavTile[][] navMap = new NavTile[15][15];
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
 
 	public Map() {
 		super(0, 0, "Map");
-
-		mapList = new ArrayList<String>();
-		spawnerList = new ArrayList<Spawner>();
-		blockList = new ArrayList<Block>();
-		navMap = new NavTile[15][15];
-		navList = new ArrayList<NavTile>();
 	}
 
 	private void makeMap() {
@@ -96,6 +102,12 @@ public class Map extends GameObject {
 			e.printStackTrace();
 		}
 
+		for (Block block : blockList) {
+			if (block instanceof IDamagable) {
+				damagableObjects.add((IDamagable) block);
+			}
+		}
+
 		// Print map
 		// for (int k = 0; k < 15; k++) {
 		// for (int l = 0; l < 15; l++) {
@@ -105,17 +117,20 @@ public class Map extends GameObject {
 		// }
 	}
 
-	public void changeMap(int currentMap) {
+	public void changeMap() {
 		spawnerList = new ArrayList<Spawner>();
 		blockList = new ArrayList<Block>();
 		navMap = new NavTile[15][15];
 		navList = new ArrayList<NavTile>();
+		damagableObjects = new ArrayList<IDamagable>();
 
 		if (currentMap < mapList.size()) {
 			mapPath = mapList.get(currentMap);
 		} else {
 			mapPath = mapList.get(0);
 		}
+
+		currentMap++;
 
 		makeMap();
 	}
@@ -127,6 +142,7 @@ public class Map extends GameObject {
 		}
 	}
 
+	@Override
 	public void draw(Graphics g) {
 		for (Block b : blockList) {
 			b.draw(g);
@@ -147,6 +163,10 @@ public class Map extends GameObject {
 
 	public ArrayList<Block> getBlockList() {
 		return blockList;
+	}
+
+	public ArrayList<IDamagable> getDamagableObjectList() {
+		return damagableObjects;
 	}
 
 	public NavTile[][] navMap() {

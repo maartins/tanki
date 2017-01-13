@@ -1,4 +1,4 @@
-
+package Objects;
 public class SuperBullet extends Bullet{
 
 	

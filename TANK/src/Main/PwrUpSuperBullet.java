@@ -1,4 +1,4 @@
-
+package Main;
 public class PwrUpSuperBullet extends PowerUp{
 	
 	private int bulletCount;

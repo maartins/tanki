@@ -1,3 +1,5 @@
+package Objects;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -5,7 +7,14 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
-public class Enemy extends GameObject implements Runnable {
+import Blocks.Block;
+import Blocks.NavTile;
+import Main.IDamagable;
+import Main.MainPanel;
+import Main.Map;
+import Main.Spawner;
+
+public class Enemy extends GameObject implements Runnable, IDamagable {
 
 	private int veloX = 0;
 	private int veloY = 0;
@@ -15,7 +24,7 @@ public class Enemy extends GameObject implements Runnable {
 	private int bulletCount = 10;
 	private int navCounter = 0;
 
-	private final int maxHp = 3;
+	private final int maxHp = 12;
 	private final int UP = 1;
 	private final int DOWN = 3;
 	private final int LEFT = 2;
@@ -26,13 +35,14 @@ public class Enemy extends GameObject implements Runnable {
 	private long waitTime;
 	private long shootTime;
 
-	private boolean isPathing;
+	private boolean isPathing = true;
 	private boolean isPathingStart = true;
-	private boolean isPathDone;
+	private boolean isPathDone = true;
 	private boolean isRunning = true;
 
 	private ArrayList<NavTile> closedList = new ArrayList<NavTile>();;
 	private ArrayList<NavTile> openList = new ArrayList<NavTile>();
+	private ArrayList<NavTile> checkList = new ArrayList<NavTile>();
 	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
 	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
@@ -61,10 +71,12 @@ public class Enemy extends GameObject implements Runnable {
 		}
 	}
 
-	public Enemy(Block posBlock) {
-		super(posBlock.getX(), posBlock.getY(), "Enemy", "Images//Enemy01.png");
+	public Enemy(Spawner spawner) {
+		super(spawner.getX(), spawner.getY(), "Enemy", "Images//Enemy01.png");
 
 		curTime = System.currentTimeMillis();
+
+		this.spawner = spawner;
 
 		for (int i = 0; i < bulletCount; i++) {
 			bulletList.add(new Bullet(-1, -1));
@@ -83,6 +95,7 @@ public class Enemy extends GameObject implements Runnable {
 
 	}
 
+	@Override
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -118,7 +131,7 @@ public class Enemy extends GameObject implements Runnable {
 			}
 
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / Settings.framesPerSecond.value()) - curTime;
+			waitTime = (1000 / Main.Settings.framesPerSecond.value()) - curTime;
 			try {
 				if (waitTime < 0) {
 					Thread.sleep(10);
@@ -226,7 +239,6 @@ public class Enemy extends GameObject implements Runnable {
 
 	public void pathing() {
 		Map mainMap = MainPanel.map;
-
 		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
 		enemyPos.setImage("Images\\Nav01.png");
 		NavTile tankPos = mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap()
@@ -237,9 +249,9 @@ public class Enemy extends GameObject implements Runnable {
 		birdPos.setImage("Images\\Nav01.png");
 		NavTile targetPos;
 
-		int tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
+		float tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
 				+ Math.abs(enemyPos.getTileY() - tankPos.getTileY())) + 10;
-		int birdValue = ((Math.abs((enemyPos.getTileX()) - birdPos.getTileX()))
+		float birdValue = ((Math.abs((enemyPos.getTileX()) - birdPos.getTileX()))
 				+ Math.abs(enemyPos.getTileY() - birdPos.getTileY())) + 10;
 		// System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
 
@@ -255,161 +267,66 @@ public class Enemy extends GameObject implements Runnable {
 			targetPos = birdPos;
 			enemyPos.setValue(birdValue);
 		}
-		// System.out.println("Tank: " + tankValue);
-		// targetPos = tankPos;
-
-		// System.out.println(targetPos.getTileX());
-		// System.out.println(enemyPos);
 
 		if (isPathingStart) {
+
+			// System.out.println("Tank: " + tankValue);
+			// targetPos = tankPos;
+
+			// System.out.println(targetPos.getTileX());
+			// System.out.println(enemyPos);
+
 			for (NavTile b : navList) {
 				b.reset();
 			}
 			navList.clear();
 
-			closedList.add(targetPos); // important: set iterators to 1 in
-										// closed list loops
+			closedList.add(targetPos); // important: set iterators to 1 in closed list loops
 			closedList.add(enemyPos);
-
-			// System.out.println("Enemy: " + enemyPos);
-
-			NavTile tempb = mainMap.navMap()[enemyPos.getTileY() + 1][enemyPos.getTileX()];
-			if (!tempb.isBlocking()) {
-				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-						+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-				tempb.setValue(value);
-				openList.add(tempb);
-			}
-
-			tempb = mainMap.navMap()[enemyPos.getTileY() - 1][enemyPos.getTileX()];
-			if (!tempb.isBlocking()) {
-				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-						+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-				tempb.setValue(value);
-				openList.add(tempb);
-			}
-
-			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() + 1];
-			if (!tempb.isBlocking()) {
-				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-						+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-				tempb.setValue(value);
-				openList.add(tempb);
-			}
-
-			tempb = mainMap.navMap()[enemyPos.getTileY()][enemyPos.getTileX() - 1];
-			if (!tempb.isBlocking()) {
-				int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-						+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-				tempb.setValue(value);
-				openList.add(tempb);
-			}
-
-			NavTile tempBlock = openList.get(0);
-			for (NavTile b : openList) {
-				if (b.getValue() <= tempBlock.getValue()) {
-					tempBlock = b;
-				}
-			}
-
-			tempBlock.setParent(enemyPos);
-			tempBlock.setImage("Images\\Nav01.png");
-			closedList.add(tempBlock);
-
-			// System.out.println("$ " + tempBlock + " " + closedList.size());
-
-			for (NavTile b : openList) {
-				b.reset();
-			}
-			openList.clear();
 
 			isPathing = true;
 			isPathingStart = false;
 		}
 
 		if (isPathing) {
+			NavTile tempb = null;
+
 			for (int i = 1; i < closedList.size(); i++) {
-
-				NavTile tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
-				if (!closedList.contains(tempb)) {
-					if (!tempb.isBlocking()) {
-						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-								+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav02.png");
-
-						openList.add(tempb);
-					}
-				}
+				// int i = closedList.size() - 1;
+				tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
+				valueTile(tempb, targetPos);
 
 				tempb = mainMap.navMap()[closedList.get(i).getTileY() - 1][closedList.get(i).getTileX()];
-				if (!closedList.contains(tempb)) {
-					if (!tempb.isBlocking()) {
-						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-								+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav02.png");
-
-						openList.add(tempb);
-					}
-				}
+				valueTile(tempb, targetPos);
 
 				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() + 1];
-				if (!closedList.contains(tempb)) {
-					if (!tempb.isBlocking()) {
-						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-								+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav02.png");
-
-						openList.add(tempb);
-					}
-				}
+				valueTile(tempb, targetPos);
 
 				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() - 1];
-				if (!closedList.contains(tempb)) {
-					if (!tempb.isBlocking()) {
-						int value = ((Math.abs((tempb.getTileX()) - targetPos.getTileX()))
-								+ Math.abs(tempb.getTileY() - targetPos.getTileY())) + 10;
-
-						tempb.setValue(value);
-						tempb.setImage("Images//Nav02.png");
-
-						openList.add(tempb);
-					}
-				}
+				valueTile(tempb, targetPos);
 			}
 
 			// System.out.println(openList.get(0));
 
 			if (!openList.isEmpty()) {
-				// System.out.println("CALCULATE BLOCK WIEGHT");
+				// System.out.println("CALCULATE BLOCK WIEGHT: " + openList.size());
 				NavTile tempBlock = openList.get(0);
 				// System.out.println("----------------------------------");
-				// for(NavTile b : openList){
+				// for (NavTile b : closedList) {
 				// System.out.println(b);
 				// }
 
 				for (NavTile b : openList) {
+					// System.out.println(b);
 					if (b.getValue() <= tempBlock.getValue()) {
 						tempBlock = b;
 					}
 				}
 
-				// System.out.println("$ " + tempBlock);
-				// System.out.println(mainMap.navMap()[6][10]);
-
 				if (tempBlock.getParent() == null) {
 					tempBlock.setParent(closedList.get(closedList.size() - 1));
 				}
-
+				// tempBlock.setImage("Images//Nav02.png");
 				closedList.add(tempBlock);
 
 				openList.clear();
@@ -435,35 +352,33 @@ public class Enemy extends GameObject implements Runnable {
 					// System.out.println("PATHING DONE " + targetPos);
 				}
 			}
-		} else {
-			if (!isPathDone) {
-				// for (NavTile n : closedList) {
-				// System.out.println(n);
-				// }
-				navList.add(closedList.get(closedList.size() - 1));
+		}
+		if (!isPathDone) {
+			System.out.println("asfasg");
 
-				for (int i = closedList.size() - 1; i > 1; i--) {
-					if (closedList.get(i).getParent() == null) {
-						// System.out.println("parent null");
+			navList.add(closedList.get(closedList.size() - 1));
+
+			for (int i = closedList.size() - 1; i > 1; i--) {
+				if (closedList.get(i).getParent() == null) {
+					// System.out.println("parent null");
+					break;
+				} else {
+					if (closedList.get(i).getParent().equals(closedList.get(1))) {
+						// System.out.println("last parent");
 						break;
 					} else {
-						if (closedList.get(i).getParent().equals(enemyPos)) {
-							// System.out.println("last parent");
-							break;
-						} else {
-							navList.add(closedList.get(i).getParent());
-						}
+						navList.add(closedList.get(i).getParent());
 					}
 				}
+			}
 
-				isPathDone = true;
-				navCounter = navList.size();
+			isPathDone = true;
+			navCounter = navList.size();
 
-				// System.out.println("NAV LIST DONE");
-				for (NavTile n : navList) {
-					n.setImage("Images//Nav01.png");
-					// System.out.println(n);
-				}
+			// System.out.println("NAV LIST DONE");
+			for (NavTile n : navList) {
+				n.setImage("Images//Nav01.png");
+				// System.out.println(n);
 			}
 		}
 
@@ -491,13 +406,43 @@ public class Enemy extends GameObject implements Runnable {
 
 			isPathingStart = true;
 			isPathing = false;
-			isPathDone = false;
+			isPathDone = true;
+		}
+	}
+
+	private void valueTile(NavTile testable, NavTile traget) {
+		if (!closedList.contains(testable)) {
+			if (!testable.isBlocking()) {
+				float value = ((Math.abs((testable.getTileX()) - traget.getTileX()))
+						+ Math.abs(testable.getTileY() - traget.getTileY())) + 10;
+
+				testable.setValue(value);
+				testable.setImage("Images//Nav02.png");
+
+				openList.add(testable);
+			}
+		}
+	}
+
+	private void valueNeighborTile(NavTile current, NavTile neighbor) {
+		if (!closedList.contains(neighbor)) {
+			if (!neighbor.isBlocking()) {
+				float value = ((Math.abs((current.getTileX()) - neighbor.getTileX()))
+						+ Math.abs(current.getTileY() - neighbor.getTileY()))
+						+ ((Math.abs((current.getTileX()) - closedList.get(1).getTileX()))
+								+ Math.abs(current.getTileY() - closedList.get(1).getTileY()))
+						+ 10;
+
+				neighbor.setValue(value);
+				// testable.setImage("Images//Nav02.png");
+				checkList.add(neighbor);
+			}
 		}
 	}
 
 	public void collisionCheck() {
 		for (Block b : MainPanel.map.getBlockList()) {
-			if (this.getBounds().intersects(b.getBounds()) && !b.isWalkable()) {
+			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
 				Rectangle insect = this.getBounds().intersection(b.getBounds());
 
 				boolean vertical = false;
@@ -677,10 +622,17 @@ public class Enemy extends GameObject implements Runnable {
 		}
 	}
 
-	public void recieveDamage(int damage) {
+	public void recieveDamage2(int damage) {
 		curHp -= damage;
 	}
 
+	@Override
+	public void recieveDamage(int damage, int dir) {
+		curHp -= damage;
+		// System.out.println("HP " + curHp);
+	}
+
+	@Override
 	public boolean isDead() {
 		if (curHp <= 0) {
 			return true;
@@ -698,6 +650,8 @@ public class Enemy extends GameObject implements Runnable {
 	}
 
 	public void die() {
+		spawner.setCanSpawn(true);
+
 		isRunning = false;
 		try {
 			thread.join();
@@ -713,4 +667,5 @@ public class Enemy extends GameObject implements Runnable {
 		}
 		navList.clear();
 	}
+
 }
