@@ -1,6 +1,5 @@
-package Main;
+package Blocks;
 
-import Blocks.Block;
 import Objects.Enemy;
 
 public class Spawner extends Block {
@@ -47,7 +46,6 @@ public class Spawner extends Block {
 
 	public Enemy spawn() {
 		canSpawn = false;
-		enemyCount--;
 		return new Enemy(this);
 	}
 }

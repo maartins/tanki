@@ -1,7 +1,6 @@
 package Objects;
 
 import Blocks.Block;
-import Main.IDamagable;
 
 public class IronBird extends GameObject implements IDamagable {
 

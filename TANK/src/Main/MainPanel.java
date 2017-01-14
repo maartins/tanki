@@ -8,21 +8,19 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import Blocks.Block;
+import Blocks.Spawner;
 import GameStates.GameStateManager;
 import GameStates.GameStates;
 import GameStates.IGameStateObserver;
 import Objects.Enemy;
+import Objects.IDamagable;
 import Objects.IronBird;
 import Objects.Tank;
 import UI.UserInterface;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
-
-	/*
-	 * private JButton startButton = new JButton("Play"); private JButton multiButton = new JButton("Top 10"); private JLabel healthLable1 = new JLabel("Tank HP: "); private JLabel healthLable2 = new JLabel("Bird HP: "); private JLabel scoreLable = new
-	 * JLabel("Score: "); private JLabel totalScoreLable = new JLabel(); private JTextField nameTextField = new JTextField("Tank name"); private JLabel titleLable = new JLabel(); private JPanel scorePanel = new JPanel();
-	 */
 
 	private long startTime;
 	private long currentTime;
@@ -81,6 +79,8 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 		tank = new Tank(map.getTankSpawnPoint());
 		this.addKeyListener(tank);
 
+		damagableObjects = map.getDamagableObjectList();
+
 		for (Spawner s : map.getSpawnerList()) {
 			if (s.canSpawn()) {
 				Enemy tmp = s.spawn();
@@ -89,9 +89,9 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 			}
 		}
 
-		for (IDamagable iDamagable : map.getDamagableObjectList()) {
-			damagableObjects.add(iDamagable);
-		}
+		// for (IDamagable iDamagable : map.getDamagableObjectList()) {
+		// damagableObjects.add(iDamagable);
+		// }
 
 		damagableObjects.add(bird);
 		damagableObjects.add(tank);
@@ -161,22 +161,25 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 							if (e.isDead()) {
 								tank.setScore(tank.getScore() + 20);
 								e.die();
-								deadObjects.add(e);
 							}
 						}
 					}
 
 					for (IDamagable b : damagableObjects) {
-						if (!(b instanceof Enemy)) {
-							if (b.isDead()) {
-								deadObjects.add(b);
-							}
+						if (b.isDead()) {
+							deadObjects.add(b);
 						}
 					}
 
 					if (!deadObjects.isEmpty()) {
 						for (IDamagable o : deadObjects) {
 							damagableObjects.remove(o);
+							if (o instanceof Block) {
+								map.getBlockList().remove(o);
+							}
+							if (o instanceof Enemy) {
+								enemies.remove(o);
+							}
 						}
 
 						deadObjects.clear();
@@ -208,7 +211,7 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 			if (totalTime > 1000) {
 				@SuppressWarnings("unused")
 				long realFPS = (long) ((double) frameCount / (double) totalTime * 1000.0);
-				// System.out.println("fps: " + realFPS);
+				System.out.println("fps: " + realFPS);
 				frameCount = 0;
 				totalTime = 0;
 			}
@@ -224,15 +227,13 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 		case MainGame:
 			break;
 		case LevelFinished:
-			for (Enemy e : enemies) {
-				e.die();
-			}
-
 			enemies.clear();
 			deadObjects.clear();
 			damagableObjects.clear();
 
 			map.changeMap();
+
+			damagableObjects = map.getDamagableObjectList();
 
 			bird = new IronBird(map.getIronBirdSpawnPoint());
 			damagableObjects.add(bird);
@@ -241,17 +242,10 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 			tank.setLocation(map.getTankSpawnPoint());
 			damagableObjects.add(tank);
 
-			for (IDamagable iDamagable : map.getDamagableObjectList()) {
-				damagableObjects.add(iDamagable);
-			}
 			break;
 		case EndScreen:
 			tank.setScore(tank.getScore() * tank.getCurHp());
 			database.write(tank.getName(), tank.getScore());
-
-			for (Enemy e : enemies) {
-				e.die();
-			}
 
 			enemies.clear();
 			deadObjects.clear();
@@ -259,9 +253,7 @@ public class MainPanel extends JPanel implements Runnable, IGameStateObserver {
 
 			map.changeMap();
 
-			for (IDamagable iDamagable : map.getDamagableObjectList()) {
-				damagableObjects.add(iDamagable);
-			}
+			damagableObjects = map.getDamagableObjectList();
 
 			bird = new IronBird(map.getIronBirdSpawnPoint());
 			damagableObjects.add(bird);

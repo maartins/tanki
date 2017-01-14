@@ -1,5 +1,4 @@
 package Objects;
-import Main.IDamagable;
 import Main.MainPanel;
 
 public class Bullet extends GameObject {

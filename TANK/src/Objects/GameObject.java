@@ -1,10 +1,12 @@
 package Objects;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -57,10 +59,14 @@ public class GameObject {
 		try {
 			image = ImageIO.read(new File(imagePath));
 
-			// int scale = Settings.scale.value();
-			// scale = scale == 1 ? scale : scale / 10 + 1;
-
-			// image = scale(image, scale);
+			BufferedImage convertedImage = null;
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			GraphicsDevice gd = ge.getDefaultScreenDevice();
+			GraphicsConfiguration gc = gd.getDefaultConfiguration();
+			convertedImage = gc.createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
+			Graphics2D g2d = convertedImage.createGraphics();
+			g2d.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+			g2d.dispose();
 
 		} catch (IOException e) {
 			System.out.println("Failed to load image.");
@@ -82,32 +88,6 @@ public class GameObject {
 		} else {
 			return new Rectangle(x, y, 32, 32);
 		}
-	}
-
-	public BufferedImage crop(BufferedImage src, Rectangle rect) {
-		BufferedImage dest = src.getSubimage(0, 0, rect.width, rect.height);
-		return dest;
-	}
-
-	public static BufferedImage scale(BufferedImage img, double scale) {
-		int w = img.getWidth();
-		int h = img.getHeight();
-		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-		AffineTransform at = new AffineTransform();
-		at.scale(scale, scale);
-		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-		after = scaleOp.filter(img, after);
-
-		return after;
-	}
-
-	public BufferedImage rotate(BufferedImage img, int cdir, int pdir) {
-		AffineTransform transform = new AffineTransform();
-		transform.rotate(Math.toRadians(-(cdir - pdir) * 90), img.getWidth() / 2, img.getHeight() / 2);
-		AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-		img = op.filter(img, null);
-
-		return img;
 	}
 
 	public NavTile getPositionOnMap() {

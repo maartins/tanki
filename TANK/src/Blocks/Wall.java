@@ -2,7 +2,8 @@ package Blocks;
 
 import java.awt.Rectangle;
 
-import Main.IDamagable;
+import Main.TransformUtils;
+import Objects.IDamagable;
 
 public class Wall extends Block implements IDamagable {
 
@@ -24,23 +25,23 @@ public class Wall extends Block implements IDamagable {
 					damage = damage + (getWidth() - damage);
 
 				setX(getX() + damage);
-				setImage(crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
+				setImage(TransformUtils.crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
 			} else if (dir == 1) {
 				if (getHeight() - damage <= 0)
 					damage = damage + (getHeight() - damage);
 
-				setImage(crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
+				setImage(TransformUtils.crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
 			} else if (dir == 2) {
 				if (getWidth() - damage <= 0)
 					damage = damage + (getWidth() - damage);
 
-				setImage(crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
+				setImage(TransformUtils.crop(getImage(), new Rectangle(getWidth() - damage, getHeight())));
 			} else if (dir == 3) {
 				if (getHeight() - damage <= 0)
 					damage = damage + (getHeight() - damage);
 
 				setY(getY() + damage);
-				setImage(crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
+				setImage(TransformUtils.crop(getImage(), new Rectangle(getWidth(), getHeight() - damage)));
 			}
 		}
 	}

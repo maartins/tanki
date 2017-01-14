@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 import Blocks.Block;
 import Blocks.NavTile;
-import Main.IDamagable;
+import Blocks.Spawner;
 import Main.MainPanel;
 import Main.Map;
-import Main.Spawner;
+import Main.TransformUtils;
 
 public class Enemy extends GameObject implements Runnable, IDamagable {
 
@@ -63,7 +63,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 		curDirection = UP;
 		preDirection = RIGHT;
-		this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 
 		if (thread == null) {
 			thread = new Thread(this);
@@ -86,7 +86,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 		curDirection = UP;
 		preDirection = RIGHT;
-		this.setImage(rotate(this.getImage(), curDirection, preDirection));
+		this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 
 		if (thread == null) {
 			thread = new Thread(this);
@@ -204,22 +204,22 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 				curDirection = LEFT;
 				veloX = -1;
 
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			} else if (navList.get(navCounter - 1).getX() > this.getX()) {
 				curDirection = RIGHT;
 				veloX = 1;
 
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			} else if (navList.get(navCounter - 1).getY() < this.getY()) {
 				curDirection = UP;
 				veloY = -1;
 
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			} else if (navList.get(navCounter - 1).getY() > this.getY()) {
 				curDirection = DOWN;
 				veloY = 1;
 
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			} else if (navList.get(navCounter - 1).getX() == this.getX()
 					&& navList.get(navCounter - 1).getY() == this.getY()) {
 				veloX = 0;
@@ -651,6 +651,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 	public void die() {
 		spawner.setCanSpawn(true);
+		spawner.setEnemyCount(spawner.getEnemyCount() - 1);
 
 		isRunning = false;
 		try {

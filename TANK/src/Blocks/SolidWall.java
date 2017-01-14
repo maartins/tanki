@@ -1,6 +1,6 @@
 package Blocks;
 
-import Main.IDamagable;
+import Objects.IDamagable;
 
 public class SolidWall extends Block implements IDamagable {
 

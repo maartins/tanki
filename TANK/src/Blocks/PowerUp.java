@@ -1,7 +1,4 @@
-package Main;
-
-
-import Blocks.Block;
+package Blocks;
 
 public class PowerUp extends Block {
 

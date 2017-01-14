@@ -12,12 +12,12 @@ import java.util.Iterator;
 
 import Blocks.Block;
 import Blocks.Floor;
-import Main.IDamagable;
+import Blocks.PowerUp;
+import Blocks.PwrUpSuperBullet;
 import Main.MainPanel;
-import Main.PowerUp;
-import Main.PwrUpSuperBullet;
 import Main.Settings;
 import Main.Sound;
+import Main.TransformUtils;
 
 public class Tank extends GameObject implements KeyListener, Runnable, IDamagable {
 
@@ -479,7 +479,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			if (curDirection != LEFT) {
 				preDirection = curDirection;
 				curDirection = LEFT;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_D:
@@ -487,7 +487,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			if (curDirection != RIGHT) {
 				preDirection = curDirection;
 				curDirection = RIGHT;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_W:
@@ -495,7 +495,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			if (curDirection != UP) {
 				preDirection = curDirection;
 				curDirection = UP;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_S:
@@ -503,7 +503,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			if (curDirection != DOWN) {
 				preDirection = curDirection;
 				curDirection = DOWN;
-				this.setImage(rotate(this.getImage(), curDirection, preDirection));
+				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
 			}
 			break;
 		case KeyEvent.VK_SPACE:
