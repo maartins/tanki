@@ -12,7 +12,7 @@ public class Main {
 	private JFrame frame = new JFrame("Tank");
 
 	public Main() {
-		frame.setPreferredSize(new Dimension(Settings.width.value(), Settings.height.value()));
+		frame.setPreferredSize(new Dimension(Settings.width, Settings.height));
 		frame.setResizable(false);
 		frame.setLayout(null);
 		frame.setContentPane(new MainPanel());

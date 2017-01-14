@@ -14,7 +14,7 @@ import Blocks.Block;
 import Blocks.Floor;
 import Blocks.PowerUp;
 import Blocks.PwrUpSuperBullet;
-import Main.MainPanel;
+import Main.Game;
 import Main.Settings;
 import Main.Sound;
 import Main.TransformUtils;
@@ -195,7 +195,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			}
 
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / Settings.framesPerSecond.value()) - curTime;
+			waitTime = (1000 / Settings.framesPerSecond) - curTime;
 			try {
 				if (waitTime < 0) {
 					Thread.sleep(10);
@@ -260,7 +260,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 	}
 
 	public void collisionCheck() {
-		for (Block b : MainPanel.map.getBlockList()) {
+		for (Block b : Game.map.getBlockList()) {
 			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
 				Rectangle insect = this.getBounds().intersection(b.getBounds());
 
@@ -306,8 +306,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 				}
 			} else if (this.getBounds().intersects(b.getBounds()) && b instanceof PowerUp) {
 				// System.out.println("Power up");
-				MainPanel.map.getBlockList().set(MainPanel.map.getBlockList().indexOf(b),
-						new Floor(b.getX(), b.getY()));
+				Game.map.getBlockList().set(Game.map.getBlockList().indexOf(b), new Floor(b.getX(), b.getY()));
 
 				if (b instanceof PwrUpSuperBullet) {
 					// System.out.println("Super Bullet");
@@ -316,7 +315,7 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			}
 		}
 
-		for (Enemy e : MainPanel.enemies) {
+		for (Enemy e : Game.enemies) {
 			if (this.getBounds().intersects(e.getBounds())) {
 				Rectangle insect = this.getBounds().intersection(e.getBounds());
 
@@ -362,8 +361,8 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			}
 		}
 
-		if (this.getBounds().intersects(MainPanel.bird.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(MainPanel.bird.getBounds());
+		if (this.getBounds().intersects(Game.bird.getBounds())) {
+			Rectangle insect = this.getBounds().intersection(Game.bird.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -393,15 +392,15 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 
 			if (horizontal) {
 				if (isLeft) {
-					this.setX(MainPanel.bird.getX() + MainPanel.bird.getWidth());
+					this.setX(Game.bird.getX() + Game.bird.getWidth());
 				} else {
-					this.setX(MainPanel.bird.getX() - this.getWidth());
+					this.setX(Game.bird.getX() - this.getWidth());
 				}
 			} else if (vertical) {
 				if (isTop) {
-					this.setY(MainPanel.bird.getY() + MainPanel.bird.getHeight());
+					this.setY(Game.bird.getY() + Game.bird.getHeight());
 				} else {
-					this.setY(MainPanel.bird.getY() - this.getHeight());
+					this.setY(Game.bird.getY() - this.getHeight());
 				}
 			}
 		}

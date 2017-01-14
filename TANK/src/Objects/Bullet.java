@@ -1,5 +1,6 @@
 package Objects;
-import Main.MainPanel;
+
+import Main.Game;
 
 public class Bullet extends GameObject {
 
@@ -85,7 +86,7 @@ public class Bullet extends GameObject {
 				break;
 			}
 
-			for (IDamagable damagable : MainPanel.damagableObjects) {
+			for (IDamagable damagable : Game.damagableObjects) {
 				if (this.getBounds().intersects(((GameObject) damagable).getBounds())) {
 					isCollision = true;
 					damagable.recieveDamage(3, direction);

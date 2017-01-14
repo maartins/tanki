@@ -1,16 +1,8 @@
 package Main;
 
-public enum Settings {
-	framesPerSecond (60),
-	width  (486),
-	height (570),
-	scale  (1);
-	
-	private final int value;
-	
-	Settings(int value) {
-        this.value = value;
-    }
-	
-	public int value() { return value; }
+public class Settings {
+	public static final int framesPerSecond = 60;
+	public static final int width = 486;
+	public static final int height = 570;
+	public static final int scale = 1;
 }

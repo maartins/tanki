@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import GameStates.GameStateManager;
 import GameStates.GameStates;
 import GameStates.IGameStateObserver;
-import Main.MainPanel;
+import Main.Game;
 import Main.Settings;
 
 public class UserInterface implements IGameStateObserver {
@@ -44,7 +44,7 @@ public class UserInterface implements IGameStateObserver {
 		guiSetUp();
 	}
 
-	public void guiSetUp() {
+	private void guiSetUp() {
 		startButton.setBounds(140, 200, 200, 60);
 		startButton.setFont(new Font("Arial", Font.BOLD, 16));
 		startButton.setBackground(new Color(182, 149, 67));
@@ -56,7 +56,7 @@ public class UserInterface implements IGameStateObserver {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!nameTextField.getText().isEmpty() || nameTextField.getText().equals(" ")) {
-					MainPanel.tank.setName(nameTextField.getText());
+					Game.tank.setName(nameTextField.getText());
 					nameTextField.setText("Tank name");
 					gsm.setState(GameStates.MainGame);
 				} else {
@@ -147,7 +147,7 @@ public class UserInterface implements IGameStateObserver {
 		totalScoreLable.setForeground(new Color(255, 255, 255));
 		parent.add(totalScoreLable);
 
-		titleLable.setBounds(0, 0, Settings.width.value(), Settings.height.value());
+		titleLable.setBounds(0, 0, Settings.width, Settings.height);
 		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
 		parent.add(titleLable);
 	}
@@ -184,7 +184,7 @@ public class UserInterface implements IGameStateObserver {
 			totalScoreLable.setVisible(true);
 			multiButton.setVisible(true);
 			multiButton.setText("Continue");
-			totalScoreLable.setText("Score " + String.format("%08d", MainPanel.tank.getScore()));
+			totalScoreLable.setText("Score " + String.format("%08d", Game.tank.getScore()));
 			break;
 		case EndScreen:
 			titleLable.setVisible(true);
@@ -194,7 +194,7 @@ public class UserInterface implements IGameStateObserver {
 			totalScoreLable.setVisible(true);
 			multiButton.setVisible(true);
 			multiButton.setText("End game");
-			totalScoreLable.setText("Score " + String.format("%08d", MainPanel.tank.getScore()));
+			totalScoreLable.setText("Score " + String.format("%08d", Game.tank.getScore()));
 			break;
 		default:
 			break;

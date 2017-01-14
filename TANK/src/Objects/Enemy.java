@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import Blocks.Block;
 import Blocks.NavTile;
 import Blocks.Spawner;
-import Main.MainPanel;
+import Main.Game;
 import Main.Map;
 import Main.TransformUtils;
 
@@ -131,7 +131,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 
 			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / Main.Settings.framesPerSecond.value()) - curTime;
+			waitTime = (1000 / Main.Settings.framesPerSecond) - curTime;
 			try {
 				if (waitTime < 0) {
 					Thread.sleep(10);
@@ -238,14 +238,12 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 	}
 
 	public void pathing() {
-		Map mainMap = MainPanel.map;
+		Map mainMap = Game.map;
 		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
 		enemyPos.setImage("Images\\Nav01.png");
-		NavTile tankPos = mainMap.navMap()[MainPanel.tank.getPositionOnMap().getY()][MainPanel.tank.getPositionOnMap()
-				.getX()];
+		NavTile tankPos = mainMap.navMap()[Game.tank.getPositionOnMap().getY()][Game.tank.getPositionOnMap().getX()];
 		tankPos.setImage("Images\\Nav01.png");
-		NavTile birdPos = mainMap.navMap()[MainPanel.bird.getPositionOnMap().getY()][MainPanel.bird.getPositionOnMap()
-				.getX()];
+		NavTile birdPos = mainMap.navMap()[Game.bird.getPositionOnMap().getY()][Game.bird.getPositionOnMap().getX()];
 		birdPos.setImage("Images\\Nav01.png");
 		NavTile targetPos;
 
@@ -323,10 +321,8 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 					}
 				}
 
-				if (tempBlock.getParent() == null) {
-					tempBlock.setParent(closedList.get(closedList.size() - 1));
-				}
-				// tempBlock.setImage("Images//Nav02.png");
+				tempBlock.setImage("Images//Nav01.png");
+
 				closedList.add(tempBlock);
 
 				openList.clear();
@@ -354,21 +350,16 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 		if (!isPathDone) {
-			System.out.println("asfasg");
+			// System.out.println("asfasg");
 
 			navList.add(closedList.get(closedList.size() - 1));
 
-			for (int i = closedList.size() - 1; i > 1; i--) {
-				if (closedList.get(i).getParent() == null) {
-					// System.out.println("parent null");
-					break;
-				} else {
-					if (closedList.get(i).getParent().equals(closedList.get(1))) {
-						// System.out.println("last parent");
-						break;
-					} else {
-						navList.add(closedList.get(i).getParent());
-					}
+			NavTile tester = closedList.get(closedList.size() - 1);
+			for (int i = closedList.size() - 2; i > 0; i--) {
+				if (testIfNeighbor(tester, closedList.get(i))) {
+					// System.out.println(tester);
+					navList.add(tester);
+					tester = closedList.get(i);
 				}
 			}
 
@@ -377,7 +368,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 			// System.out.println("NAV LIST DONE");
 			for (NavTile n : navList) {
-				n.setImage("Images//Nav01.png");
+				n.setImage("Images//Nav03.png");
 				// System.out.println(n);
 			}
 		}
@@ -407,6 +398,32 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			isPathingStart = true;
 			isPathing = false;
 			isPathDone = true;
+		}
+	}
+
+	private boolean testIfNeighbor(NavTile current, NavTile next) {
+		int downY = current.getTileY() + 1;
+		int downX = current.getTileX();
+
+		int upY = current.getTileY() - 1;
+		int upX = current.getTileX();
+
+		int rightY = current.getTileY();
+		int rightX = current.getTileX() + 1;
+
+		int leftY = current.getTileY();
+		int leftX = current.getTileX() - 1;
+
+		if (downY == next.getTileY() & downX == next.getTileX()) {
+			return true;
+		} else if (upY == next.getTileY() & upX == next.getTileX()) {
+			return true;
+		} else if (rightY == next.getTileY() & rightX == next.getTileX()) {
+			return true;
+		} else if (leftY == next.getTileY() & leftX == next.getTileX()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -441,7 +458,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 	}
 
 	public void collisionCheck() {
-		for (Block b : MainPanel.map.getBlockList()) {
+		for (Block b : Game.map.getBlockList()) {
 			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
 				Rectangle insect = this.getBounds().intersection(b.getBounds());
 
@@ -487,7 +504,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 
-		for (Enemy e : MainPanel.enemies) {
+		for (Enemy e : Game.enemies) {
 			if (!this.equals(e) && this.getBounds().intersects(e.getBounds())) {
 				Rectangle insect = this.getBounds().intersection(e.getBounds());
 
@@ -533,8 +550,8 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 
-		if (this.getBounds().intersects(MainPanel.tank.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(MainPanel.tank.getBounds());
+		if (this.getBounds().intersects(Game.tank.getBounds())) {
+			Rectangle insect = this.getBounds().intersection(Game.tank.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -564,21 +581,21 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 			if (horizontal) {
 				if (isLeft) {
-					this.setX(MainPanel.tank.getX() + MainPanel.tank.getWidth());
+					this.setX(Game.tank.getX() + Game.tank.getWidth());
 				} else {
-					this.setX(MainPanel.tank.getX() - this.getWidth());
+					this.setX(Game.tank.getX() - this.getWidth());
 				}
 			} else if (vertical) {
 				if (isTop) {
-					this.setY(MainPanel.tank.getY() + MainPanel.tank.getHeight());
+					this.setY(Game.tank.getY() + Game.tank.getHeight());
 				} else {
-					this.setY(MainPanel.tank.getY() - this.getHeight());
+					this.setY(Game.tank.getY() - this.getHeight());
 				}
 			}
 		}
 
-		if (this.getBounds().intersects(MainPanel.bird.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(MainPanel.bird.getBounds());
+		if (this.getBounds().intersects(Game.bird.getBounds())) {
+			Rectangle insect = this.getBounds().intersection(Game.bird.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -608,15 +625,15 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 			if (horizontal) {
 				if (isLeft) {
-					this.setX(MainPanel.bird.getX() + MainPanel.bird.getWidth());
+					this.setX(Game.bird.getX() + Game.bird.getWidth());
 				} else {
-					this.setX(MainPanel.bird.getX() - this.getWidth());
+					this.setX(Game.bird.getX() - this.getWidth());
 				}
 			} else if (vertical) {
 				if (isTop) {
-					this.setY(MainPanel.bird.getY() + MainPanel.bird.getHeight());
+					this.setY(Game.bird.getY() + Game.bird.getHeight());
 				} else {
-					this.setY(MainPanel.bird.getY() - this.getHeight());
+					this.setY(Game.bird.getY() - this.getHeight());
 				}
 			}
 		}
