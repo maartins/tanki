@@ -6,23 +6,16 @@ public class Bullet extends GameObject {
 
 	private int x; // Bullets current x position
 	private int y; // Bullets current y position
-	private int direction; // Bullets moving direction
-	private int damage; // Bullets damage
+	private int direction = -1; // Bullets moving direction
+	private int damage = 1; // Bullets damage
 
 	private final int SPEED = 5; // Bullets speed
 	private final int MAXDIST = 500; // Bullets maximum travel distance
-
-	private boolean isMaxDistReached = false; // Check if the maximum distance
-	private boolean isCollision = false; // Check if bullet collides
 
 	public Bullet(int posX, int posY) {
 		super(posX, posY, "Bullet", "Images//Bullet01.png");
 		x = posX;
 		y = posY;
-
-		direction = -1;
-
-		damage = 1;
 	}
 
 	public Bullet(int posX, int posY, int curDir) {
@@ -31,8 +24,15 @@ public class Bullet extends GameObject {
 		y = posY;
 
 		direction = curDir;
+	}
 
-		damage = 1;
+	public Bullet(int posX, int posY, int curDir, int damage) {
+		super(posX, posY, "Bullet", "Images//Bullet01.png");
+		x = posX;
+		y = posY;
+
+		direction = curDir;
+		this.damage = damage;
 	}
 
 	public Bullet(int posX, int posY, int curDir, String name) {
@@ -41,8 +41,6 @@ public class Bullet extends GameObject {
 		y = posY;
 
 		direction = curDir;
-
-		damage = 1;
 	}
 
 	public Bullet(int posX, int posY, int curDir, int damage, String name, String imagePath) {
@@ -51,46 +49,61 @@ public class Bullet extends GameObject {
 		y = posY;
 
 		direction = curDir;
-
 		this.damage = damage;
 	}
 
-	public void move() {
+	public synchronized void move() {
 		if (!isHidden()) {
 			switch (direction) {
 			case 0:
-				this.setX(this.getX() + SPEED);
-				if (this.getX() - x >= MAXDIST) {
-					isMaxDistReached = true;
+				setX(getX() + SPEED);
+				if (getX() - x >= MAXDIST) {
+					resetMe();
 				}
 				break;
 			case 1:
-				this.setY(this.getY() - SPEED);
-				if (this.getY() - y <= -MAXDIST) {
-					isMaxDistReached = true;
+				setY(getY() - SPEED);
+				if (getY() - y <= -MAXDIST) {
+					resetMe();
 				}
 				break;
 			case 2:
-				this.setX(this.getX() - SPEED);
-				if (this.getX() - x <= -MAXDIST) {
-					isMaxDistReached = true;
+				setX(getX() - SPEED);
+				if (getX() - x <= -MAXDIST) {
+					resetMe();
 				}
 				break;
 			case 3:
-				this.setY(this.getY() + SPEED);
-				if (this.getY() - y >= MAXDIST) {
-					isMaxDistReached = true;
+				setY(getY() + SPEED);
+				if (getY() - y >= MAXDIST) {
+					resetMe();
 				}
 				break;
 			default:
 				break;
 			}
+			if (!Game.damagableObjects.isEmpty()) {
+				Game.damagableObjects.stream()
+							.parallel()
+							.filter(obj -> !obj.isDead())
+							.filter(obj -> ((GameObject) obj).getBounds()
+										.intersects(getBounds()))
+							.forEach(obj -> {
+								obj.recieveDamage(damage, direction);
+								resetMe();
+							});
 
-			for (IDamagable damagable : Game.damagableObjects) {
-				if (this.getBounds().intersects(((GameObject) damagable).getBounds())) {
-					isCollision = true;
-					damagable.recieveDamage(3, direction);
-				}
+				/*
+				 * for (IDamagable damagable : Game.damagableObjects) {
+				 * if (!damagable.isDead()) {
+				 * if (getBounds().intersects(((GameObject) damagable).getBounds())) {
+				 * isCollision = true;
+				 * resetMe();
+				 * damagable.recieveDamage(3, direction);
+				 * }
+				 * }
+				 * }
+				 */
 			}
 		}
 	}
@@ -99,17 +112,7 @@ public class Bullet extends GameObject {
 		direction = value;
 	}
 
-	public boolean isMaxDistReached() {
-		return isMaxDistReached;
-	}
-
-	public boolean isCollision() {
-		return isCollision;
-	}
-
 	public void resetMe() {
-		isCollision = false;
-		isMaxDistReached = false;
 		setIsHidden(true);
 		setX(-1);
 		setY(-1);

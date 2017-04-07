@@ -4,24 +4,24 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import Blocks.Block;
 import Blocks.NavTile;
 import Blocks.Spawner;
+import Main.BulletManager;
+import Main.EnemyManager;
 import Main.Game;
 import Main.Map;
 import Main.TransformUtils;
 
-public class Enemy extends GameObject implements Runnable, IDamagable {
+public class Enemy extends GameObject implements IDamagable {
 
 	private int veloX = 0;
 	private int veloY = 0;
 	private int curDirection;
 	private int preDirection;
 	private int curHp;
-	private int bulletCount = 10;
 	private int navCounter = 0;
 
 	private final int maxHp = 12;
@@ -30,69 +30,45 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 
-	private long startTime;
-	private long curTime;
-	private long waitTime;
 	private long shootTime;
 
 	private boolean isPathing = true;
 	private boolean isPathingStart = true;
 	private boolean isPathDone = true;
-	private boolean isRunning = true;
 
 	private ArrayList<NavTile> closedList = new ArrayList<NavTile>();;
 	private ArrayList<NavTile> openList = new ArrayList<NavTile>();
 	private ArrayList<NavTile> checkList = new ArrayList<NavTile>();
 	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
-	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
+
+	private BulletManager bulletManager = new BulletManager(10, 2);
 
 	private Spawner spawner;
 
-	private Thread thread;
-
 	public Enemy(int posX, int posY) {
 		super(posX, posY, "Enemy", "Images//Enemy01.png");
-
-		curTime = System.currentTimeMillis();
-
-		for (int i = 0; i < bulletCount; i++) {
-			bulletList.add(new Bullet(-1, -1));
-		}
 
 		curHp = maxHp;
 
 		curDirection = UP;
 		preDirection = RIGHT;
-		this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
+		setImage(TransformUtils.rotate(getImage(), curDirection, preDirection));
 
-		if (thread == null) {
-			thread = new Thread(this);
-			thread.start();
-		}
+		EnemyManager.enemies.add(this);
 	}
 
 	public Enemy(Spawner spawner) {
 		super(spawner.getX(), spawner.getY(), "Enemy", "Images//Enemy01.png");
 
-		curTime = System.currentTimeMillis();
-
 		this.spawner = spawner;
-
-		for (int i = 0; i < bulletCount; i++) {
-			bulletList.add(new Bullet(-1, -1));
-		}
 
 		curHp = maxHp;
 
 		curDirection = UP;
 		preDirection = RIGHT;
-		this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
+		setImage(TransformUtils.rotate(getImage(), curDirection, preDirection));
 
-		if (thread == null) {
-			thread = new Thread(this);
-			thread.start();
-		}
-
+		EnemyManager.enemies.add(this);
 	}
 
 	@Override
@@ -101,47 +77,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.drawImage(this.getImage(), this.getX(), this.getY(), null);
 
-		if (!bulletList.isEmpty()) {
-			for (Bullet b : bulletList) {
-				if (!b.isHidden()) {
-					b.draw(g);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void run() {
-		while (isRunning) {
-			startTime = System.currentTimeMillis();
-			Toolkit.getDefaultToolkit().sync();
-
-			if (!bulletList.isEmpty()) {
-				for (Bullet b : bulletList) {
-					if (!b.isMaxDistReached()) {
-						if (!b.isCollision()) {
-							b.move();
-						} else {
-							b.resetMe();
-						}
-					} else {
-						b.resetMe();
-					}
-				}
-			}
-
-			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / Main.Settings.framesPerSecond) - curTime;
-			try {
-				if (waitTime < 0) {
-					Thread.sleep(10);
-				} else {
-					Thread.sleep(waitTime);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		bulletManager.draw(g);
 	}
 
 	private void shoot() {
@@ -150,40 +86,23 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			posX = this.getX() + this.getWidth();
 			posY = this.getY() + (this.getHeight() / 2);
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == UP) {
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() - 2;
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == LEFT) {
 			posX = this.getX() - 2;
 			posY = this.getY() + (this.getHeight() / 2);
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == DOWN) {
 			posX = this.getX() + (this.getWidth() / 2);
 			posY = this.getY() + this.getHeight();
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		}
-
-		if (bulletCount > 1)
-			bulletCount--;
-		else
-			bulletCount = 10;
 	}
 
 	public void control() {
@@ -200,28 +119,34 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			preDirection = curDirection;
 
 			// System.out.println(navCounter);
-			if (navList.get(navCounter - 1).getX() < this.getX()) {
+			if (navList.get(navCounter - 1)
+						.getX() < this.getX()) {
 				curDirection = LEFT;
 				veloX = -1;
 
 				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
-			} else if (navList.get(navCounter - 1).getX() > this.getX()) {
+			} else if (navList.get(navCounter - 1)
+						.getX() > this.getX()) {
 				curDirection = RIGHT;
 				veloX = 1;
 
 				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
-			} else if (navList.get(navCounter - 1).getY() < this.getY()) {
+			} else if (navList.get(navCounter - 1)
+						.getY() < this.getY()) {
 				curDirection = UP;
 				veloY = -1;
 
 				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
-			} else if (navList.get(navCounter - 1).getY() > this.getY()) {
+			} else if (navList.get(navCounter - 1)
+						.getY() > this.getY()) {
 				curDirection = DOWN;
 				veloY = 1;
 
 				this.setImage(TransformUtils.rotate(this.getImage(), curDirection, preDirection));
-			} else if (navList.get(navCounter - 1).getX() == this.getX()
-					&& navList.get(navCounter - 1).getY() == this.getY()) {
+			} else if (navList.get(navCounter - 1)
+						.getX() == this.getX()
+						&& navList.get(navCounter - 1)
+									.getY() == this.getY()) {
 				veloX = 0;
 				veloY = 0;
 
@@ -239,18 +164,24 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 	public void pathing() {
 		Map mainMap = Game.map;
-		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap().getY()][this.getPositionOnMap().getX()];
+		NavTile enemyPos = mainMap.navMap()[this.getPositionOnMap()
+					.getY()][this.getPositionOnMap()
+								.getX()];
 		enemyPos.setImage("Images\\Nav01.png");
-		NavTile tankPos = mainMap.navMap()[Game.tank.getPositionOnMap().getY()][Game.tank.getPositionOnMap().getX()];
+		NavTile tankPos = mainMap.navMap()[Game.tank.getPositionOnMap()
+					.getY()][Game.tank.getPositionOnMap()
+								.getX()];
 		tankPos.setImage("Images\\Nav01.png");
-		NavTile birdPos = mainMap.navMap()[Game.bird.getPositionOnMap().getY()][Game.bird.getPositionOnMap().getX()];
+		NavTile birdPos = mainMap.navMap()[Game.bird.getPositionOnMap()
+					.getY()][Game.bird.getPositionOnMap()
+								.getX()];
 		birdPos.setImage("Images\\Nav01.png");
 		NavTile targetPos;
 
 		float tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
-				+ Math.abs(enemyPos.getTileY() - tankPos.getTileY())) + 10;
+					+ Math.abs(enemyPos.getTileY() - tankPos.getTileY())) + 10;
 		float birdValue = ((Math.abs((enemyPos.getTileX()) - birdPos.getTileX()))
-				+ Math.abs(enemyPos.getTileY() - birdPos.getTileY())) + 10;
+					+ Math.abs(enemyPos.getTileY() - birdPos.getTileY())) + 10;
 		// System.out.println("Tank: " + tankValue + " Bird: " + birdValue);
 
 		// enemyPos.setValue(tankValue);
@@ -291,16 +222,24 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 			for (int i = 1; i < closedList.size(); i++) {
 				// int i = closedList.size() - 1;
-				tempb = mainMap.navMap()[closedList.get(i).getTileY() + 1][closedList.get(i).getTileX()];
+				tempb = mainMap.navMap()[closedList.get(i)
+							.getTileY() + 1][closedList.get(i)
+										.getTileX()];
 				valueTile(tempb, targetPos);
 
-				tempb = mainMap.navMap()[closedList.get(i).getTileY() - 1][closedList.get(i).getTileX()];
+				tempb = mainMap.navMap()[closedList.get(i)
+							.getTileY() - 1][closedList.get(i)
+										.getTileX()];
 				valueTile(tempb, targetPos);
 
-				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() + 1];
+				tempb = mainMap.navMap()[closedList.get(i)
+							.getTileY()][closedList.get(i)
+										.getTileX() + 1];
 				valueTile(tempb, targetPos);
 
-				tempb = mainMap.navMap()[closedList.get(i).getTileY()][closedList.get(i).getTileX() - 1];
+				tempb = mainMap.navMap()[closedList.get(i)
+							.getTileY()][closedList.get(i)
+										.getTileX() - 1];
 				valueTile(tempb, targetPos);
 			}
 
@@ -332,17 +271,17 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 					isPathDone = false;
 					// System.out.println("PATHING DONE " + targetPos);
 				} else if (tempBlock.getTileX() - 1 == targetPos.getTileX()
-						&& tempBlock.getTileY() == targetPos.getTileY()) {
+							&& tempBlock.getTileY() == targetPos.getTileY()) {
 					isPathing = false;
 					isPathDone = false;
 					// System.out.println("PATHING DONE " + targetPos);
 				} else if (tempBlock.getTileY() + 1 == targetPos.getTileY()
-						&& tempBlock.getTileX() == targetPos.getTileX()) {
+							&& tempBlock.getTileX() == targetPos.getTileX()) {
 					isPathing = false;
 					isPathDone = false;
 					// System.out.println("PATHING DONE " + targetPos);
 				} else if (tempBlock.getTileY() - 1 == targetPos.getTileY()
-						&& tempBlock.getTileX() == targetPos.getTileX()) {
+							&& tempBlock.getTileX() == targetPos.getTileX()) {
 					isPathing = false;
 					isPathDone = false;
 					// System.out.println("PATHING DONE " + targetPos);
@@ -374,8 +313,10 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 		}
 
 		boolean reset = false;
-		if (targetPos.getTileX() != closedList.get(0).getTileX()
-				|| targetPos.getTileY() != closedList.get(0).getTileY()) {
+		if (targetPos.getTileX() != closedList.get(0)
+					.getTileX()
+					|| targetPos.getTileY() != closedList.get(0)
+								.getTileY()) {
 			reset = true;
 		}
 
@@ -431,7 +372,7 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 		if (!closedList.contains(testable)) {
 			if (!testable.isBlocking()) {
 				float value = ((Math.abs((testable.getTileX()) - traget.getTileX()))
-						+ Math.abs(testable.getTileY() - traget.getTileY())) + 10;
+							+ Math.abs(testable.getTileY() - traget.getTileY())) + 10;
 
 				testable.setValue(value);
 				testable.setImage("Images//Nav02.png");
@@ -445,10 +386,12 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 		if (!closedList.contains(neighbor)) {
 			if (!neighbor.isBlocking()) {
 				float value = ((Math.abs((current.getTileX()) - neighbor.getTileX()))
-						+ Math.abs(current.getTileY() - neighbor.getTileY()))
-						+ ((Math.abs((current.getTileX()) - closedList.get(1).getTileX()))
-								+ Math.abs(current.getTileY() - closedList.get(1).getTileY()))
-						+ 10;
+							+ Math.abs(current.getTileY() - neighbor.getTileY()))
+							+ ((Math.abs((current.getTileX()) - closedList.get(1)
+										.getTileX()))
+										+ Math.abs(current.getTileY() - closedList.get(1)
+													.getTileY()))
+							+ 10;
 
 				neighbor.setValue(value);
 				// testable.setImage("Images//Nav02.png");
@@ -459,8 +402,10 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 	public void collisionCheck() {
 		for (Block b : Game.map.getBlockList()) {
-			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
-				Rectangle insect = this.getBounds().intersection(b.getBounds());
+			if (this.getBounds()
+						.intersects(b.getBounds()) && b.isSolid()) {
+				Rectangle insect = this.getBounds()
+							.intersection(b.getBounds());
 
 				boolean vertical = false;
 				boolean horizontal = false;
@@ -504,9 +449,11 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 
-		for (Enemy e : Game.enemies) {
-			if (!this.equals(e) && this.getBounds().intersects(e.getBounds())) {
-				Rectangle insect = this.getBounds().intersection(e.getBounds());
+		for (Enemy e : EnemyManager.enemies) {
+			if (!this.equals(e) && this.getBounds()
+						.intersects(e.getBounds())) {
+				Rectangle insect = this.getBounds()
+							.intersection(e.getBounds());
 
 				boolean vertical = false;
 				boolean horizontal = false;
@@ -550,8 +497,10 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 
-		if (this.getBounds().intersects(Game.tank.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(Game.tank.getBounds());
+		if (this.getBounds()
+					.intersects(Game.tank.getBounds())) {
+			Rectangle insect = this.getBounds()
+						.intersection(Game.tank.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -594,8 +543,10 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 			}
 		}
 
-		if (this.getBounds().intersects(Game.bird.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(Game.bird.getBounds());
+		if (this.getBounds()
+					.intersects(Game.bird.getBounds())) {
+			Rectangle insect = this.getBounds()
+						.intersection(Game.bird.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -646,7 +597,9 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 	@Override
 	public void recieveDamage(int damage, int dir) {
 		curHp -= damage;
-		// System.out.println("HP " + curHp);
+		if (isDead()) {
+			die();
+		}
 	}
 
 	@Override
@@ -668,15 +621,6 @@ public class Enemy extends GameObject implements Runnable, IDamagable {
 
 	public void die() {
 		spawner.setCanSpawn(true);
-		spawner.setEnemyCount(spawner.getEnemyCount() - 1);
-
-		isRunning = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		closedList.clear();
 		openList.clear();

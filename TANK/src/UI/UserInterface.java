@@ -24,27 +24,20 @@ public class UserInterface implements IGameStateObserver {
 	private JLabel healthLable1 = new JLabel("Tank HP: ");
 	private JLabel healthLable2 = new JLabel("Bird HP: ");
 	private JLabel scoreLable = new JLabel("Score: ");
+	private JLabel fpsLabel = new JLabel("FPS: ");
 	private JLabel totalScoreLable = new JLabel();
 	private JTextField nameTextField = new JTextField("Tank name");
 	private JLabel titleLable = new JLabel();
 	private JPanel scorePanel = new JPanel();
 
 	private JPanel parent;
-	private GameStateManager gsm;
 
-	public UserInterface(JPanel panel) {
-		parent = panel;
-		guiSetUp();
+	public UserInterface() {
 	}
 
-	public UserInterface(JPanel panel, GameStateManager gsm) {
+	public void guiSetUp(JPanel panel) {
 		parent = panel;
-		this.gsm = gsm;
-		gsm.addObserver(this);
-		guiSetUp();
-	}
 
-	private void guiSetUp() {
 		startButton.setBounds(140, 200, 200, 60);
 		startButton.setFont(new Font("Arial", Font.BOLD, 16));
 		startButton.setBackground(new Color(182, 149, 67));
@@ -58,7 +51,7 @@ public class UserInterface implements IGameStateObserver {
 				if (!nameTextField.getText().isEmpty() || nameTextField.getText().equals(" ")) {
 					Game.tank.setName(nameTextField.getText());
 					nameTextField.setText("Tank name");
-					gsm.setState(GameStates.MainGame);
+					GameStateManager.setState(GameStates.MainGame);
 				} else {
 					nameTextField.setText("Tank name");
 				}
@@ -92,7 +85,7 @@ public class UserInterface implements IGameStateObserver {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (gsm.getState() == GameStates.MainMenu) {
+				if (GameStateManager.getState() == GameStates.MainMenu) {
 					if (multiButton.getText() == "Top 10") {
 						startButton.setVisible(false);
 						nameTextField.setVisible(false);
@@ -116,11 +109,11 @@ public class UserInterface implements IGameStateObserver {
 						nameTextField.setVisible(true);
 						multiButton.setText("Top 10");
 					}
-				} else if (gsm.getState() == GameStates.LevelFinished) {
-					gsm.setState(GameStates.MainGame);
+				} else if (GameStateManager.getState() == GameStates.LevelFinished) {
+					GameStateManager.setState(GameStates.MainGame);
 					multiButton.setText("Top 10");
 				} else {
-					gsm.setState(GameStates.MainMenu);
+					GameStateManager.setState(GameStates.MainMenu);
 					multiButton.setText("Top 10");
 				}
 			}
@@ -142,6 +135,11 @@ public class UserInterface implements IGameStateObserver {
 		scoreLable.setForeground(new Color(255, 255, 255));
 		parent.add(scoreLable);
 
+		fpsLabel.setBounds(340, 485, 200, 30);
+		fpsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+		fpsLabel.setForeground(new Color(255, 255, 255));
+		parent.add(fpsLabel);
+
 		totalScoreLable.setBounds(140, 200, 200, 30);
 		totalScoreLable.setFont(new Font("Arial", Font.BOLD, 16));
 		totalScoreLable.setForeground(new Color(255, 255, 255));
@@ -150,6 +148,22 @@ public class UserInterface implements IGameStateObserver {
 		titleLable.setBounds(0, 0, Settings.width, Settings.height);
 		titleLable.setIcon(new ImageIcon("Images//tank_title.png"));
 		parent.add(titleLable);
+	}
+
+	public void updateFps(float fps) {
+		fpsLabel.setText("FPS: " + fps);
+	}
+
+	public void updateTankHealth(int curHp) {
+		healthLable1.setText("Tank HP: " + curHp);
+	}
+
+	public void updateBirdHealth(int curHp) {
+		healthLable2.setText("Bird HP: " + curHp);
+	}
+
+	public void setScore(int curScore) {
+		scoreLable.setText("Score: " + String.format("%08d", curScore));
 	}
 
 	@Override
@@ -164,6 +178,7 @@ public class UserInterface implements IGameStateObserver {
 			healthLable2.setVisible(false);
 			totalScoreLable.setVisible(false);
 			scorePanel.setVisible(false);
+			fpsLabel.setVisible(false);
 			break;
 		case MainGame:
 			titleLable.setVisible(false);
@@ -175,6 +190,7 @@ public class UserInterface implements IGameStateObserver {
 			totalScoreLable.setVisible(false);
 			scorePanel.setVisible(false);
 			multiButton.setVisible(false);
+			fpsLabel.setVisible(true);
 			break;
 		case LevelFinished:
 			titleLable.setVisible(true);
@@ -183,6 +199,7 @@ public class UserInterface implements IGameStateObserver {
 			healthLable2.setVisible(false);
 			totalScoreLable.setVisible(true);
 			multiButton.setVisible(true);
+			fpsLabel.setVisible(false);
 			multiButton.setText("Continue");
 			totalScoreLable.setText("Score " + String.format("%08d", Game.tank.getScore()));
 			break;
@@ -193,6 +210,7 @@ public class UserInterface implements IGameStateObserver {
 			healthLable2.setVisible(false);
 			totalScoreLable.setVisible(true);
 			multiButton.setVisible(true);
+			fpsLabel.setVisible(false);
 			multiButton.setText("End game");
 			totalScoreLable.setText("Score " + String.format("%08d", Game.tank.getScore()));
 			break;

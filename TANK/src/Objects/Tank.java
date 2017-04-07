@@ -4,31 +4,27 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import Blocks.Block;
 import Blocks.Floor;
 import Blocks.PowerUp;
 import Blocks.PwrUpSuperBullet;
+import Main.BulletManager;
+import Main.EnemyManager;
 import Main.Game;
-import Main.Settings;
 import Main.Sound;
 import Main.TransformUtils;
 
-public class Tank extends GameObject implements KeyListener, Runnable, IDamagable {
+public class Tank extends GameObject implements KeyListener, IDamagable {
 
-	private int veloX;
-	private int veloY;
+	private int veloX = 0;
+	private int veloY = 0;
 	private int curDirection;
 	private int preDirection;
 	private int curHp;
-	private int score;
-	private int superBulletCount;
-	private int bulletCount = 10;
+	private int score = 0;
 
 	private final int maxHp = 50;
 	private final int UP = 1;
@@ -36,96 +32,36 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 	private final int LEFT = 2;
 	private final int RIGHT = 0;
 
-	private long startTime;
-	private long curTime;
-	private long waitTime;
 	private long shootTime;
 
-	private boolean keyA;
-	private boolean keyD;
-	private boolean keyW;
-	private boolean keyS;
-	private boolean keySPACE;
-	private boolean isRunning;
+	private boolean keyA = false;
+	private boolean keyD = false;
+	private boolean keyW = false;
+	private boolean keyS = false;
+	private boolean keySPACE = false;
 
-	private ArrayList<Bullet> bulletList;
+	private BulletManager bulletManager = new BulletManager(10, 3);
 
-	private Sound shootSound;
+	private Sound shootSound = new Sound("Sounds//tank_shoot01.wav");
 	@SuppressWarnings("unused")
-	private Sound moveSound;
-
-	private Thread thread;
+	private Sound moveSound = new Sound("Sounds//tank_move01.wav");
 
 	public Tank(Block posBlock) {
 		super(posBlock.getX(), posBlock.getY(), "Tank", "Images//Tank01.png");
 
-		bulletList = new ArrayList<Bullet>();
-		for (int i = 0; i < bulletCount; i++) {
-			bulletList.add(new Bullet(-1, -1));
-		}
-
 		curHp = maxHp;
-		score = 0;
-		superBulletCount = 0;
-
-		veloX = 0;
-		veloY = 0;
 
 		curDirection = UP;
 		preDirection = RIGHT;
-
-		keyA = false;
-		keyD = false;
-		keyW = false;
-		keyS = false;
-
-		keySPACE = false;
-
-		shootSound = new Sound("Sounds//tank_shoot01.wav");
-		moveSound = new Sound("Sounds//tank_move01.wav");
-
-		isRunning = true;
-
-		if (thread == null) {
-			thread = new Thread(this);
-			thread.start();
-		}
 	}
 
 	public Tank(int posX, int posY) {
 		super(posX, posY, "Tank", "Images//Test02.png");
 
-		bulletList = new ArrayList<Bullet>();
-		for (int i = 0; i < bulletCount; i++) {
-			bulletList.add(new Bullet(-1, -1));
-		}
-
 		curHp = maxHp;
-		score = 0;
-		superBulletCount = 0;
-
-		veloX = 0;
-		veloY = 0;
 
 		curDirection = UP;
 		preDirection = RIGHT;
-
-		keyA = false;
-		keyD = false;
-		keyW = false;
-		keyS = false;
-
-		keySPACE = false;
-
-		shootSound = new Sound("Sounds//tank_shoot01.wav");
-		moveSound = new Sound("Sounds//tank_move01.wav");
-
-		isRunning = true;
-
-		if (thread == null) {
-			thread = new Thread(this);
-			thread.start();
-		}
 	}
 
 	public int getCurHp() {
@@ -157,55 +93,9 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.drawImage(this.getImage(), this.getX(), this.getY(), null);
+		g2d.drawImage(getImage(), getX(), getY(), null);
 
-		if (!bulletList.isEmpty()) {
-			for (Bullet b : bulletList) {
-				if (!b.isHidden()) {
-					b.draw(g);
-				}
-			}
-		}
-
-		// System.out.println(bulletList.size());
-	}
-
-	@Override
-	public void run() {
-		while (isRunning) {
-			startTime = System.currentTimeMillis();
-			Toolkit.getDefaultToolkit().sync();
-
-			if (!bulletList.isEmpty()) {
-				Iterator<Bullet> iterator = bulletList.iterator();
-				while (iterator.hasNext()) {
-					Bullet b = iterator.next();
-
-					// System.out.println(b.toString());
-					if (!b.isMaxDistReached()) {
-						if (!b.isCollision()) {
-							b.move();
-						} else {
-							b.resetMe();
-						}
-					} else {
-						b.resetMe();
-					}
-				}
-			}
-
-			curTime = System.currentTimeMillis() - startTime;
-			waitTime = (1000 / Settings.framesPerSecond) - curTime;
-			try {
-				if (waitTime < 0) {
-					Thread.sleep(10);
-				} else {
-					Thread.sleep(waitTime);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		bulletManager.draw(g);
 	}
 
 	public void control() {
@@ -242,27 +132,18 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 				shootTime = System.currentTimeMillis();
 				shootSound.play();
 
-				if (superBulletCount == 0) {
-					shoot();
-				} else {
-					superShoot();
-					superBulletCount--;
-				}
-				// System.out.println("SHOOT");
+				shoot();
 			}
 		}
 
-		// System.out.println("cur dir: " + curDirection + " prev dir: " +
-		// preDirection);
-
-		this.setX(this.getX() + veloX);
-		this.setY(this.getY() + veloY);
+		setX(getX() + veloX);
+		setY(getY() + veloY);
 	}
 
 	public void collisionCheck() {
 		for (Block b : Game.map.getBlockList()) {
-			if (this.getBounds().intersects(b.getBounds()) && b.isSolid()) {
-				Rectangle insect = this.getBounds().intersection(b.getBounds());
+			if (getBounds().intersects(b.getBounds()) && b.isSolid()) {
+				Rectangle insect = getBounds().intersection(b.getBounds());
 
 				boolean vertical = false;
 				boolean horizontal = false;
@@ -304,20 +185,23 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 						this.setY(b.getY() - this.getHeight());
 					}
 				}
-			} else if (this.getBounds().intersects(b.getBounds()) && b instanceof PowerUp) {
+			} else if (this.getBounds()
+						.intersects(b.getBounds()) && b instanceof PowerUp) {
 				// System.out.println("Power up");
-				Game.map.getBlockList().set(Game.map.getBlockList().indexOf(b), new Floor(b.getX(), b.getY()));
+				Game.map.getBlockList()
+							.set(Game.map.getBlockList()
+										.indexOf(b), new Floor(b.getX(), b.getY()));
 
 				if (b instanceof PwrUpSuperBullet) {
 					// System.out.println("Super Bullet");
-					superBulletCount = ((PwrUpSuperBullet) b).getBulletCount();
+					//superBulletCount = ((PwrUpSuperBullet) b).getBulletCount();
 				}
 			}
 		}
 
-		for (Enemy e : Game.enemies) {
-			if (this.getBounds().intersects(e.getBounds())) {
-				Rectangle insect = this.getBounds().intersection(e.getBounds());
+		for (Enemy e : EnemyManager.enemies) {
+			if (getBounds().intersects(e.getBounds())) {
+				Rectangle insect = getBounds().intersection(e.getBounds());
 
 				boolean vertical = false;
 				boolean horizontal = false;
@@ -361,8 +245,10 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 			}
 		}
 
-		if (this.getBounds().intersects(Game.bird.getBounds())) {
-			Rectangle insect = this.getBounds().intersection(Game.bird.getBounds());
+		if (this.getBounds()
+					.intersects(Game.bird.getBounds())) {
+			Rectangle insect = this.getBounds()
+						.intersection(Game.bird.getBounds());
 
 			boolean vertical = false;
 			boolean horizontal = false;
@@ -409,63 +295,25 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 	private void shoot() {
 		int posX = 0, posY = 0;
 		if (curDirection == RIGHT) {
-			posX = this.getX() + this.getWidth();
-			posY = this.getY() + (this.getHeight() / 2);
+			posX = getX() + getWidth();
+			posY = getY() + (getHeight() / 2);
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == UP) {
-			posX = this.getX() + (this.getWidth() / 2);
-			posY = this.getY() - 2;
+			posX = getX() + (getWidth() / 2);
+			posY = getY() - 2;
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == LEFT) {
-			posX = this.getX() - 2;
-			posY = this.getY() + (this.getHeight() / 2);
+			posX = getX() - 2;
+			posY = getY() + (getHeight() / 2);
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
+			bulletManager.createShot(posX, posY, curDirection);
 		} else if (curDirection == DOWN) {
-			posX = this.getX() + (this.getWidth() / 2);
-			posY = this.getY() + this.getHeight();
+			posX = getX() + (getWidth() / 2);
+			posY = getY() + getHeight();
 
-			bulletList.get(bulletCount - 1).setIsHidden(false);
-			bulletList.get(bulletCount - 1).setX(posX);
-			bulletList.get(bulletCount - 1).setY(posY);
-			bulletList.get(bulletCount - 1).setDirection(curDirection);
-		}
-
-		if (bulletCount > 1)
-			bulletCount--;
-		else
-			bulletCount = 10;
-	}
-
-	private void superShoot() {
-		int posX = 0, posY = 0;
-		if (curDirection == RIGHT) {
-			posX = this.getX() + this.getWidth();
-			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new SuperBullet(posX + 3, posY, curDirection));
-		} else if (curDirection == UP) {
-			posX = this.getX() + (this.getWidth() / 2);
-			posY = this.getY() - 2;
-			bulletList.add(new SuperBullet(posX, posY - 3, curDirection));
-		} else if (curDirection == LEFT) {
-			posX = this.getX() - 2;
-			posY = this.getY() + (this.getHeight() / 2);
-			bulletList.add(new SuperBullet(posX - 3, posY, curDirection));
-		} else if (curDirection == DOWN) {
-			posX = this.getX() + (this.getWidth() / 2);
-			posY = this.getY() + this.getHeight();
-			bulletList.add(new SuperBullet(posX, posY + 3, curDirection));
+			bulletManager.createShot(posX, posY, curDirection);
 		}
 	}
 
@@ -557,14 +405,6 @@ public class Tank extends GameObject implements KeyListener, Runnable, IDamagabl
 	}
 
 	public void die() {
-		isRunning = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		curHp = maxHp;
 		score = 0;
 	}

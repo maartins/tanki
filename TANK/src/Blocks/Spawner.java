@@ -25,7 +25,7 @@ public class Spawner extends Block {
 	}
 
 	public boolean canSpawn() {
-		if (enemyCount > 0) {
+		if (!isEmpty()) {
 			return canSpawn;
 		} else {
 			return false;
@@ -37,14 +37,15 @@ public class Spawner extends Block {
 	}
 
 	public boolean isEmpty() {
-		if (enemyCount == 0) {
-			return true;
-		} else {
+		if (enemyCount >= 0) {
 			return false;
+		} else {
+			return true;
 		}
 	}
 
 	public Enemy spawn() {
+		enemyCount--;
 		canSpawn = false;
 		return new Enemy(this);
 	}

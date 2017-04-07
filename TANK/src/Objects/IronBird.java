@@ -21,7 +21,7 @@ public class IronBird extends GameObject implements IDamagable {
 		curHp = maxHp;
 	}
 
-	public int getCurHP() {
+	public int getCurHp() {
 		return curHp;
 	}
 

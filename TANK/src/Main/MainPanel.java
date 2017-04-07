@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable {
 
-	private IGame game = new Game();
+	private GameCore game = new Game();
 
 	private long startTime;
 	private long currentTime;
@@ -28,7 +28,9 @@ public class MainPanel extends JPanel implements Runnable {
 		this.setDoubleBuffered(true);
 		this.setBackground(new Color(0, 0, 0));
 
-		game.setup(this);
+		game.setWindow(this);
+
+		game.setup();
 
 		isRunning = true;
 
@@ -74,6 +76,7 @@ public class MainPanel extends JPanel implements Runnable {
 			if (totalTime > 1000) {
 				@SuppressWarnings("unused")
 				long realFPS = (long) ((double) frameCount / (double) totalTime * 1000.0);
+				game.getUI().updateFps(realFPS);
 				// System.out.println("fps: " + realFPS);
 				frameCount = 0;
 				totalTime = 0;

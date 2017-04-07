@@ -3,49 +3,36 @@ package Main;
 import java.awt.Graphics;
 import java.io.File;
 import java.util.ArrayList;
-
-import javax.swing.JPanel;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import Blocks.Block;
 import Blocks.Spawner;
 import GameStates.GameStateManager;
 import GameStates.GameStates;
-import GameStates.IGameStateObserver;
 import Objects.Enemy;
 import Objects.IDamagable;
 import Objects.IronBird;
 import Objects.Tank;
-import UI.UserInterface;
 
-public class Game implements IGame, IGameStateObserver {
+public class Game extends GameCore {
 
 	public static IronBird bird;
 	public static Tank tank;
 	public static Map map;
-	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	public static ArrayList<IDamagable> damagableObjects = new ArrayList<IDamagable>();
+	public static CopyOnWriteArrayList<IDamagable> damagableObjects = new CopyOnWriteArrayList<IDamagable>();
 
 	private ArrayList<IDamagable> deadObjects = new ArrayList<IDamagable>();
 
 	private Database database;
 
-	private GameStateManager gsm;
-
-	private UserInterface ui;
-	private JPanel window;
-
 	@Override
-	public void setup(JPanel window) {
-		this.window = window;
-
-		gsm = new GameStateManager();
-		gsm.addObserver(this);
-
-		ui = new UserInterface(window, gsm);
+	public void setup() {
+		GameStateManager.addObserver(this);
+		GameStateManager.setState(GameStates.MainMenu); // default: MainMenu
 
 		Sound loadShoot = new Sound("Sounds\\tank_shoot01.wav");
-
-		gsm.setState(GameStates.MainMenu); // default: MainMenu
 
 		File folder = new File("Maps//");
 		map = new Map();
@@ -60,9 +47,7 @@ public class Game implements IGame, IGameStateObserver {
 
 		for (Spawner s : map.getSpawnerList()) {
 			if (s.canSpawn()) {
-				Enemy tmp = s.spawn();
-				enemies.add(tmp);
-				damagableObjects.add(tmp);
+				damagableObjects.add(s.spawn());
 			}
 		}
 
@@ -72,81 +57,84 @@ public class Game implements IGame, IGameStateObserver {
 
 	@Override
 	public void draw(Graphics g) {
-		if (gsm.getState() == GameStates.MainGame) {
+		if (GameStateManager.getState() == GameStates.MainGame) {
 			map.draw(g);
 			tank.draw(g);
 			bird.draw(g);
 
-			synchronized (enemies) {
-				for (Enemy e : enemies) {
-					if (!e.isDead()) {
-						e.draw(g);
-					}
-				}
-			}
+			EnemyManager.draw(g);
 		}
 	}
 
 	@Override
 	public void update() {
-		if (gsm.getState() == GameStates.MainGame) {
-			int emptySpawnerCounter = 0;
+		if (GameStateManager.getState() == GameStates.MainGame) {
+			List<Spawner> spawners = map.getSpawnerList();
 
-			for (Spawner s : map.getSpawnerList()) {
-				if (s.canSpawn()) {
-					Enemy tmp = s.spawn();
-					enemies.add(tmp);
-					damagableObjects.add(tmp);
-				}
-				if (s.isEmpty()) {
-					emptySpawnerCounter++;
-				}
-			}
+			spawners.stream()
+						.filter(s -> s.canSpawn())
+						.forEach(s -> damagableObjects.add(s.spawn()));
 
-			if (emptySpawnerCounter == map.getSpawnerList().size()) {
-				gsm.setState(GameStates.LevelFinished);
+			int emptySpawnerCounter = (int) spawners.stream()
+						.filter(s -> s.isEmpty())
+						.count();
+
+			if (emptySpawnerCounter == spawners.size()) {
+				GameStateManager.setState(GameStates.LevelFinished);
 			} else if (tank.isDead() | bird.isDead()) {
-				gsm.setState(GameStates.EndScreen);
+				GameStateManager.setState(GameStates.EndScreen);
 			} else {
 				tank.control();
 				tank.collisionCheck();
 
-				if (!enemies.isEmpty()) {
-					for (Enemy e : enemies) {
-						// e.pathing();
-						// e.control();
-						e.collisionCheck();
+				//				if (!EnemyManager.enemies.isEmpty()) {
+				//					for (Enemy e : EnemyManager.enemies) {
+				//						e.pathing();
+				//						e.control();
+				//						e.collisionCheck();
+				//
+				//						if (e.isDead()) {
+				//							tank.setScore(tank.getScore() + 20);
+				//							e.die();
+				//						}
+				//					}
+				//				}
 
-						if (e.isDead()) {
-							tank.setScore(tank.getScore() + 20);
-							e.die();
-						}
-					}
-				}
+				EnemyManager.update()
+							.forEach(enemy -> {
+								enemy.control();
+								enemy.collisionCheck();
+								//enemy.pathing();
+							});
 
-				for (IDamagable b : damagableObjects) {
-					if (b.isDead()) {
-						deadObjects.add(b);
-					}
-				}
+				//for (IDamagable b : damagableObjects) {
+				//	if (b.isDead()) {
+				//		deadObjects.add(b);
+				//	}
+				//}
+
+				damagableObjects.stream()
+							.filter(obj -> obj.isDead())
+							.collect(Collectors.toCollection(() -> deadObjects));
 
 				if (!deadObjects.isEmpty()) {
 					for (IDamagable o : deadObjects) {
 						damagableObjects.remove(o);
 						if (o instanceof Block) {
-							map.getBlockList().remove(o);
+							map.getBlockList()
+										.remove(o);
 						}
 						if (o instanceof Enemy) {
-							enemies.remove(o);
+							EnemyManager.enemies.remove(o);
 						}
 					}
 
 					deadObjects.clear();
 				}
 
-				// healthLable1.setText("Tank HP: " + tank.getCurHp());
-				// healthLable2.setText("Bird HP: " + bird.getCurHP());
-				// scoreLable.setText("Score: " + String.format("%08d", tank.getScore()));
+				ui.updateTankHealth(tank.getCurHp());
+				ui.updateBirdHealth(bird.getCurHp());
+				ui.setScore(tank.getScore());
 			}
 		}
 	}
@@ -159,7 +147,7 @@ public class Game implements IGame, IGameStateObserver {
 		case MainGame:
 			break;
 		case LevelFinished:
-			enemies.clear();
+			EnemyManager.enemies.clear();
 			deadObjects.clear();
 			damagableObjects.clear();
 
@@ -179,7 +167,7 @@ public class Game implements IGame, IGameStateObserver {
 			tank.setScore(tank.getScore() * tank.getCurHp());
 			database.write(tank.getName(), tank.getScore());
 
-			enemies.clear();
+			EnemyManager.enemies.clear();
 			deadObjects.clear();
 			damagableObjects.clear();
 

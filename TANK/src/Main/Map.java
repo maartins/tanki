@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import Blocks.Block;
 import Blocks.Floor;
@@ -27,7 +28,7 @@ public class Map extends GameObject {
 	private ArrayList<Spawner> spawnerList = new ArrayList<Spawner>();
 	private ArrayList<Block> blockList = new ArrayList<Block>();
 	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
-	private ArrayList<IDamagable> damagableObjects = new ArrayList<IDamagable>();
+	private CopyOnWriteArrayList<IDamagable> damagableObjects = new CopyOnWriteArrayList<IDamagable>();
 
 	private NavTile[][] navMap = new NavTile[15][15];
 	private Block tankSpawnPoint;
@@ -126,7 +127,7 @@ public class Map extends GameObject {
 		blockList = new ArrayList<Block>();
 		navMap = new NavTile[15][15];
 		navList = new ArrayList<NavTile>();
-		damagableObjects = new ArrayList<IDamagable>();
+		damagableObjects = new CopyOnWriteArrayList<IDamagable>();
 
 		if (currentMap < mapList.size()) {
 			mapPath = mapList.get(currentMap);
@@ -169,7 +170,7 @@ public class Map extends GameObject {
 		return blockList;
 	}
 
-	public ArrayList<IDamagable> getDamagableObjectList() {
+	public CopyOnWriteArrayList<IDamagable> getDamagableObjectList() {
 		return damagableObjects;
 	}
 
