@@ -7,15 +7,13 @@ public class Block extends GameObject {
 	private int tileX;
 	private int tileY;
 
-	private boolean isSolid;
-
 	public Block(int posX, int posY, boolean isSolid, String name) {
 		super(posX, posY, name);
 
 		tileX = posX / 32;
 		tileY = posY / 32;
 
-		this.isSolid = isSolid;
+		super.setIsSolid(isSolid);
 	}
 
 	/**
@@ -34,7 +32,7 @@ public class Block extends GameObject {
 		tileX = posX / 32;
 		tileY = posY / 32;
 
-		this.isSolid = isSolid;
+		super.setIsSolid(isSolid);
 	}
 
 	/**
@@ -52,15 +50,7 @@ public class Block extends GameObject {
 		tileX = posX / 32;
 		tileY = posY / 32;
 
-		isSolid = false;
-	}
-
-	public boolean isSolid() {
-		return isSolid;
-	}
-
-	public void setSolid(boolean isSolid) {
-		this.isSolid = isSolid;
+		super.setIsSolid(false);
 	}
 
 	public int getTileX() {

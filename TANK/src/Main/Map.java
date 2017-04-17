@@ -7,35 +7,32 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 import Blocks.Block;
 import Blocks.Floor;
-import Blocks.NavTile;
 import Blocks.PwrUpSuperBullet;
 import Blocks.SolidWall;
 import Blocks.Spawner;
 import Blocks.Wall;
 import Objects.GameObject;
-import Objects.IDamagable;
+import Pathfinding.AStarPathing;
+import Pathfinding.NavTile;
 
-public class Map extends GameObject {
+public class Map {
 
 	private int currentMap = 0;
 
-	private String mapPath;
+	private ArrayList<String> mapFiles = new ArrayList<String>();
 
-	private ArrayList<String> mapList = new ArrayList<String>();
-	private ArrayList<Spawner> spawnerList = new ArrayList<Spawner>();
-	private ArrayList<Block> blockList = new ArrayList<Block>();
-	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
-	private CopyOnWriteArrayList<IDamagable> damagableObjects = new CopyOnWriteArrayList<IDamagable>();
+	private CopyOnWriteArrayList<GameObject> worldObjects = new CopyOnWriteArrayList<GameObject>();
 
 	private NavTile[][] navMap = new NavTile[15][15];
+
 	private Block tankSpawnPoint;
 	private Block ironBirdSpawnPoint;
 
 	public Map() {
-		super(0, 0, "Map");
 	}
 
 	private void makeMap() {
@@ -43,7 +40,7 @@ public class Map extends GameObject {
 
 		try {
 			String curLine;
-			bufReader = new BufferedReader(new FileReader(mapPath));
+			bufReader = new BufferedReader(new FileReader(mapFiles.get(currentMap)));
 			int blockSize = 32;
 			int globalCounter = 0;
 
@@ -52,51 +49,43 @@ public class Map extends GameObject {
 				int j = 0;
 				for (char c : curLine.toCharArray()) {
 					if (c == '#') {
-						blockList.add(new Floor(j * blockSize, i * blockSize));
-						blockList.add(new Wall(j * blockSize, i * blockSize));
+						worldObjects.add(new Floor(j * blockSize, i * blockSize));
+						worldObjects.add(new Wall(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
 						navMap[i][j].setName(globalCounter + "  wall");
-						navList.add(navMap[i][j]);
 					} else if (c == '%') {
-						blockList.add(new SolidWall(j * blockSize, i * blockSize));
+						worldObjects.add(new SolidWall(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
 						navMap[i][j].setName(globalCounter + " swall");
-						navList.add(navMap[i][j]);
 					} else if (c == ' ') {
-						blockList.add(new Floor(j * blockSize, i * blockSize));
+						worldObjects.add(new Floor(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
 						navMap[i][j].setName(globalCounter + " floor");
-						navList.add(navMap[i][j]);
 					} else if (c == 's') {
-						spawnerList.add(new Spawner(j * blockSize, i * blockSize));
-						blockList.add(new Floor(j * blockSize, i * blockSize));
+						worldObjects.add(new Spawner(j * blockSize, i * blockSize));
+						worldObjects.add(new Floor(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
 						navMap[i][j].setName(globalCounter + " spawn");
-						navList.add(navMap[i][j]);
 					} else if (c == 't') {
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
-						blockList.add(tankSpawnPoint);
+						worldObjects.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
 						navMap[i][j].setName(globalCounter + "  tank");
-						navList.add(navMap[i][j]);
 					} else if (c == '1') {
-						blockList.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
+						worldObjects.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
 						navMap[i][j].setName(globalCounter + " pwrup");
-						navList.add(navMap[i][j]);
 					} else if (c == 'b') {
 						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
-						blockList.add(ironBirdSpawnPoint);
+						worldObjects.add(ironBirdSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
 						navMap[i][j].setName(globalCounter + "  bird");
-						navList.add(navMap[i][j]);
 					} else {
 						// never
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
-						blockList.add(tankSpawnPoint);
+						worldObjects.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
 						navMap[i][j].setName(globalCounter + "  none");
-						navList.add(navMap[i][j]);
 					}
 					j++;
 					globalCounter++;
@@ -106,72 +95,55 @@ public class Map extends GameObject {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		for (Block block : blockList) {
-			if (block instanceof IDamagable) {
-				damagableObjects.add((IDamagable) block);
-			}
-		}
-
-		// Print map
-		// for (int k = 0; k < 15; k++) {
-		// for (int l = 0; l < 15; l++) {
-		// System.out.print(navMap[k][l] + " <> ");
-		// }
-		// System.out.println("");
-		// }
 	}
 
 	public void changeMap() {
-		spawnerList = new ArrayList<Spawner>();
-		blockList = new ArrayList<Block>();
+		worldObjects = new CopyOnWriteArrayList<GameObject>();
 		navMap = new NavTile[15][15];
-		navList = new ArrayList<NavTile>();
-		damagableObjects = new CopyOnWriteArrayList<IDamagable>();
 
-		if (currentMap < mapList.size()) {
-			mapPath = mapList.get(currentMap);
-		} else {
-			mapPath = mapList.get(0);
+		if (currentMap > mapFiles.size() - 1) {
+			currentMap = 0;
 		}
 
-		currentMap++;
-
 		makeMap();
+
+		AStarPathing.setNavMap(navMap);
+
+		currentMap++;
 	}
 
 	public void getFiles(File folder) {
 		for (File f : folder.listFiles()) {
-			mapList.add(folder.getName() + "//" + f.getName());
-			// System.out.println(folder.getName() + "//" + f.getName());
+			mapFiles.add(folder.getName() + "//" + f.getName());
 		}
 	}
 
-	@Override
 	public void draw(Graphics g) {
-		for (Block b : blockList) {
-			b.draw(g);
-		}
+		worldObjects.stream()
+					.filter(obj -> obj instanceof Block)
+					.forEach(obj -> obj.draw(g));
 
-		for (NavTile n : navList) {
-			n.draw(g);
+		for (NavTile[] array : navMap) {
+			for (NavTile n : array) {
+				n.draw(g);
+			}
 		}
+	}
+
+	public void add(GameObject obj) {
+		worldObjects.add(obj);
+	}
+
+	public void remove(GameObject obj) {
+		worldObjects.remove(obj);
 	}
 
 	public ArrayList<String> getMapList() {
-		return mapList;
+		return mapFiles;
 	}
 
-	public ArrayList<Spawner> getSpawnerList() {
-		return spawnerList;
-	}
-
-	public ArrayList<Block> getBlockList() {
-		return blockList;
-	}
-
-	public CopyOnWriteArrayList<IDamagable> getDamagableObjectList() {
-		return damagableObjects;
+	public Stream<GameObject> getWorld() {
+		return worldObjects.stream();
 	}
 
 	public NavTile[][] navMap() {
@@ -182,15 +154,7 @@ public class Map extends GameObject {
 		return tankSpawnPoint;
 	}
 
-	public void setTankSpawnPoint(Block tankSpawnPoint) {
-		this.tankSpawnPoint = tankSpawnPoint;
-	}
-
 	public Block getIronBirdSpawnPoint() {
 		return ironBirdSpawnPoint;
-	}
-
-	public void setIronBirdSpawnPoint(Block ironBirdSpawnPoint) {
-		this.ironBirdSpawnPoint = ironBirdSpawnPoint;
 	}
 }

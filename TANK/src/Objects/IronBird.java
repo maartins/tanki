@@ -1,6 +1,8 @@
 package Objects;
 
 import Blocks.Block;
+import GameStates.GameStateManager;
+import GameStates.GameStates;
 
 public class IronBird extends GameObject implements IDamagable {
 
@@ -25,8 +27,13 @@ public class IronBird extends GameObject implements IDamagable {
 		return curHp;
 	}
 
-	public void recieveDamage2(int damage) {
+	@Override
+	public void recieveDamage(int damage, int dir) {
 		curHp -= damage;
+
+		if (isDead()) {
+			GameStateManager.setState(GameStates.EndScreen);
+		}
 	}
 
 	@Override
@@ -38,8 +45,4 @@ public class IronBird extends GameObject implements IDamagable {
 		}
 	}
 
-	@Override
-	public void recieveDamage(int damage, int dir) {
-		curHp -= damage;
-	}
 }

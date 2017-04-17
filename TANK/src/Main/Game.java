@@ -3,15 +3,13 @@ package Main;
 import java.awt.Graphics;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import Blocks.Block;
 import Blocks.Spawner;
 import GameStates.GameStateManager;
 import GameStates.GameStates;
 import Objects.Enemy;
+import Objects.GameObject;
 import Objects.IDamagable;
 import Objects.IronBird;
 import Objects.Tank;
@@ -20,8 +18,7 @@ public class Game extends GameCore {
 
 	public static IronBird bird;
 	public static Tank tank;
-	public static Map map;
-	public static CopyOnWriteArrayList<IDamagable> damagableObjects = new CopyOnWriteArrayList<IDamagable>();
+	public static Map map = new Map();
 
 	private ArrayList<IDamagable> deadObjects = new ArrayList<IDamagable>();
 
@@ -32,27 +29,21 @@ public class Game extends GameCore {
 		GameStateManager.addObserver(this);
 		GameStateManager.setState(GameStates.MainMenu); // default: MainMenu
 
-		Sound loadShoot = new Sound("Sounds\\tank_shoot01.wav");
-
-		File folder = new File("Maps//");
-		map = new Map();
-		map.getFiles(folder);
+		map.getFiles(new File("Maps//"));
 		map.changeMap();
 
 		bird = new IronBird(map.getIronBirdSpawnPoint());
 		tank = new Tank(map.getTankSpawnPoint());
 		window.addKeyListener(tank);
 
-		damagableObjects = map.getDamagableObjectList();
+		map.getWorld()
+					.filter(obj -> obj instanceof Spawner)
+					.map(obj -> (Spawner) obj)
+					.filter(obj -> obj.canSpawn())
+					.forEach(obj -> map.add(obj.spawn()));
 
-		for (Spawner s : map.getSpawnerList()) {
-			if (s.canSpawn()) {
-				damagableObjects.add(s.spawn());
-			}
-		}
-
-		damagableObjects.add(bird);
-		damagableObjects.add(tank);
+		map.add(bird);
+		map.add(tank);
 	}
 
 	@Override
@@ -69,61 +60,45 @@ public class Game extends GameCore {
 	@Override
 	public void update() {
 		if (GameStateManager.getState() == GameStates.MainGame) {
-			List<Spawner> spawners = map.getSpawnerList();
+			map.getWorld()
+						.filter(obj -> obj instanceof Spawner)
+						.map(obj -> (Spawner) obj)
+						.filter(obj -> obj.canSpawn())
+						.forEach(obj -> map.add(obj.spawn()));
 
-			spawners.stream()
-						.filter(s -> s.canSpawn())
-						.forEach(s -> damagableObjects.add(s.spawn()));
-
-			int emptySpawnerCounter = (int) spawners.stream()
+			int emptySpawnerCounter = (int) map.getWorld()
+						.filter(obj -> obj instanceof Spawner)
+						.map(obj -> (Spawner) obj)
 						.filter(s -> s.isEmpty())
 						.count();
 
-			if (emptySpawnerCounter == spawners.size()) {
+			int spawnerSize = (int) map.getWorld()
+						.filter(obj -> obj instanceof Spawner)
+						.map(obj -> (Spawner) obj)
+						.count();
+
+			if (emptySpawnerCounter == spawnerSize) {
 				GameStateManager.setState(GameStates.LevelFinished);
-			} else if (tank.isDead() | bird.isDead()) {
-				GameStateManager.setState(GameStates.EndScreen);
 			} else {
 				tank.control();
 				tank.collisionCheck();
-
-				//				if (!EnemyManager.enemies.isEmpty()) {
-				//					for (Enemy e : EnemyManager.enemies) {
-				//						e.pathing();
-				//						e.control();
-				//						e.collisionCheck();
-				//
-				//						if (e.isDead()) {
-				//							tank.setScore(tank.getScore() + 20);
-				//							e.die();
-				//						}
-				//					}
-				//				}
 
 				EnemyManager.update()
 							.forEach(enemy -> {
 								enemy.control();
 								enemy.collisionCheck();
-								//enemy.pathing();
+								enemy.pathing();
 							});
 
-				//for (IDamagable b : damagableObjects) {
-				//	if (b.isDead()) {
-				//		deadObjects.add(b);
-				//	}
-				//}
-
-				damagableObjects.stream()
+				map.getWorld()
+							.filter(obj -> obj instanceof IDamagable)
+							.map(obj -> (IDamagable) obj)
 							.filter(obj -> obj.isDead())
 							.collect(Collectors.toCollection(() -> deadObjects));
 
 				if (!deadObjects.isEmpty()) {
 					for (IDamagable o : deadObjects) {
-						damagableObjects.remove(o);
-						if (o instanceof Block) {
-							map.getBlockList()
-										.remove(o);
-						}
+						map.remove((GameObject) o);
 						if (o instanceof Enemy) {
 							EnemyManager.enemies.remove(o);
 						}
@@ -149,19 +124,21 @@ public class Game extends GameCore {
 		case LevelFinished:
 			EnemyManager.enemies.clear();
 			deadObjects.clear();
-			damagableObjects.clear();
 
 			map.changeMap();
 
-			damagableObjects = map.getDamagableObjectList();
-
 			bird = new IronBird(map.getIronBirdSpawnPoint());
-			damagableObjects.add(bird);
-
 			tank.setScore(tank.getScore() * tank.getCurHp());
 			tank.setLocation(map.getTankSpawnPoint());
-			damagableObjects.add(tank);
 
+			map.getWorld()
+						.filter(obj -> obj instanceof Spawner)
+						.map(obj -> (Spawner) obj)
+						.filter(obj -> obj.canSpawn())
+						.forEach(obj -> map.add(obj.spawn()));
+
+			map.add(bird);
+			map.add(tank);
 			break;
 		case EndScreen:
 			tank.setScore(tank.getScore() * tank.getCurHp());
@@ -169,19 +146,21 @@ public class Game extends GameCore {
 
 			EnemyManager.enemies.clear();
 			deadObjects.clear();
-			damagableObjects.clear();
 
 			map.changeMap();
 
-			damagableObjects = map.getDamagableObjectList();
-
 			bird = new IronBird(map.getIronBirdSpawnPoint());
-			damagableObjects.add(bird);
-
-			tank.die();
 			tank = new Tank(map.getTankSpawnPoint());
 			window.addKeyListener(tank);
-			damagableObjects.add(tank);
+
+			map.getWorld()
+						.filter(obj -> obj instanceof Spawner)
+						.map(obj -> (Spawner) obj)
+						.filter(obj -> obj.canSpawn())
+						.forEach(obj -> map.add(obj.spawn()));
+
+			map.add(bird);
+			map.add(tank);
 			break;
 		default:
 			break;

@@ -13,7 +13,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Blocks.NavTile;
+import Main.Game;
+import Pathfinding.NavTile;
 
 public class GameObject {
 
@@ -23,6 +24,7 @@ public class GameObject {
 	private String name;
 
 	private boolean isHidden = true;
+	private boolean isSolid = true;
 
 	private BufferedImage image;
 
@@ -112,7 +114,9 @@ public class GameObject {
 			y = (int) Math.floor(this.y / 32);
 		}
 
-		return new NavTile(x, y, false);
+		//System.out.println(name + " " + y + " " + x);
+
+		return Game.map.navMap()[y][x];
 	}
 
 	public int getX() {
@@ -169,6 +173,14 @@ public class GameObject {
 
 	public void setIsHidden(boolean value) {
 		isHidden = value;
+	}
+
+	public boolean isSolid() {
+		return isSolid;
+	}
+
+	public void setIsSolid(boolean value) {
+		isSolid = value;
 	}
 
 	public String getName() {

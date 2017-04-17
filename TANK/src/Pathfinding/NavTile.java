@@ -1,4 +1,7 @@
-package Blocks;
+package Pathfinding;
+
+import Blocks.Block;
+
 public class NavTile extends Block {
 
 	private float value;

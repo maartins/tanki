@@ -8,11 +8,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import Blocks.Block;
-import Blocks.Floor;
-import Blocks.PowerUp;
-import Blocks.PwrUpSuperBullet;
+import GameStates.GameStateManager;
+import GameStates.GameStates;
 import Main.BulletManager;
-import Main.EnemyManager;
 import Main.Game;
 import Main.Sound;
 import Main.TransformUtils;
@@ -141,155 +139,54 @@ public class Tank extends GameObject implements KeyListener, IDamagable {
 	}
 
 	public void collisionCheck() {
-		for (Block b : Game.map.getBlockList()) {
-			if (getBounds().intersects(b.getBounds()) && b.isSolid()) {
-				Rectangle insect = getBounds().intersection(b.getBounds());
+		Game.map.getWorld()
+					.filter(obj -> !obj.equals(this))
+					.filter(GameObject::isSolid)
+					.filter(obj -> getBounds().intersects(obj.getBounds()))
+					.forEach(obj -> {
+						Rectangle insect = getBounds().intersection(obj.getBounds());
 
-				boolean vertical = false;
-				boolean horizontal = false;
-				boolean isLeft = false;
-				boolean isTop = false;
+						boolean vertical = false;
+						boolean horizontal = false;
+						boolean isLeft = false;
+						boolean isTop = false;
 
-				if (insect.getX() == this.getX()) {
-					horizontal = true;
-					isLeft = true;
-				} else if (insect.getX() + insect.getWidth() == this.getX() + this.getWidth()) {
-					horizontal = true;
-				}
+						if (insect.getX() == getX()) {
+							horizontal = true;
+							isLeft = true;
+						} else if (insect.getX() + insect.getWidth() == getX() + getWidth()) {
+							horizontal = true;
+						}
+						if (insect.getY() == getY()) {
+							vertical = true;
+							isTop = true;
+						} else if (insect.getY() + insect.getHeight() == getY() + getHeight()) {
+							vertical = true;
+						}
 
-				if (insect.getY() == this.getY()) {
-					vertical = true;
-					isTop = true;
-				} else if (insect.getY() + insect.getHeight() == this.getY() + this.getHeight()) {
-					vertical = true;
-				}
+						if (horizontal && vertical) {
+							if (insect.getWidth() > insect.getHeight()) {
+								horizontal = false;
+							} else {
+								vertical = false;
+							}
+						}
 
-				if (horizontal && vertical) {
-					if (insect.getWidth() > insect.getHeight()) {
-						horizontal = false;
-					} else {
-						vertical = false;
-					}
-				}
+						if (horizontal) {
+							if (isLeft) {
+								setX(obj.getX() + obj.getWidth());
+							} else {
+								setX(obj.getX() - getWidth());
+							}
+						} else if (vertical) {
+							if (isTop) {
+								setY(obj.getY() + obj.getHeight());
+							} else {
+								setY(obj.getY() - getHeight());
+							}
+						}
+					});
 
-				if (horizontal) {
-					if (isLeft) {
-						this.setX(b.getX() + b.getWidth());
-					} else {
-						this.setX(b.getX() - this.getWidth());
-					}
-				} else if (vertical) {
-					if (isTop) {
-						this.setY(b.getY() + b.getHeight());
-					} else {
-						this.setY(b.getY() - this.getHeight());
-					}
-				}
-			} else if (this.getBounds()
-						.intersects(b.getBounds()) && b instanceof PowerUp) {
-				// System.out.println("Power up");
-				Game.map.getBlockList()
-							.set(Game.map.getBlockList()
-										.indexOf(b), new Floor(b.getX(), b.getY()));
-
-				if (b instanceof PwrUpSuperBullet) {
-					// System.out.println("Super Bullet");
-					//superBulletCount = ((PwrUpSuperBullet) b).getBulletCount();
-				}
-			}
-		}
-
-		for (Enemy e : EnemyManager.enemies) {
-			if (getBounds().intersects(e.getBounds())) {
-				Rectangle insect = getBounds().intersection(e.getBounds());
-
-				boolean vertical = false;
-				boolean horizontal = false;
-				boolean isLeft = false;
-				boolean isTop = false;
-
-				if (insect.getX() == this.getX()) {
-					horizontal = true;
-					isLeft = true;
-				} else if (insect.getX() + insect.getWidth() == this.getX() + this.getWidth()) {
-					horizontal = true;
-				}
-				if (insect.getY() == this.getY()) {
-					vertical = true;
-					isTop = true;
-				} else if (insect.getY() + insect.getHeight() == this.getY() + this.getHeight()) {
-					vertical = true;
-				}
-
-				if (horizontal && vertical) {
-					if (insect.getWidth() > insect.getHeight()) {
-						horizontal = false;
-					} else {
-						vertical = false;
-					}
-				}
-
-				if (horizontal) {
-					if (isLeft) {
-						this.setX(e.getX() + e.getWidth());
-					} else {
-						this.setX(e.getX() - this.getWidth());
-					}
-				} else if (vertical) {
-					if (isTop) {
-						this.setY(e.getY() + e.getHeight());
-					} else {
-						this.setY(e.getY() - this.getHeight());
-					}
-				}
-			}
-		}
-
-		if (this.getBounds()
-					.intersects(Game.bird.getBounds())) {
-			Rectangle insect = this.getBounds()
-						.intersection(Game.bird.getBounds());
-
-			boolean vertical = false;
-			boolean horizontal = false;
-			boolean isLeft = false;
-			boolean isTop = false;
-
-			if (insect.getX() == this.getX()) {
-				horizontal = true;
-				isLeft = true;
-			} else if (insect.getX() + insect.getWidth() == this.getX() + this.getWidth()) {
-				horizontal = true;
-			}
-			if (insect.getY() == this.getY()) {
-				vertical = true;
-				isTop = true;
-			} else if (insect.getY() + insect.getHeight() == this.getY() + this.getHeight()) {
-				vertical = true;
-			}
-
-			if (horizontal && vertical) {
-				if (insect.getWidth() > insect.getHeight()) {
-					horizontal = false;
-				} else {
-					vertical = false;
-				}
-			}
-
-			if (horizontal) {
-				if (isLeft) {
-					this.setX(Game.bird.getX() + Game.bird.getWidth());
-				} else {
-					this.setX(Game.bird.getX() - this.getWidth());
-				}
-			} else if (vertical) {
-				if (isTop) {
-					this.setY(Game.bird.getY() + Game.bird.getHeight());
-				} else {
-					this.setY(Game.bird.getY() - this.getHeight());
-				}
-			}
-		}
 	}
 
 	private void shoot() {
@@ -385,14 +282,13 @@ public class Tank extends GameObject implements KeyListener, IDamagable {
 	public void keyTyped(KeyEvent e) {
 	}
 
-	public void recieveDamage2(int damage) {
-		curHp -= damage;
-	}
-
 	@Override
 	public void recieveDamage(int damage, int dir) {
 		curHp -= damage;
-		// updateUI(curHP);
+
+		if (isDead()) {
+			GameStateManager.setState(GameStates.EndScreen);
+		}
 	}
 
 	@Override
@@ -402,11 +298,6 @@ public class Tank extends GameObject implements KeyListener, IDamagable {
 		} else {
 			return false;
 		}
-	}
-
-	public void die() {
-		curHp = maxHp;
-		score = 0;
 	}
 
 	@Override
