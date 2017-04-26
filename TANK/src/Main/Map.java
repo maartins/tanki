@@ -21,7 +21,7 @@ import Pathfinding.NavTile;
 
 public class Map {
 
-	private int currentMap = 0;
+	private int currentMap = 1;
 
 	private ArrayList<String> mapFiles = new ArrayList<String>();
 
@@ -33,6 +33,21 @@ public class Map {
 	private Block ironBirdSpawnPoint;
 
 	public Map() {
+	}
+
+	public void changeMap() {
+		worldObjects = new CopyOnWriteArrayList<GameObject>();
+		navMap = new NavTile[15][15];
+
+		if (currentMap > mapFiles.size() - 1) {
+			currentMap = 0;
+		}
+
+		makeMap();
+
+		AStarPathing.setNavMap(navMap);
+
+		currentMap++;
 	}
 
 	private void makeMap() {
@@ -52,7 +67,7 @@ public class Map {
 						worldObjects.add(new Floor(j * blockSize, i * blockSize));
 						worldObjects.add(new Wall(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
-						navMap[i][j].setName(globalCounter + "  wall");
+						navMap[i][j].setName(globalCounter + " wall");
 					} else if (c == '%') {
 						worldObjects.add(new SolidWall(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
@@ -70,7 +85,7 @@ public class Map {
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						worldObjects.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
-						navMap[i][j].setName(globalCounter + "  tank");
+						navMap[i][j].setName(globalCounter + " tank");
 					} else if (c == '1') {
 						worldObjects.add(new PwrUpSuperBullet(j * blockSize, i * blockSize));
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
@@ -79,37 +94,46 @@ public class Map {
 						ironBirdSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						worldObjects.add(ironBirdSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, true);
-						navMap[i][j].setName(globalCounter + "  bird");
+						navMap[i][j].setName(globalCounter + " bird");
 					} else {
 						// never
 						tankSpawnPoint = new Floor(j * blockSize, i * blockSize);
 						worldObjects.add(tankSpawnPoint);
 						navMap[i][j] = new NavTile(j * blockSize, i * blockSize, false);
-						navMap[i][j].setName(globalCounter + "  none");
+						navMap[i][j].setName(globalCounter + " none");
 					}
 					j++;
 					globalCounter++;
 				}
 				i++;
 			}
+
+			setupAccessToBird();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void changeMap() {
-		worldObjects = new CopyOnWriteArrayList<GameObject>();
-		navMap = new NavTile[15][15];
+	private void setupAccessToBird() {
+		ArrayList<NavTile> ironbirdNeighbors = new ArrayList<NavTile>();
 
-		if (currentMap > mapFiles.size() - 1) {
-			currentMap = 0;
+		// top
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() - 1][ironBirdSpawnPoint.getTileX() - 1]);
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY()][ironBirdSpawnPoint.getTileX() - 1]);
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() + 1][ironBirdSpawnPoint.getTileX() - 1]);
+		// mid
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() - 1][ironBirdSpawnPoint.getTileX()]);
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() + 1][ironBirdSpawnPoint.getTileX()]);
+		// bot
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() - 1][ironBirdSpawnPoint.getTileX() + 1]);
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY()][ironBirdSpawnPoint.getTileX() + 1]);
+		ironbirdNeighbors.add(navMap[ironBirdSpawnPoint.getTileY() + 1][ironBirdSpawnPoint.getTileX() + 1]);
+
+		for (NavTile navTile : ironbirdNeighbors) {
+			if (navTile.isSolid()) {
+				navTile.setIsSolid(false);
+			}
 		}
-
-		makeMap();
-
-		AStarPathing.setNavMap(navMap);
-
-		currentMap++;
 	}
 
 	public void getFiles(File folder) {
@@ -136,10 +160,6 @@ public class Map {
 
 	public void remove(GameObject obj) {
 		worldObjects.remove(obj);
-	}
-
-	public ArrayList<String> getMapList() {
-		return mapFiles;
 	}
 
 	public Stream<GameObject> getWorld() {

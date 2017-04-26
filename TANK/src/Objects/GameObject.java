@@ -23,7 +23,7 @@ public class GameObject {
 
 	private String name;
 
-	private boolean isHidden = true;
+	private boolean isHidden = false;
 	private boolean isSolid = true;
 
 	private BufferedImage image;
@@ -79,7 +79,7 @@ public class GameObject {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		if (image != null) {
+		if (image != null || isHidden) {
 			g2d.drawImage(image, x, y, null);
 		}
 	}

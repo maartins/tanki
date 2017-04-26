@@ -151,11 +151,16 @@ public class Tank extends GameObject implements KeyListener, IDamagable {
 						boolean isLeft = false;
 						boolean isTop = false;
 
-						if (insect.getX() == getX()) {
-							horizontal = true;
-							isLeft = true;
-						} else if (insect.getX() + insect.getWidth() == getX() + getWidth()) {
-							horizontal = true;
+						System.out.println(insect.toString());
+						System.out.println(this.toString());
+
+						if (insect.getHeight() > 10) {
+							if (insect.getX() - 1 == getX()) {
+								horizontal = true;
+								isLeft = true;
+							} else if (insect.getX() + insect.getWidth() == getX() + getWidth()) {
+								horizontal = true;
+							}
 						}
 						if (insect.getY() == getY()) {
 							vertical = true;

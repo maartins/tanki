@@ -85,9 +85,9 @@ public class Game extends GameCore {
 
 				EnemyManager.update()
 							.forEach(enemy -> {
-								enemy.control();
-								enemy.collisionCheck();
-								enemy.pathing();
+								//enemy.control();
+								//enemy.collisionCheck();
+								//enemy.pathing();
 							});
 
 				map.getWorld()

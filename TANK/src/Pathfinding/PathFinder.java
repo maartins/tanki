@@ -15,8 +15,6 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 	private ArrayList<NavTile> openList = new ArrayList<NavTile>();
 	private ArrayList<NavTile> navList = new ArrayList<NavTile>();
 
-	private boolean isPathDone = false;
-
 	public PathFinder(NavTile enemyPos, NavTile tankPos, NavTile birdPos, NavTile[][] navMap) {
 		this.enemyPos = enemyPos;
 		this.tankPos = tankPos;
@@ -25,7 +23,9 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 	}
 
 	@Override
-	public ArrayList<NavTile> call() throws Exception {
+	public ArrayList<NavTile> call() {
+		boolean isPathDone = false;
+
 		NavTile targetPos;
 
 		float tankValue = ((Math.abs((enemyPos.getTileX()) - tankPos.getTileX()))
@@ -41,18 +41,13 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 		if (tankValue > birdValue) {
 			targetPos = birdPos;
 			enemyPos.setValue(birdValue);
-		} else if (birdValue > tankValue) {
+		} else {
 			targetPos = tankPos;
 			enemyPos.setValue(tankValue);
-		} else {
-			targetPos = birdPos;
-			enemyPos.setValue(birdValue);
 		}
 
 		closedList.add(targetPos); // important: set iterators to 1 in closed list loops
 		closedList.add(enemyPos);
-
-		isPathDone = false;
 
 		while (!isPathDone) {
 			NavTile tempb = null;
@@ -146,8 +141,6 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 			}
 
 			if (isPathDone) {
-				System.out.println("asfasg");
-
 				navList.add(closedList.get(closedList.size() - 1));
 
 				NavTile tester = closedList.get(closedList.size() - 1);
@@ -159,43 +152,12 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 					}
 				}
 
-				isPathDone = true;
-
-				// System.out.println("NAV LIST DONE");
+				//System.out.println("NAV LIST DONE");
 				for (NavTile n : navList) {
 					n.setImage("Images//Nav03.png");
 					// System.out.println(n);
 				}
 			}
-
-			//		boolean reset = false;
-			//		if (targetPos.getTileX() != closedList.get(0)
-			//					.getTileX()
-			//					|| targetPos.getTileY() != closedList.get(0)
-			//								.getTileY()) {
-			//			reset = true;
-			//		}
-
-			//			if (reset) {
-			//				System.out.println("Reset");
-			//				for (NavTile b : closedList) {
-			//					b.reset();
-			//				}
-			//				for (NavTile b : openList) {
-			//					b.reset();
-			//				}
-			//				for (NavTile b : navList) {
-			//					b.reset();
-			//				}
-			//
-			//				closedList.clear();
-			//				openList.clear();
-			//				navList.clear();
-			//
-			//				isPathingStart = true;
-			//				isPathing = false;
-			//				isPathDone = true;
-			//			}
 		}
 
 		return navList;
@@ -234,7 +196,7 @@ public class PathFinder implements Callable<ArrayList<NavTile>> {
 
 	private static synchronized boolean isValidForValue(NavTile testable, ArrayList<NavTile> closedList) {
 		if (!closedList.contains(testable)) {
-			if (!testable.isBlocking()) {
+			if (!testable.isSolid()) {
 				return true;
 			}
 		}

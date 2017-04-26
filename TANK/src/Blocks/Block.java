@@ -13,7 +13,7 @@ public class Block extends GameObject {
 		tileX = posX / 32;
 		tileY = posY / 32;
 
-		super.setIsSolid(isSolid);
+		setIsSolid(isSolid);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Block extends GameObject {
 		tileX = posX / 32;
 		tileY = posY / 32;
 
-		super.setIsSolid(isSolid);
+		setIsSolid(isSolid);
 	}
 
 	/**

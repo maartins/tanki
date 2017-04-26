@@ -18,5 +18,4 @@ public class AStarPathing {
 		Callable<ArrayList<NavTile>> task = new PathFinder(enemyPos, tankPos, birdPos, navMap);
 		return pool.submit(task);
 	}
-
 }

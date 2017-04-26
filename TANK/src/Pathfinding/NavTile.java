@@ -6,16 +6,12 @@ public class NavTile extends Block {
 
 	private float value;
 
-	private boolean isBlocking;
-
 	private NavTile parent;
 
-	public NavTile(int x, int y, boolean isBlocking) {
-		super(x, y, isBlocking, "navtile");
+	public NavTile(int x, int y, boolean isSolid) {
+		super(x, y, isSolid, "navtile");
 
 		value = 0;
-
-		this.isBlocking = isBlocking;
 
 		parent = null;
 	}
@@ -26,14 +22,6 @@ public class NavTile extends Block {
 
 	public void setValue(float value) {
 		this.value = value;
-	}
-
-	public boolean isBlocking() {
-		return isBlocking;
-	}
-
-	public void setBlocking(boolean isBlocking) {
-		this.isBlocking = isBlocking;
 	}
 
 	public NavTile getParent() {
@@ -50,7 +38,7 @@ public class NavTile extends Block {
 
 	@Override
 	public String toString() {
-		return "isBlocking:" + isBlocking + " navtile:" + getName() + "\t x:" + getTileX() + "\t y:" + getTileY()
-				+ "\t value:" + value + " parent:" + parent;
+		return "isBlocking:" + isSolid() + " navtile:" + getName() + "\t x:" + getTileX() + "\t y:" + getTileY()
+					+ "\t value:" + value + " parent:" + parent;
 	}
 }

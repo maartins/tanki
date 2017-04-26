@@ -6,8 +6,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import Blocks.Spawner;
 import Main.BulletManager;
@@ -173,8 +171,8 @@ public class Enemy extends GameObject implements IDamagable {
 
 			try {
 				path = AStarPathing.findPath(enemyPos, tankPos, birdPos)
-							.get(3, TimeUnit.SECONDS);
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+							.get();
+			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			} finally {
 				if (path != null) {
@@ -184,6 +182,7 @@ public class Enemy extends GameObject implements IDamagable {
 					navCounter = navList.size();
 
 					hasPath = true;
+
 				} else {
 					hasPath = false;
 				}
